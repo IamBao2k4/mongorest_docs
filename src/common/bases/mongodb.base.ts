@@ -1,5 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { appSettings } from '../../configs/app-settings';
+import Ajv from 'ajv';
 
 class MongoDBService {
 
