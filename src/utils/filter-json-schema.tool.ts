@@ -1,551 +1,582 @@
+import Ajv from "ajv";
+import addFormats from "ajv-formats";
 import { isMongoId } from "class-validator";
 import { HttpError } from "./http-error";
 import { appSettings } from "../configs/app-settings";
 
-export function filterData(jsonSchema: any, body: any, is_update: boolean = false): any {
-    const filteredData: any = {};
-    // Hàm để duyệt qua các thuộc tính trong json schema và xử lý từng thuộc tính
-    const processSchema = (schema: any, data: any, output: any) => {
-        const requiredFields = schema.required || []; // Lấy danh sách các field required từ schema
-        // Kiểm tra tất cả các field bắt buộc and have no default value
-        if (!is_update) {
-            requiredFields.forEach((requiredField: string) => {
-                if (!schema.properties[requiredField].default && !(schema.properties[requiredField].widget === 'boolean')) {
-                    if (data[requiredField] === undefined || data[requiredField] === null) {
-                        throw new HttpError(`Field "${requiredField}" is required but missing.`, 400);
-                    }
-                    if (typeof data[requiredField] === 'string' && data[requiredField].trim() === '') {
-                        throw new HttpError(`Field "${requiredField}" is required but missing.`, 400);
-                    }
-                    if (Array.isArray(data[requiredField]) && data[requiredField].length === 0) {
-                        throw new HttpError(`Field "${requiredField}" is required but missing.`, 400);
-                    }
-                    if (typeof data[requiredField] === 'object' && !Array.isArray(data[requiredField]) && Object.keys(data[requiredField]).length === 0) {
-                        throw new HttpError(`Field "${requiredField}" is required but missing.`, 400);
-                    }
-                }
-            });
-        }
-
-        Object.keys(schema.properties).forEach((key) => {
-            const fieldSchema = schema.properties[key];
-            let value = data[key];
-            // Nếu giá trị tồn tại trong body
-            if (
-                (value !== undefined && value !== null)
-                || fieldSchema.type === 'object'
-                || fieldSchema.default
-                || fieldSchema.type === 'boolean' // tại default bọn này là 0 và false => :>>>
-                || fieldSchema.widget === 'numberInput'
-            ) {
-                // Nếu là object, xử lý đệ quy
-                if (fieldSchema.type === 'object' && fieldSchema.properties) {
-                    output[key] = {};
-                    if (!value) {
-                        value = {};
-                    }
-                    processSchema(fieldSchema, value, output[key]);
-                } else if (fieldSchema.widget === 'select') {
-                    // Nếu widget là select, kiểm tra xem giá trị có hợp lệ không
-                    const validChoices = fieldSchema.choices.map((choice: any) => choice.value);
-                    if (fieldSchema.default && !value && !is_update) {
-                        if (!validChoices.includes(fieldSchema.default)) {
-                            throw new Error(`Invalid default value for field "${key}". Expected one of: ${validChoices.join(', ')}`);
-                        }
-                        output[key] = [fieldSchema.default];
-                    } else {
-                        if (fieldSchema.isMultiple) {
-                            // Nếu là multiple, kiểm tra từng phần tử
-                            let value_term = value;
-                            if (!value_term && is_update) {
-                                // do nothing
-                            } else {
-                                if (!Array.isArray(value)) {
-                                    // convert to array
-                                    value_term = [value];
-                                }
-                                const invalidValues = value_term.filter((v: any) => !validChoices.includes(v));
-                                if (invalidValues.length > 0) {
-                                    throw new Error(`Invalid value for field "${key}". Expected one of: ${validChoices.join(', ')}`);
-                                }
-                                output[key] = value_term;
-                            }
-                        } else if (!fieldSchema.isMultiple) {
-                            if (Array.isArray(value)) {
-                                if (value.length > 1) throw new HttpError(`Invalid value for field "${key}". Expected a single value.`, 400);
-                                value = value[0];
-                            }
-                            if (!validChoices.includes(value) && !is_update) {
-                                throw new Error(`Invalid value for field "${key}". Expected one of: ${validChoices.join(', ')}`);
-                            } else if (!validChoices.includes(value) && is_update) {
-                                // do nothing
-                            } else {
-                                output[key] = [value];
-                            }
-                        }
-                    }
-                } else if (fieldSchema?.widget == 'file') {
-                    if (!value) {
-                        output[key] = [];
-                    } else if (!Array.isArray(value)) {
-                        output[key] = [value];
-                    } else {
-                        output[key] = value;
-                    }
-                    // check value is mongoDB id
-                    for (let i = 0; i < output[key].length; i++) {
-                        if (!isMongoId(output[key][i])) {
-                            throw new Error(`Invalid value for field "${key}". Expected a valid MongoDB ID.`);
-                        }
-                    }
-                } else if (fieldSchema?.widget?.includes('date')) {
-                    output[key] = new Date(appSettings.timeZoneMongoDB.getCustomTime(value));
-                } else if (fieldSchema.widget === 'boolean') {
-                    if (value == undefined && value == null && !is_update) {
-                        output[key] = fieldSchema.default;
-                    } else if (value !== undefined && value !== null) {
-                        if (typeof value == 'string' && value == 'false') {
-                            output[key] = false;
-                        } else {
-                            output[key] = value ? true : false;
-                        }
-                    }
-                } else if (fieldSchema.widget === 'numberInput') {
-                    if (isNaN(value) && isNaN(fieldSchema.default) && requiredFields.includes(key)) {
-                        throw new Error(`Invalid value for field "${key}". Expected a number.`);
-                    } else if (!is_update && !isNaN(fieldSchema.default) && isNaN(value)) {
-                        output[key] = Number(fieldSchema.default);
-                    } else if (!isNaN(value)) {
-                        output[key] = Number(value);
-                    }
-                } else if (
-                    fieldSchema.widget === 'shortAnswer' ||
-                    fieldSchema.widget === 'textarea' ||
-                    fieldSchema.widget === 'UriKeyGen' ||
-                    fieldSchema.widget === 'color'
-                ) {
-                    // Nếu là string, kiểm tra giá trị có phải là chuỗi không
-                    if (typeof value !== 'string' && value !== null) {
-                        throw new Error(`Invalid value for field "${key}". Expected a string. Actual: ${typeof value}`);
-                    }
-                    output[key] = value;
-                } else {
-                    // Chỉ thêm giá trị hợp lệ vào output mà không cần validate
-                    output[key] = value;
-                }
-            }
-        });
-
-        // Xử lý dependencies
-        if (schema.dependencies) {
-            Object.keys(schema.dependencies).forEach((dependentField) => {
-                // Lấy giá trị của trường phụ thuộc từ dữ liệu đầu vào
-                const dependentValue = data[dependentField];
-                // Nếu không có giá trị cho trường phụ thuộc, không cần xử lý dependencies
-                if (dependentValue === undefined || dependentValue === null) {
-                    return;
-                }
-                // Lấy thông tin dependencies
-                const dependency = schema.dependencies[dependentField];
-                // Xử lý dependencies có oneOf
-                if (dependency.oneOf) {
-                    let matchedSchema = null;
-                    let additionalRequiredFields: string[] = [];
-                    let allDependentFields: Set<string> = new Set();
-                    // Thu thập tất cả các trường phụ thuộc từ tất cả các variants
-                    dependency.oneOf.forEach((variant: any) => {
-                        Object.keys(variant.properties).forEach(propKey => {
-                            if (propKey !== dependentField) {
-                                allDependentFields.add(propKey);
-                            }
-                        });
-                    });
-                    // Tìm schema phù hợp với giá trị của trường phụ thuộc
-                    for (const variant of dependency.oneOf) {
-                        // Kiểm tra xem giá trị của trường phụ thuộc có nằm trong enum của variant không
-                        if (variant.properties[dependentField] &&
-                            variant.properties[dependentField].enum &&
-                            variant.properties[dependentField].enum.includes(dependentValue)) {
-                            matchedSchema = variant;
-                            // Lấy danh sách các trường bắt buộc bổ sung nếu có
-                            additionalRequiredFields = variant.required || [];
-                            // Đặt tất cả các trường phụ thuộc không liên quan thành null
-                            allDependentFields.forEach(fieldName => {
-                                if (!variant.properties[fieldName]) {
-                                    output[fieldName] = null;
-                                }
-                            });
-                            // Xử lý các thuộc tính bổ sung
-                            Object.keys(variant.properties).forEach((propKey) => {
-                                // Bỏ qua trường đã xử lý
-                                if (propKey === dependentField) {
-                                    return;
-                                }
-                                const propSchema = variant.properties[propKey];
-                                const propValue = data[propKey];
-                                // Kiểm tra trường có bắt buộc không và có giá trị không
-                                if (
-                                    additionalRequiredFields.includes(propKey) &&
-                                    (propValue === undefined || propValue === null) &&
-                                    !is_update
-                                ) {
-                                    throw new HttpError(
-                                        `Field "${propKey}" is required when "${dependentField}" is "${dependentValue}".`,
-                                        400
-                                    );
-                                }
-                                // Xử lý giá trị cho trường phụ thuộc
-                                if (propValue !== undefined && propValue !== null) {
-                                    // Xử lý các kiểu widget khác nhau
-
-                                    // Xử lý các widget relation
-                                    if (propSchema.widget === 'relation') {
-                                        // Xử lý relation với typeSelect multiple
-                                        if (propSchema.typeSelect === 'multiple') {
-                                            if (!Array.isArray(propValue)) {
-                                                output[propKey] = [propValue];
-                                            } else {
-                                                output[propKey] = propValue;
-                                            }
-
-                                            // Kiểm tra tính hợp lệ của từng giá trị trong mảng
-                                            output[propKey].forEach((val: any) => {
-                                                if (!isMongoId(val)) {
-                                                    throw new Error(`Invalid relation ID for field "${propKey}". Expected a valid MongoDB ID.`);
-                                                }
-                                            });
-                                        } else {
-                                            // Xử lý relation không multiple
-                                            if (Array.isArray(propValue)) {
-                                                if (propValue.length > 1) {
-                                                    throw new HttpError(
-                                                        `Invalid value for field "${propKey}". Expected a single value.`,
-                                                        400
-                                                    );
-                                                }
-                                                output[propKey] = propValue[0];
-                                            } else {
-                                                output[propKey] = propValue;
-                                            }
-
-                                            // Kiểm tra tính hợp lệ của ID
-                                            if (!isMongoId(output[propKey])) {
-                                                throw new Error(`Invalid relation ID for field "${propKey}". Expected a valid MongoDB ID.`);
-                                            }
-                                        }
-                                    } else if (propSchema.widget === 'shortAnswer' || propSchema.widget === 'textarea') {
-                                        // Kiểm tra giá trị là chuỗi
-                                        if (typeof propValue !== 'string') {
-                                            throw new Error(`Invalid value for field "${propKey}". Expected a string.`);
-                                        }
-                                        output[propKey] = propValue;
-                                    } else {
-                                        output[propKey] = propValue;
-                                    }
-                                } else {
-                                    // Nếu không có giá trị nhưng trường này thuộc về schema phù hợp, đặt giá trị là null
-                                    output[propKey] = null;
-                                }
-                            });
-
-                            break;
-                        }
-                    }
-                    // Nếu không có schema phù hợp
-                    // if (!matchedSchema) {
-                    //     throw new HttpException(
-                    //         `Invalid value "${dependentValue}" for field "${dependentField}".`,
-                    //         HttpStatus.BAD_REQUEST
-                    //     );
-                    // }
-                }
-            });
-        }
-
-        // Xử lý allOf - BỔ SUNG MỚI
-        if (schema.allOf) {
-            // Xử lý từng điều kiện trong allOf
-            schema.allOf.forEach((condition: any, index: number) => {
-                // Xử lý điều kiện if-then
-                if (condition.if && condition.then) {
-                    // Kiểm tra xem dữ liệu có thỏa mãn điều kiện "if" không
-                    let conditionMet = true;
-
-                    // Lấy điều kiện từ phần "if"
-                    const ifCondition = condition.if;
-
-                    // Kiểm tra điều kiện properties
-                    if (ifCondition.properties) {
-                        Object.keys(ifCondition.properties).forEach(propKey => {
-                            const propCondition = ifCondition.properties[propKey];
-                            const propValue = data[propKey];
-
-                            // Kiểm tra điều kiện contains (thường dùng cho mảng)
-                            if (propCondition.contains) {
-                                // Nếu là điều kiện "contains" trong mảng
-                                if (Array.isArray(propValue)) {
-                                    // Kiểm tra xem mảng có chứa giá trị cần thiết không
-                                    if (propCondition.contains.const) {
-                                        const constValue = propCondition.contains.const;
-                                        if (!propValue.includes(constValue)) {
-                                            conditionMet = false;
-                                        }
-                                    }
-                                } else {
-                                    // Nếu không phải mảng nhưng yêu cầu điều kiện contains
-                                    conditionMet = false;
-                                }
-                            }
-                            // Có thể thêm các kiểu điều kiện khác tùy theo schema
-                        });
-                    }
-
-                    // Nếu điều kiện được thỏa mãn, áp dụng phần "then"
-                    if (conditionMet) {
-                        const thenSchema = condition.then;
-                        // Áp dụng các thuộc tính và yêu cầu từ phần "then"
-                        if (thenSchema.properties) {
-                            Object.keys(thenSchema.properties).forEach(propKey => {
-                                // Thêm thuộc tính vào đầu ra nếu nó không tồn tại
-                                if (!output[propKey] && data[propKey] !== undefined) {
-                                    // Xử lý giá trị dựa trên loại widget
-                                    const propSchema = thenSchema.properties[propKey];
-                                    const propValue = data[propKey];
-
-                                    // Xử lý các loại widget khác nhau
-                                    if (propSchema.widget === 'select') {
-                                        // Xử lý tương tự như phần xử lý select ở trên
-                                        const validChoices = propSchema.choices?.map((choice: any) => choice.value) || [];
-
-                                        if (propSchema.isMultiple) {
-                                            let value_term = propValue;
-                                            if (!value_term && is_update) {
-                                                // do nothing
-                                            } else {
-                                                if (!Array.isArray(propValue)) {
-                                                    value_term = [propValue];
-                                                }
-                                                const invalidValues = value_term.filter((v: any) => !validChoices.includes(v));
-                                                if (invalidValues.length > 0) {
-                                                    throw new Error(`Invalid value for field "${propKey}". Expected one of: ${validChoices.join(', ')}`);
-                                                }
-                                                output[propKey] = value_term;
-                                            }
-                                        } else {
-                                            let singleValue = propValue;
-                                            if (Array.isArray(propValue)) {
-                                                if (propValue.length > 1) throw new HttpError(`Invalid value for field "${propKey}". Expected a single value.`, 400);
-                                                singleValue = propValue[0];
-                                            }
-                                            if (!validChoices.includes(singleValue) && !is_update) {
-                                                throw new Error(`Invalid value for field "${propKey}". Expected one of: ${validChoices.join(', ')}`);
-                                            } else if (!validChoices.includes(singleValue) && is_update) {
-                                                // do nothing
-                                            } else {
-                                                output[propKey] = [singleValue];
-                                            }
-                                        }
-                                    } else if (propSchema.widget === 'numberInput') {
-                                        // Xử lý tương tự như phần xử lý numberInput ở trên
-                                        if (isNaN(propValue) && thenSchema.required?.includes(propKey)) {
-                                            throw new Error(`Invalid value for field "${propKey}". Expected a number.`);
-                                        } else if (!is_update && !isNaN(propSchema.default) && isNaN(propValue)) {
-                                            output[propKey] = Number(propSchema.default);
-                                        } else if (!isNaN(propValue)) {
-                                            output[propKey] = Number(propValue);
-                                        }
-                                    } else if (propSchema.widget === 'boolean') {
-                                        // Xử lý tương tự như phần xử lý boolean ở trên
-                                        if (propValue === undefined && propValue === null && !is_update) {
-                                            output[propKey] = propSchema.default;
-                                        } else if (propValue !== undefined && propValue !== null) {
-                                            if (typeof propValue == 'string' && propValue == 'false') {
-                                                output[propKey] = false;
-                                            } else {
-                                                output[propKey] = propValue ? true : false;
-                                            }
-                                        }
-                                    } else {
-                                        // Xử lý các widget khác
-                                        output[propKey] = propValue;
-                                    }
-                                }
-                            });
-                        }
-
-                        // Kiểm tra các trường required từ phần "then"
-                        if (thenSchema.required && !is_update) {
-                            thenSchema.required.forEach((requiredField: string) => {
-                                if (data[requiredField] === undefined || data[requiredField] === null) {
-                                    throw new HttpError(
-                                        `Field "${requiredField}" is required based on condition ${index + 1}.`,
-                                        400
-                                    );
-                                }
-                            });
-                        }
-                    }
-                } else {
-                    // Xử lý trường hợp allOf schema là schema bình thường mà không phải if-then
-                    // Thực hiện xác thực dữ liệu theo schema này
-                    // Merge các thuộc tính và kiểm tra tính hợp lệ
-                    if (condition.properties) {
-                        Object.keys(condition.properties).forEach(propKey => {
-                            const propSchema = condition.properties[propKey];
-                            const propValue = data[propKey];
-
-                            // Kiểm tra tính hợp lệ của dữ liệu
-                            if (propValue !== undefined && propValue !== null) {
-                                // Xử lý giá trị trường này dựa trên loại widget
-                                // Logic tương tự như xử lý trường ở trên
-                                // Thêm giá trị vào output nếu chưa tồn tại
-                                if (output[propKey] === undefined) {
-                                    output[propKey] = processFieldValue(propKey, propSchema, propValue, is_update);
-                                }
-                            }
-                        });
-
-                        // Kiểm tra các trường required
-                        if (condition.required && !is_update) {
-                            condition.required.forEach((requiredField: string) => {
-                                if (data[requiredField] === undefined || data[requiredField] === null) {
-                                    throw new HttpError(
-                                        `Field "${requiredField}" is required based on schema condition.`,
-                                        400
-                                    );
-                                }
-                            });
-                        }
-                    }
-                }
-            });
-        }
-    };
-
-    // Hàm hỗ trợ xử lý giá trị trường
-    const processFieldValue = (fieldKey: string, fieldSchema: any, fieldValue: any, isUpdate: boolean): any => {
-        // Logic xử lý các loại widget khác nhau
-        // Trả về giá trị đã xử lý
-        if (fieldSchema.widget === 'select') {
-            const validChoices = fieldSchema.choices?.map((choice: any) => choice.value) || [];
-
-            if (fieldSchema.isMultiple) {
-                if (!Array.isArray(fieldValue)) {
-                    return [fieldValue];
-                } else {
-                    return fieldValue;
-                }
-            } else {
-                if (Array.isArray(fieldValue)) {
-                    if (fieldValue.length > 1) {
-                        throw new HttpError(
-                            `Invalid value for field "${fieldKey}". Expected a single value.`,
-                            400
-                        );
-                    }
-                    return [fieldValue[0]];
-                } else {
-                    return [fieldValue];
-                }
-            }
-        } else if (fieldSchema.widget === 'numberInput') {
-            return Number(fieldValue);
-        } else if (fieldSchema.widget === 'boolean') {
-            if (typeof fieldValue === 'string' && fieldValue === 'false') {
-                return false;
-            } else {
-                return fieldValue ? true : false;
-            }
-        } else {
-            return fieldValue;
-        }
-    };
-
-    // Bắt đầu xử lý schema với body request
-    processSchema(jsonSchema, body, filteredData);
-    return filteredData;
+// Create AJV instance with custom keywords
+function createAjvInstance(): Ajv {
+    const ajv = new Ajv({
+        allErrors: true,
+        useDefaults: true,
+        coerceTypes: false,
+        removeAdditional: true,
+        strict: false
+    });
+    
+    addFormats(ajv);
+    setupCustomKeywords(ajv);
+    return ajv;
 }
 
-// "json_schema": {
-//     "type": "object",
-//     "properties": {
-//       "newInput1": {
-//         "title": "New Input 1",
-//         "type": "string",
-//         "widget": "select",
-//         "choices": [
-//           {
-//             "key": "oke1",
-//             "value": "OKE1"
-//           },
-//           {
-//             "key": "oke2",
-//             "value": "OKE2"
-//           }
-//         ]
-//       }
-//     },
-//     "required": []
-//   },
+// Setup all custom keywords for AJV
+function setupCustomKeywords(ajv: Ajv): void {
+    // Widget validation keyword
+    ajv.addKeyword({
+        keyword: "widgetValidation",
+        type: ["string", "number", "boolean", "array", "object", "null"],
+        schemaType: "object",
+        modifying: true,
+        compile: (schema) => {
+            return function validate(data: any, dataCxt: any) {
+                const { widget, choices, isMultiple, typeSelect, typeRelation, default: defaultValue } = schema;
+                
+                switch (widget) {
+                    case 'select':
+                        return validateSelectWidget(data, choices, isMultiple, dataCxt.parentDataProperty, dataCxt.parentData);
+                        
+                    case 'file':
+                        return validateFileWidget(data, dataCxt.parentDataProperty, dataCxt.parentData);
+                        
+                    case 'relation':
+                        return validateRelationWidget(data, typeSelect, typeRelation, dataCxt.parentDataProperty, dataCxt.parentData);
+                        
+                    case 'boolean':
+                        return validateBooleanWidget(data, defaultValue, dataCxt.parentDataProperty, dataCxt.parentData);
+                        
+                    case 'numberInput':
+                        return validateNumberWidget(data, defaultValue, dataCxt.parentDataProperty, dataCxt.parentData);
+                        
+                    case 'shortAnswer':
+                    case 'textarea':
+                    case 'UriKeyGen':
+                    case 'color':
+                        return validateStringWidget(data, dataCxt.parentDataProperty);
+                        
+                    default:
+                        return true;
+                }
+            };
+        }
+    });
+    
+    // Required field validation
+    ajv.addKeyword({
+        keyword: "customRequired",
+        type: "object",
+        schemaType: "object",
+        compile: (schema) => {
+            return function validate(data: any, dataCxt: any) {
+                const { required = [], properties = {}, isUpdate = false } = schema;
+                
+                if (!isUpdate) {
+                    for (const field of required) {
+                        const fieldSchema = properties[field];
+                        const fieldValue = data[field];
+                        
+                        // Skip if has default or is boolean
+                        if (fieldSchema?.default !== undefined || fieldSchema?.widget === 'boolean') {
+                            continue;
+                        }
+                        
+                        if (isEmptyValue(fieldValue)) {
+                            throw new Error(`Field "${field}" is required but missing.`);
+                        }
+                    }
+                }
+                
+                return true;
+            };
+        }
+    });
+    
+    // Dependencies handling
+    ajv.addKeyword({
+        keyword: "customDependencies",
+        type: "object",
+        schemaType: "object",
+        modifying: true,
+        compile: (schema) => {
+            return function validate(data: any, dataCxt: any) {
+                const { dependencies = {}, isUpdate = false } = schema;
+                return processDependencies(data, dependencies, isUpdate);
+            };
+        }
+    });
+    
+    // AllOf processing
+    ajv.addKeyword({
+        keyword: "customAllOf",
+        type: "object",
+        schemaType: "array",
+        modifying: true,
+        compile: (schema) => {
+            return function validate(data: any, dataCxt: any) {
+                return processAllOf(data, schema, dataCxt.rootData.isUpdate || false);
+            };
+        }
+    });
+}
 
-// "json_schema": {
-//     "title": "post-type",
-//     "type": "object",
-//     "description": "post-type",
-//     "expanded": true,
-//     "properties": {
-//       "title": {
-//         "title": "title",
-//         "type": "string",
-//         "widget": "shortAnswer",
-//         "expanded": true,
-//         "require": false,
-//         "filter": true,
-//         "objectKey": "title"
-//       },
-//       "slug": {
-//         "widget": "UriKeyGen",
-//         "title": "slug",
-//         "type": "string",
-//         "filter": true,
-//         "depend_field": "root_title"
-//       },
-//       "locale": {
-//         "widget": "select",
-//         "returnValue": 2,
-//         "choices": [
-//           {
-//             "key": "vi",
-//             "value": "vi"
-//           },
-//           {
-//             "key": "en",
-//             "value": "en"
-//           }
-//         ],
-//         "default": "vi",
-//         "allowNull": false,
-//         "isMultiple": false,
-//         "title": "locale",
-//         "type": "string",
-//         "filter": true
-//       },
-//       "locale_id": {
-//         "title": "locale_id",
-//         "type": "string",
-//         "widget": "shortAnswer",
-//         "objectKey": "locale_id",
-//         "filter": true
-//       }
-//     },
-//     "form": {
-//       "json": "{\"title\":\"post-type\",\"type\":\"object\",\"description\":\"post-type\",\"expanded\":true,\"properties\":{\"newInput1\":{\"title\":\"title\",\"type\":\"string\",\"widget\":\"shortAnswer\",\"expanded\":true,\"require\":false},\"newInput2\":{\"title\":\"slug\",\"type\":\"object\",\"expanded\":true},\"newInput3\":{\"title\":\"locale\",\"type\":\"object\"},\"newInput4\":{\"title\":\"locale_id\",\"type\":\"object\"}}}",
-//       "ui": "{\"newInput1\":{\"ui:widget\":\"shortAnswer\"},\"ui:order\":[\"newInput1\",\"newInput2\",\"newInput3\",\"newInput4\"]}"
-//     },
-//     "required": [
-//       "title",
-//       "slug",
-//       "locale"
-//     ],
-//     "dependencies": {}
-//   }
+// Widget validation functions
+function validateSelectWidget(data: any, choices: any[], isMultiple: boolean, propertyName: string, parentData: any): boolean {
+    if (!choices || !Array.isArray(choices)) return true;
+    
+    const validChoices = choices.map(choice => choice.value);
+    
+    if (isMultiple) {
+        let valueArray = Array.isArray(data) ? data : [data];
+        const invalidValues = valueArray.filter(v => !validChoices.includes(v));
+        
+        if (invalidValues.length > 0) {
+            throw new Error(`Invalid value for field "${propertyName}". Expected one of: ${validChoices.join(', ')}`);
+        }
+        
+        parentData[propertyName] = valueArray;
+    } else {
+        let singleValue = Array.isArray(data) ? data[0] : data;
+        
+        if (Array.isArray(data) && data.length > 1) {
+            throw new HttpError(`Invalid value for field "${propertyName}". Expected a single value.`, 400);
+        }
+        
+        if (!validChoices.includes(singleValue)) {
+            throw new Error(`Invalid value for field "${propertyName}". Expected one of: ${validChoices.join(', ')}`);
+        }
+        
+        parentData[propertyName] = [singleValue];
+    }
+    
+    return true;
+}
+
+function validateFileWidget(data: any, propertyName: string, parentData: any): boolean {
+    let fileArray = [];
+    
+    if (data) {
+        fileArray = Array.isArray(data) ? data : [data];
+        
+        // Validate MongoDB IDs
+        for (const fileId of fileArray) {
+            if (!isMongoId(fileId)) {
+                throw new Error(`Invalid value for field "${propertyName}". Expected a valid MongoDB ID.`);
+            }
+        }
+    }
+    
+    parentData[propertyName] = fileArray;
+    return true;
+}
+
+function validateRelationWidget(data: any, typeSelect: string, typeRelation: any, propertyName: string, parentData: any): boolean {
+    if (!data) return true;
+    
+    if (typeSelect === 'multiple') {
+        let relationArray = Array.isArray(data) ? data : [data];
+        
+        for (const relationId of relationArray) {
+            if (!isMongoId(relationId)) {
+                throw new Error(`Invalid relation ID for field "${propertyName}". Expected a valid MongoDB ID.`);
+            }
+        }
+        
+        parentData[propertyName] = relationArray;
+    } else {
+        let singleRelation = Array.isArray(data) ? data[0] : data;
+        
+        if (Array.isArray(data) && data.length > 1) {
+            throw new HttpError(`Invalid value for field "${propertyName}". Expected a single value.`, 400);
+        }
+        
+        if (!isMongoId(singleRelation)) {
+            throw new Error(`Invalid relation ID for field "${propertyName}". Expected a valid MongoDB ID.`);
+        }
+        
+        parentData[propertyName] = singleRelation;
+    }
+    
+    return true;
+}
+
+function validateBooleanWidget(data: any, defaultValue: any, propertyName: string, parentData: any): boolean {
+    if (data === undefined || data === null) {
+        if (defaultValue !== undefined) {
+            parentData[propertyName] = defaultValue;
+        }
+    } else {
+        if (typeof data === 'string' && data === 'false') {
+            parentData[propertyName] = false;
+        } else {
+            parentData[propertyName] = Boolean(data);
+        }
+    }
+    
+    return true;
+}
+
+function validateNumberWidget(data: any, defaultValue: any, propertyName: string, parentData: any): boolean {
+    if (isNaN(data)) {
+        if (!isNaN(defaultValue)) {
+            parentData[propertyName] = Number(defaultValue);
+        } else {
+            throw new Error(`Invalid value for field "${propertyName}". Expected a number.`);
+        }
+    } else {
+        parentData[propertyName] = Number(data);
+    }
+    
+    return true;
+}
+
+function validateStringWidget(data: any, propertyName: string): boolean {
+    if (data !== null && typeof data !== 'string') {
+        throw new Error(`Invalid value for field "${propertyName}". Expected a string. Actual: ${typeof data}`);
+    }
+    
+    return true;
+}
+
+// Helper functions
+function isEmptyValue(value: any): boolean {
+    if (value === undefined || value === null) return true;
+    if (typeof value === 'string' && value.trim() === '') return true;
+    if (Array.isArray(value) && value.length === 0) return true;
+    if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) return true;
+    
+    return false;
+}
+
+function processDependencies(data: any, dependencies: any, isUpdate: boolean): boolean {
+    Object.keys(dependencies).forEach(dependentField => {
+        const dependentValue = data[dependentField];
+        if (dependentValue === undefined || dependentValue === null) return;
+        
+        const dependency = dependencies[dependentField];
+        
+        if (dependency.oneOf) {
+            processOneOfDependency(data, dependentField, dependentValue, dependency, isUpdate);
+        }
+    });
+    
+    return true;
+}
+
+function processOneOfDependency(data: any, dependentField: string, dependentValue: any, dependency: any, isUpdate: boolean): void {
+    let matchedSchema = null;
+    let allDependentFields = new Set<string>();
+    
+    // Collect all dependent fields
+    dependency.oneOf.forEach((variant: any) => {
+        Object.keys(variant.properties).forEach(propKey => {
+            if (propKey !== dependentField) {
+                allDependentFields.add(propKey);
+            }
+        });
+    });
+    
+    // Find matching schema
+    for (const variant of dependency.oneOf) {
+        if (variant.properties[dependentField]?.enum?.includes(dependentValue)) {
+            matchedSchema = variant;
+            
+            // Set unrelated fields to null
+            allDependentFields.forEach(fieldName => {
+                if (!variant.properties[fieldName]) {
+                    data[fieldName] = null;
+                }
+            });
+            
+            // Process additional properties
+            processVariantProperties(data, variant, isUpdate);
+            break;
+        }
+    }
+}
+
+function processVariantProperties(data: any, variant: any, isUpdate: boolean): void {
+    const additionalRequiredFields = variant.required || [];
+    
+    Object.keys(variant.properties).forEach(propKey => {
+        const propSchema = variant.properties[propKey];
+        const propValue = data[propKey];
+        
+        // Check required fields
+        if (additionalRequiredFields.includes(propKey) && 
+            isEmptyValue(propValue) && !isUpdate) {
+            throw new HttpError(
+                `Field "${propKey}" is required when dependent field condition is met.`,
+                400
+            );
+        }
+        
+        // Process field value
+        if (propValue !== undefined && propValue !== null) {
+            processFieldByWidget(data, propKey, propSchema, propValue, isUpdate);
+        } else {
+            data[propKey] = null;
+        }
+    });
+}
+
+function processAllOf(data: any, allOfSchemas: any[], isUpdate: boolean): boolean {
+    allOfSchemas.forEach((condition, index) => {
+        if (condition.if && condition.then) {
+            // Process if-then conditions
+            const conditionMet = checkIfCondition(data, condition.if);
+            
+            if (conditionMet) {
+                processThenSchema(data, condition.then, isUpdate, index);
+            }
+        } else {
+            // Process regular schema conditions
+            processRegularSchema(data, condition, isUpdate);
+        }
+    });
+    
+    return true;
+}
+
+function checkIfCondition(data: any, ifCondition: any): boolean {
+    if (!ifCondition.properties) return false;
+    
+    return Object.keys(ifCondition.properties).every(propKey => {
+        const propCondition = ifCondition.properties[propKey];
+        const propValue = data[propKey];
+        
+        if (propCondition.contains) {
+            if (Array.isArray(propValue) && propCondition.contains.const) {
+                return propValue.includes(propCondition.contains.const);
+            }
+            return false;
+        }
+        
+        return true;
+    });
+}
+
+function processThenSchema(data: any, thenSchema: any, isUpdate: boolean, conditionIndex: number): void {
+    if (thenSchema.properties) {
+        Object.keys(thenSchema.properties).forEach(propKey => {
+            if (data[propKey] !== undefined && !data.hasOwnProperty(propKey)) {
+                const propSchema = thenSchema.properties[propKey];
+                processFieldByWidget(data, propKey, propSchema, data[propKey], isUpdate);
+            }
+        });
+    }
+    
+    // Check required fields
+    if (thenSchema.required && !isUpdate) {
+        thenSchema.required.forEach((requiredField: string) => {
+            if (isEmptyValue(data[requiredField])) {
+                throw new HttpError(
+                    `Field "${requiredField}" is required based on condition ${conditionIndex + 1}.`,
+                    400
+                );
+            }
+        });
+    }
+}
+
+function processRegularSchema(data: any, schema: any, isUpdate: boolean): void {
+    if (schema.properties) {
+        Object.keys(schema.properties).forEach(propKey => {
+            const propSchema = schema.properties[propKey];
+            const propValue = data[propKey];
+            
+            if (propValue !== undefined && propValue !== null && !data.hasOwnProperty(propKey + '_processed')) {
+                processFieldByWidget(data, propKey, propSchema, propValue, isUpdate);
+                data[propKey + '_processed'] = true; // Mark as processed
+            }
+        });
+    }
+    
+    if (schema.required && !isUpdate) {
+        schema.required.forEach((requiredField: string) => {
+            if (isEmptyValue(data[requiredField])) {
+                throw new HttpError(
+                    `Field "${requiredField}" is required based on schema condition.`,
+                    400
+                );
+            }
+        });
+    }
+}
+
+function processFieldByWidget(data: any, fieldKey: string, fieldSchema: any, fieldValue: any, isUpdate: boolean): void {
+    const { widget } = fieldSchema;
+    
+    switch (widget) {
+        case 'select':
+            validateSelectWidget(fieldValue, fieldSchema.choices, fieldSchema.isMultiple, fieldKey, data);
+            break;
+            
+        case 'relation':
+            validateRelationWidget(fieldValue, fieldSchema.typeSelect, fieldSchema.typeRelation, fieldKey, data);
+            break;
+            
+        case 'numberInput':
+            validateNumberWidget(fieldValue, fieldSchema.default, fieldKey, data);
+            break;
+            
+        case 'boolean':
+            validateBooleanWidget(fieldValue, fieldSchema.default, fieldKey, data);
+            break;
+            
+        case 'shortAnswer':
+        case 'textarea':
+            if (typeof fieldValue !== 'string') {
+                throw new Error(`Invalid value for field "${fieldKey}". Expected a string.`);
+            }
+            data[fieldKey] = fieldValue;
+            break;
+            
+        default:
+            data[fieldKey] = fieldValue;
+            break;
+    }
+}
+
+function convertSchemaToAjv(jsonSchema: any, isUpdate: boolean = false): any {
+    const ajvSchema: any = {
+        type: "object",
+        properties: {},
+        additionalProperties: false,
+    };
+    
+    // Add custom validation keywords
+    ajvSchema.customRequired = {
+        required: jsonSchema.required || [],
+        properties: jsonSchema.properties || {},
+        isUpdate: isUpdate
+    };
+    
+    if (jsonSchema.dependencies) {
+        ajvSchema.customDependencies = {
+            dependencies: jsonSchema.dependencies,
+            isUpdate: isUpdate
+        };
+    }
+    
+    if (jsonSchema.allOf) {
+        ajvSchema.customAllOf = jsonSchema.allOf;
+    }
+    
+    // Convert properties
+    if (jsonSchema.properties) {
+        Object.keys(jsonSchema.properties).forEach(key => {
+            const prop = jsonSchema.properties[key];
+            ajvSchema.properties[key] = convertProperty(prop);
+        });
+    }
+    
+    return ajvSchema;
+}
+
+function convertProperty(prop: any): any {
+    const converted: any = {
+        type: prop.type || "string"
+    };
+    
+    // Add default values
+    if (prop.default !== undefined) {
+        converted.default = prop.default;
+    }
+    
+    // Add widget validation
+    if (prop.widget) {
+        converted.widgetValidation = {
+            widget: prop.widget,
+            choices: prop.choices,
+            isMultiple: prop.isMultiple,
+            typeSelect: prop.typeSelect,
+            typeRelation: prop.typeRelation,
+            default: prop.default
+        };
+    }
+    
+    // Handle nested objects
+    if (prop.type === 'object' && prop.properties) {
+        converted.properties = {};
+        Object.keys(prop.properties).forEach(nestedKey => {
+            converted.properties[nestedKey] = convertProperty(prop.properties[nestedKey]);
+        });
+        
+        if (prop.required) {
+            converted.required = prop.required;
+        }
+    }
+    
+    // Handle date widgets
+    if (prop.widget?.includes('date')) {
+        converted.format = 'date-time';
+    }
+    
+    return converted;
+}
+
+function processDateFields(data: any, properties: any): void {
+    Object.keys(properties).forEach(key => {
+        const prop = properties[key];
+        
+        if (prop.widget?.includes('date') && data[key]) {
+            data[key] = new Date(appSettings.timeZoneMongoDB.getCustomTime(data[key]));
+        }
+        
+        // Process nested objects
+        if (prop.type === 'object' && prop.properties && data[key]) {
+            processDateFields(data[key], prop.properties);
+        }
+    });
+}
+
+// Main filter function
+export function filterData(jsonSchema: any, body: any, is_update: boolean = false): any {
+    try {
+        // Create AJV instance
+        const ajv = createAjvInstance();
+        
+        // Convert to AJV schema
+        const ajvSchema = convertSchemaToAjv(jsonSchema, is_update);
+        
+        // Add isUpdate to root data for access in keywords
+        const dataWithContext: any = { ...body, isUpdate: is_update };
+        
+        // Compile and validate
+        const validate = ajv.compile(ajvSchema);
+        const isValid = validate(dataWithContext);
+        
+        if (!isValid) {
+            const errorMessages = validate.errors?.map(err => 
+                `${err.instancePath || 'root'}: ${err.message}`
+            ).join(', ') || 'Validation failed';
+            
+            throw new HttpError(errorMessages, 400);
+        }
+        
+        // Cast back to any since we know validation passed
+        const validatedData = dataWithContext as any;
+        
+        // Remove context data
+        delete validatedData.isUpdate;
+        
+        // Process date fields
+        processDateFields(validatedData, jsonSchema.properties || {});
+        
+        return validatedData;
+        
+    } catch (error: any) {
+        if (error instanceof HttpError) {
+            throw error;
+        }
+        throw new HttpError(error.message || 'Validation failed', 400);
+    }
+}
+
+// Usage examples:
+/*
+// Basic usage (same as before)
+const filteredData = filterData(tenantSchema.json_schema, requestBody, false);
+
+// For updates
+const updatedData = filterData(tenantSchema.json_schema, requestBody, true);
+*/

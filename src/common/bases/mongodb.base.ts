@@ -1,17 +1,79 @@
 import { MongoClient } from 'mongodb';
 import { appSettings } from '../../configs/app-settings';
 import Ajv from 'ajv';
-
+import * as fs from 'fs';
+import * as path from 'path';
 class MongoDBService {
 
   private client: MongoClient;
   private dbName: string;
+  private ajv: Ajv = new Ajv();
+  private entitiesCache: any = [];
+  private entitiesFilePath: string = '';
+  private fileWatcher: fs.FSWatcher | null = null;
 
   constructor() {
     const uri = `${appSettings.mongo.url}/${appSettings.mongo.dbName}${appSettings.mongo.options}`;
     this.client = new MongoClient(uri);
     this.dbName = appSettings.mongo.dbName || 'test';
+    this.ajv = new Ajv();
+    this.entitiesFilePath = path.join(process.cwd(), 'json/entities', '_entities.json');
     console.log(`MongoDBService initialized: ${this.dbName}`);
+    this.initFileWatcher();
+  }
+
+  private initFileWatcher() {
+    // Load initial data into cache
+    this.loadEntitiesFromFile();
+
+    // Watch for file changes
+    if (fs.existsSync(this.entitiesFilePath)) {
+      this.fileWatcher = fs.watch(this.entitiesFilePath, (eventType, filename) => {
+        if (eventType === 'change') {
+          console.log('Entities file changed, reloading cache...');
+          this.loadEntitiesFromFile();
+        }
+      });
+      console.log(`File watcher initialized for: ${this.entitiesFilePath}`);
+    } else {
+      console.warn(`Entities file not found: ${this.entitiesFilePath}`);
+    }
+  }
+
+  private loadEntitiesFromFile(): any {
+    try {
+      if (!fs.existsSync(this.entitiesFilePath)) {
+        console.warn(`File ${this.entitiesFilePath} not found`);
+        this.entitiesCache = null;
+        return null;
+      }
+
+      const data = fs.readFileSync(this.entitiesFilePath, 'utf8');
+      const entities = JSON.parse(data);
+
+      // Validate JSON structure with AJV - flexible schema
+      const schema = {
+        type: 'object',
+        additionalProperties: true // Allow any structure
+      };
+
+      const validate = this.ajv.compile(schema);
+      const valid = validate(entities);
+
+      if (!valid) {
+        console.error('Invalid entities JSON structure:', validate.errors);
+        throw new Error(`Invalid entities JSON structure: ${JSON.stringify(validate.errors)}`);
+      }
+
+      // Cache the validated data
+      this.entitiesCache = entities;
+      console.log('Entities data loaded and cached successfully');
+      return entities;
+    } catch (error) {
+      console.error('Error loading entities file:', error);
+      this.entitiesCache = null;
+      return null;
+    }
   }
 
   async getDatabase() {
