@@ -1,0 +1,8 @@
+{
+  "_id": "67d83adf13dd97e218421d4e",
+  "title": "validate",
+  "collection_name": "validate",
+  "unique_key": "[\n    {\n        \"title\": 1\n    }\n]",
+  "use_parent": false,
+  "use_parent_delete_childs": false
+}
