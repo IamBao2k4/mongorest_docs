@@ -1,14 +1,19 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
-import { CommonService } from '../services/common/common.service';
-
-const commonService = new CommonService();
+import { commonService } from '../services/common/common.service';
+import { queryBuilderMiddleware } from '../common/middlewares/query-builder.middleware';
 
 export async function CommonRoutes(app: FastifyInstance) {
   // Lấy danh sách entity
-  app.get('/common/:entityName', async (request, reply) => {
+  app.get('/common/:entityName', {
+    preHandler: queryBuilderMiddleware
+  }, async (request, reply) => {
     const { entityName } = request.params as { entityName: string };
-    // TODO: Lấy danh sách entity từ DB
-    return { entity: entityName, action: 'list' };
+    const { queryData, pagination } = request;
+
+    return await commonService.findAllQuery(
+      entityName,
+      queryData,
+    );
   });
 
   // Lấy chi tiết entity theo id

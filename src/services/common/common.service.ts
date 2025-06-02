@@ -14,7 +14,7 @@ export interface PaginatedResult<T> {
     count: number;
 }
 
-export class CommonService {
+class CommonService {
 
   LIST_ENTITY_WITHOUT_TENANT = [
     'user',
@@ -121,3 +121,5 @@ export class CommonService {
   }
 
 }
+
+export const commonService = new CommonService();

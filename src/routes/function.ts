@@ -1,7 +1,8 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import { entityService } from '../services/entity/entity.service';
 
-export async function EntityRoutes(app: FastifyInstance) {
+
+export async function FunctionRoutes(app: FastifyInstance) {
 
   app.get('/entity', async (request, reply) => {
     const list = await entityService.getListEntity()

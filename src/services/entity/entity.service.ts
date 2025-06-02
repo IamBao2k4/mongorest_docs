@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { HttpError } from '../../utils/http-error';
 
-export class EntityService {
+class EntityService {
 
     constructor() {
         this.watchEntityFolder((eventType, filename) => {
@@ -174,3 +174,5 @@ export class EntityService {
     }
 
 }
+
+export const entityService = new EntityService();
