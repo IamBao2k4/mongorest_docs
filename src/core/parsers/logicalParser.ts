@@ -1,5 +1,5 @@
 import { FilterParser } from "./filterParser";
-
+ 
 /**
  * Handles logical operations like OR and AND
  */
@@ -15,20 +15,20 @@ export class LogicalParser {
     } else if (expression.startsWith('not.')) {
       return this.parseNot(expression.substring(4));
     }
-    
+   
     return null;
   }
-  
+ 
   private parseOr(expression: string): Record<string, any> {
     const conditions = this.parseConditions(expression);
     return { $or: conditions };
   }
-  
+ 
   private parseAnd(expression: string): Record<string, any> {
     const conditions = this.parseConditions(expression);
     return { $and: conditions };
   }
-  
+ 
   private parseNot(expression: string): Record<string, any> {
     if (expression.startsWith('and=')) {
       const andCondition = this.parseAnd(expression.substring(4));
@@ -37,29 +37,29 @@ export class LogicalParser {
       const orCondition = this.parseOr(expression.substring(3));
       return { $not: orCondition };
     }
-    
+   
     // Handle single condition negation
     const [field, operator, value] = expression.split('.');
     const filterParser = new FilterParser();
     const filter = filterParser.parseFilter(field, `${operator}.${value}`);
     const condition = filterParser.convertFilter(filter);
-    
+   
     return { $not: condition };
   }
-  
+ 
   private parseConditions(expression: string): Record<string, any>[] {
     // Remove outer parentheses
     const cleaned = expression.replace(/^\(|\)$/g, '');
-    
+   
     // Split by comma but respect nested parentheses
     const conditions: string[] = [];
     let current = '';
     let depth = 0;
-    
+   
     for (const char of cleaned) {
       if (char === '(' || char === '{') depth++;
       if (char === ')' || char === '}') depth--;
-      
+     
       if (char === ',' && depth === 0) {
         conditions.push(current.trim());
         current = '';
@@ -67,11 +67,11 @@ export class LogicalParser {
         current += char;
       }
     }
-    
+   
     if (current.trim()) {
       conditions.push(current.trim());
     }
-    
+   
     const filterParser = new FilterParser();
     return conditions.map(condition => {
     // Tìm vị trí của operator (=) để tách field và expression
@@ -79,7 +79,7 @@ export class LogicalParser {
     if (equalIndex === -1) {
       throw new Error(`Invalid condition format: ${condition}`);
     }
-    
+   
     const field = condition.substring(0, equalIndex);
     const expression = condition.substring(equalIndex + 1);
     const filter = filterParser.parseFilter(field, expression);
