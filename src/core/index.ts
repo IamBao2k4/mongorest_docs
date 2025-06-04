@@ -14,3 +14,19 @@ export interface ParsedFilter {
   value: any;
   modifier?: string;
 }
+
+export interface MongoQuery {
+  filter: Record<string, any>;
+  projection?: Record<string, 1 | 0>;
+  sort?: Record<string, 1 | -1>;
+  // New properties for enhanced functionality
+  pipeline?: any[];
+  hasEmbeds?: boolean;
+  embeddedTables?: string[];
+}
+
+export interface ConvertOptions {
+  collection?: string; // Required for embeds to work
+  enableEmbeds?: boolean;
+  maxEmbedDepth?: number;
+}

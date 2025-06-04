@@ -16,7 +16,7 @@ describe('TextOperators', () => {
     
     it('should handle multiple wildcards', () => {
       const result = operator.convert('email', '*@gmail.*');
-      expect(result).toEqual({ email: { $regex: '.*@gmail.*', $options: 'i' } });
+      expect(result).toEqual({ email: { $regex: '.*@gmail\\..*', $options: 'i' } });
     });
   });
   

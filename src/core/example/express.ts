@@ -1,9 +1,12 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { MongoClient } from 'mongodb';
 import { PostgRESTToMongoConverter } from '../main/mongorest'; 
+import { setupBasicRelationships } from '../config/relationships';
 
 const app = express();
-const converter = new PostgRESTToMongoConverter();
+// ✅ Setup converter with relationships
+const registry = setupBasicRelationships();
+const converter = new PostgRESTToMongoConverter(registry);
 
 // MongoDB connection
 let db: any;
@@ -16,7 +19,8 @@ MongoClient.connect('mongodb://thaily:Th%40i2004@localhost:27017/mongorest?authS
 // Middleware to convert PostgREST params to MongoDB query
 const postgrestToMongo = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const mongoQuery = converter.convert(req.query as Record<string, string>);
+    const {collection} = req.params
+    const mongoQuery = converter.convert(req.query as Record<string, string>, collection);
     console.log(JSON.stringify(mongoQuery))
     req.mongoQuery = mongoQuery;
     next();
@@ -33,33 +37,55 @@ declare global {
         filter: Record<string, any>;
         projection?: Record<string, 1 | 0>;
         sort?: Record<string, 1 | -1>;
+        pipeline?: Record<string, any>[];
       };
     }
   }
 }
 
-// Generic endpoint for any collection
 app.get('/api/:collection', postgrestToMongo, async (req, res) => {
   try {
     const { collection } = req.params;
-    const { filter, projection, sort } = req.mongoQuery!;
-    
-    let query = db.collection(collection).find(filter);
-    
+    const { filter, projection, sort, pipeline } = req.mongoQuery!;
+
+    // Xây dựng pipeline aggregation
+    const aggPipeline = [];
+
+    // 1. Thêm $match nếu có filter
+    if (filter && Object.keys(filter).length > 0) {
+      aggPipeline.push({ $match: filter });
+    }
+
+    // 2. Thêm pipeline $lookup, $graphLookup, ... nếu có (ví dụ trong req.mongoQuery.pipeline)
+    if (pipeline && Array.isArray(pipeline) && pipeline.length > 0) {
+      aggPipeline.push(...pipeline);
+    }
+
+    // 3. Thêm $project nếu có
     if (projection && Object.keys(projection).length > 0) {
-      query = query.project(projection);
+      aggPipeline.push({ $project: projection });
     }
-    
+
+    // 4. Thêm $sort nếu có
     if (sort && Object.keys(sort).length > 0) {
-      query = query.sort(sort);
+      aggPipeline.push({ $sort: sort });
     }
-    
+
+    // Nếu không có stage nào thì đừng aggregate, dùng find bình thường
+    let query;
+    if (aggPipeline.length > 0) {
+      query = db.collection(collection).aggregate(aggPipeline);
+    } else {
+      query = db.collection(collection).find({});
+    }
+
     const results = await query.toArray();
     res.json(results);
   } catch (error: any) {
     res.status(500).json({ error: 'Database error', details: error.message });
   }
 });
+
 
 // Specific endpoints with examples
 app.get('/users', postgrestToMongo, async (req, res) => {

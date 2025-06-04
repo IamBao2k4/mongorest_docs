@@ -1,5 +1,5 @@
 import { ParsedFilter } from "..";
-import { ContainedInOperator, ContainsOperator, InOperator, OverlapOperator } from "../operators/arrayOperators";
+import { ContainedInOperator, ContainsOperator, InOperator, OverlapOperator } from "../operators/arrayOperator";
 import { BaseOperator } from "../operators/baseOperator";
 import { EqualOperator, GreaterThanEqualOperator, GreaterThanOperator, LessThanEqualOperator, LessThanOperator, NotEqualOperator } from "../operators/comparisonOperators";
 import { IsDistinctOperator, IsOperator } from "../operators/nullOperators";

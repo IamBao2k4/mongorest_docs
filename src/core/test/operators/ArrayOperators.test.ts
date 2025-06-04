@@ -3,7 +3,7 @@ import {
   ContainsOperator,
   ContainedInOperator,
   OverlapOperator
-} from '../../operators/arrayOperators';
+} from '../../operators/arrayOperator';
 
 describe('ArrayOperators', () => {
   describe('InOperator', () => {
