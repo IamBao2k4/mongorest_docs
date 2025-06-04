@@ -2,7 +2,7 @@ import mongoose, { Collection } from 'mongoose';
 import { PostgRESTToMongoConverter } from '../main/mongorest';
 
 // Connect to MongoDB
-mongoose.connect('mongodb://thaily:Th%40i2004@localhost:27017/mongorest?authSource=admin');
+mongoose.connect('mongodb://localhost:27017/');
 
 // Example schemas
 const UserSchema = new mongoose.Schema({

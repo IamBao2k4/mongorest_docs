@@ -19,6 +19,10 @@ export class SelectParser {
       // Handle alias format: "alias:field_name"
       if (trimmed.includes(':')) {
         const [alias, fieldName] = trimmed.split(':');
+        if(fieldName.includes('(')) {
+          // Handle function calls like "COUNT(*)"
+          const functionName = fieldName.split('(')[0].trim();
+        }
         projection[fieldName.trim()] = 1;
       } else {
         // Handle JSON path like "json_data->field" (simplified)

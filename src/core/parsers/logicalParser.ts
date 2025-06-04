@@ -74,10 +74,16 @@ export class LogicalParser {
     
     const filterParser = new FilterParser();
     return conditions.map(condition => {
-      const [field, ...rest] = condition.split('.');
-      const expression = rest.join('.');
-      const filter = filterParser.parseFilter(field, expression);
-      return filterParser.convertFilter(filter);
-    });
+    // Tìm vị trí của operator (=) để tách field và expression
+    const equalIndex = condition.indexOf('=');
+    if (equalIndex === -1) {
+      throw new Error(`Invalid condition format: ${condition}`);
+    }
+    
+    const field = condition.substring(0, equalIndex);
+    const expression = condition.substring(equalIndex + 1);
+    const filter = filterParser.parseFilter(field, expression);
+    return filterParser.convertFilter(filter);
+  });
   }
 }

@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import { IndexRoute } from './routes/_index';
 import { registerGlobalErrorHandler } from './common/exceptions/global.exception';
 import { responseInterceptor } from './common/interceptors/response.interceptor';
+import { SchemaLoader } from './core/schema/loader';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -39,8 +40,57 @@ app.get('/', async (request, reply) => {
 registerGlobalErrorHandler(app); 
 IndexRoute(app);
 
+const loadSchemasFromSubfolders = async (schemasPath: string) => {
+    const allSchemas = new Map();
+    
+    // Load từ folder collections
+    const collectionsPath = path.join(schemasPath, 'collections');
+    if (fs.existsSync(collectionsPath)) {
+        console.log(`Loading collections from: ${collectionsPath}`);
+        const collectionSchemas = await SchemaLoader.loadAllSchemas(collectionsPath);
+        console.log(`Found ${collectionSchemas.size} collection schemas:`, Array.from(collectionSchemas.keys()));
+        
+        // Merge vào allSchemas
+        for (const [key, value] of collectionSchemas) {
+            allSchemas.set(key, value);
+        }
+    }
+    
+    // Load từ folder functions  
+    const functionsPath = path.join(schemasPath, 'functions');
+    if (fs.existsSync(functionsPath)) {
+        console.log(`Loading functions from: ${functionsPath}`);
+        const functionSchemas = await SchemaLoader.loadAllSchemas(functionsPath);
+        console.log(`Found ${functionSchemas.size} function schemas:`, Array.from(functionSchemas.keys()));
+        
+        // Merge vào allSchemas
+        for (const [key, value] of functionSchemas) {
+            allSchemas.set(key, value);
+        }
+    }
+    
+    return allSchemas;
+};
+
 const start = async () => {
     try {
+        // Load all schemas from schemas folder and subfolders
+        const schemasPath = path.join(__dirname, 'schemas');
+        
+        if (!fs.existsSync(schemasPath)) {
+            console.log(`Schemas directory not found: ${schemasPath}`);
+            console.log('Creating schemas directory structure...');
+            
+            // Tạo folder structure
+            fs.mkdirSync(path.join(schemasPath, 'collections'), { recursive: true });
+            fs.mkdirSync(path.join(schemasPath, 'functions'), { recursive: true });
+            
+            console.log('Schemas directory structure created');
+        }
+        
+        const schemas = await loadSchemasFromSubfolders(schemasPath);
+        console.log(`Total loaded ${schemas.size} schemas:`, Array.from(schemas.keys()));
+        
         await app.listen({ port: 3000 });
         console.log('Server is running on http://localhost:3000');
     } catch (err) {
