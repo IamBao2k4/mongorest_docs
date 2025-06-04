@@ -5,7 +5,8 @@ export * from './relationship';
 
 // Schema Type Definitions
 export interface Schema {
-  collection: string;
+  name?: string;
+  collection?: string;
   fields: Record<string, FieldDefinition>;
   relationships?: Record<string, Relationship>;
   indexes?: IndexDefinition[];

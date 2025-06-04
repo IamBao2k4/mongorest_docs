@@ -62,23 +62,21 @@
       "id": "transformForCRM",
       "type": "transform",
       "script": "userToCRMFormat",
-      "input": "{{steps.getModifiedUsers.output}}"
+      "input": "{{steps.getModifiedUsers.result}}"
     },
     {
       "id": "checkDryRun",
-      "type": "condition",
-      "condition": "{{params.dryRun}} === true",
-      "then": [
-        {
-          "id": "returnPreview",
-          "type": "transform",
-          "script": "createPreviewResponse",
-          "input": {
-            "users": "{{steps.getModifiedUsers.output}}",
-            "crmData": "{{steps.transformForCRM.output}}"
-          }
+      "type": "conditional",
+      "condition": { "params.dryRun": { "$eq": true } },
+      "then": {
+        "id": "returnPreview",
+        "type": "transform",
+        "script": "createPreviewResponse",
+        "input": {
+          "users": "{{steps.getModifiedUsers.result}}",
+          "crmData": "{{steps.transformForCRM.result}}"
         }
-      ],
+      },
       "else": [
         {
           "id": "sendToCRM",
@@ -89,7 +87,7 @@
             "Authorization": "Bearer {{config.crmToken}}",
             "Content-Type": "application/json"
           },
-          "body": "{{steps.transformForCRM.output}}",
+          "body": "{{steps.transformForCRM.result}}",
           "timeout": 30000
         },
         {
@@ -97,7 +95,7 @@
           "type": "updateMany",
           "collection": "users",
           "filter": {
-            "_id": { "$in": "{{steps.getModifiedUsers.output.map(u => u._id)}}" }
+            "_id": { "$in": "{{steps.getModifiedUsers.ids}}" }
           },
           "update": {
             "$set": {
@@ -115,11 +113,11 @@
       "document": {
         "type": "crm_user_sync",
         "timestamp": "{{now}}",
-        "usersProcessed": "{{steps.getModifiedUsers.output.length}}",
+        "usersProcessed": "{{steps.getModifiedUsers.count}}",
         "syncId": "{{generateId()}}",
         "parameters": "{{params}}",
-        "crmResponse": "{{steps.sendToCRM.output}}",
-        "success": "{{steps.sendToCRM.success}}",
+        "crmResponse": "{{steps.sendToCRM.response || null}}",
+        "success": "{{steps.sendToCRM.success || params.dryRun}}",
         "executedBy": "{{user.id}}",
         "dryRun": "{{params.dryRun}}"
       }

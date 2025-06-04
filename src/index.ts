@@ -47,7 +47,7 @@ const loadSchemasFromSubfolders = async (schemasPath: string) => {
     const collectionsPath = path.join(schemasPath, 'collections');
     if (fs.existsSync(collectionsPath)) {
         console.log(`Loading collections from: ${collectionsPath}`);
-        const collectionSchemas = await SchemaLoader.loadAllSchemas(collectionsPath);
+        const collectionSchemas = await SchemaLoader.loadAllSchemas(collectionsPath, true);
         console.log(`Found ${collectionSchemas.size} collection schemas:`, Array.from(collectionSchemas.keys()));
         
         // Merge vào allSchemas
@@ -60,7 +60,7 @@ const loadSchemasFromSubfolders = async (schemasPath: string) => {
     const functionsPath = path.join(schemasPath, 'functions');
     if (fs.existsSync(functionsPath)) {
         console.log(`Loading functions from: ${functionsPath}`);
-        const functionSchemas = await SchemaLoader.loadAllSchemas(functionsPath);
+        const functionSchemas = await SchemaLoader.loadAllSchemas(functionsPath, false);
         console.log(`Found ${functionSchemas.size} function schemas:`, Array.from(functionSchemas.keys()));
         
         // Merge vào allSchemas

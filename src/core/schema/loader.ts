@@ -21,7 +21,7 @@ export class SchemaLoader {
   /**
    * Tải schema từ file JSON
    */
-  static async loadSchema(filePath: string): Promise<Schema> {
+  static async loadSchema(filePath: string, isCollection: boolean): Promise<Schema> {
     try {
       // Check cache first
       const cacheKey = path.resolve(filePath);
@@ -48,7 +48,8 @@ export class SchemaLoader {
       }
 
       // Validate schema structure
-      const validation = await SchemaLoader.validateSchemaDefinition(schema);
+      const validation = isCollection? await SchemaLoader.validateSchemaDefinition(schema)
+                                     : await SchemaLoader.validateFunctionSchemaDefinition(schema);                              
       if (!validation.valid) {
         const errorMessages = validation.errors?.map(e => e.message).join(', ') || 'Unknown validation errors';
         throw new LoaderError(
@@ -75,7 +76,7 @@ export class SchemaLoader {
   /**
    * Tải tất cả schemas từ một thư mục
    */
-  static async loadAllSchemas(schemasDir: string): Promise<Map<string, Schema>> {
+  static async loadAllSchemas(schemasDir: string, isCollection: boolean): Promise<Map<string, Schema>> {
     try {
       const schemas = new Map<string, Schema>();
       const collectionNames = new Set<string>();
@@ -92,18 +93,25 @@ export class SchemaLoader {
       const loadPromises = files.map(async (file) => {
         const filePath = path.join(schemasDir, file);
         try {
-          const schema = await SchemaLoader.loadSchema(filePath);
+          const schema = await SchemaLoader.loadSchema(filePath, isCollection);
           
-          // Check for duplicate collection names
-          if (collectionNames.has(schema.collection)) {
+          // Check for duplicate collection names or function names
+          if (isCollection && !schema.collection) {
+            throw new LoaderError(`Schema file ${file} does not define a collection name`, filePath);
+          }
+          if (!isCollection && !schema) {
+            throw new LoaderError(`Schema file ${file} does not define a function name`, filePath);
+          }
+          const name = isCollection ? schema.collection : schema.name;
+            if (collectionNames.has(name!)) {
             throw new LoaderError(
-              `Duplicate collection name '${schema.collection}' found in ${file}`,
+              `Duplicate schema name '${name}' found in file ${file}`,
               filePath
             );
-          }
-
-          collectionNames.add(schema.collection);
-          schemas.set(schema.collection, schema);
+            }
+          collectionNames.add(name!);
+          // Store schema in map
+          schemas.set(name!, schema);
           
           return { file, schema, success: true };
         } catch (error) {
@@ -141,6 +149,14 @@ export class SchemaLoader {
    */
   private static async validateSchemaDefinition(schema: object): Promise<ValidationResult> {
     return SchemaValidator.validateSchemaDefinition(schema);
+  }
+
+  /**
+   * Validate cấu trúc của schema function
+   */
+
+  private static async validateFunctionSchemaDefinition(func: object): Promise<ValidationResult> {
+    return SchemaValidator.validateFunctionSchemaDefinition(func);
   }
 
   /**
@@ -396,8 +412,13 @@ export class SchemaLoader {
       // Clear cache for changed file
       SchemaLoader.schemaCache.delete(path.resolve(filePath));
 
+      // modify parent directory to get the directory name if "collections" or "functions"
+      const parentDir = path.dirname(filePath);
+      const dirName = path.basename(parentDir);
+
+      const isCollection = dirName === 'collections'? true : false;
       // Reload all schemas
-      const updatedSchemas = await SchemaLoader.loadAllSchemas(schemasDir);
+      const updatedSchemas = await SchemaLoader.loadAllSchemas(schemasDir, isCollection);
       
       // Call callback with updated schemas
       callback({

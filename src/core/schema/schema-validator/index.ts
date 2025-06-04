@@ -8,6 +8,7 @@ import { Schema, FieldDefinition, ValidationError, ValidationResult, Relationshi
 export class SchemaValidator {
   private static ajv: Ajv;
   private static schemaValidator: ValidateFunction<any>;
+  private static functionSchemaValidator: ValidateFunction<any>;
   
   static {
     // Initialize AJV instance
@@ -23,6 +24,9 @@ export class SchemaValidator {
     
     // Define the main schema validation schema
     this.schemaValidator = this.ajv.compile(this.getSchemaDefinitionSchema());
+    
+    // Define the function schema validation schema
+    this.functionSchemaValidator = this.ajv.compile(this.getFunctionSchemaDefinitionSchema());
   }
   
   /**
@@ -57,6 +61,39 @@ export class SchemaValidator {
         const relationshipErrors = this.validateRelationshipDefinitions(schema.relationships, new Map());
         errors.push(...relationshipErrors);
       }
+    }
+    
+    return {
+      valid: errors.length === 0,
+      errors: errors.length > 0 ? errors : undefined
+    };
+  }
+  
+  /**
+   * Validate function schema definition using AJV
+   */
+  static validateFunctionSchemaDefinition(schema: any): ValidationResult {
+    // First validate with AJV
+    const isValid = this.functionSchemaValidator(schema);
+    const errors: ValidationError[] = [];
+    
+    if (!isValid && this.functionSchemaValidator.errors) {
+      // Convert AJV errors to our error format
+      for (const error of this.functionSchemaValidator.errors) {
+        errors.push({
+          name: "FunctionSchemaValidationError",
+          field: error.instancePath?.replace('/', '') || error.keyword,
+          error: error.keyword?.toUpperCase() || 'VALIDATION_ERROR',
+          message: error.message || 'Function schema validation failed',
+          severity: 'error'
+        });
+      }
+    }
+    
+    // Additional custom validations for functions
+    if (errors.length === 0) {
+      const customErrors = this.performFunctionCustomValidations(schema);
+      errors.push(...customErrors);
     }
     
     return {
@@ -242,6 +279,175 @@ export class SchemaValidator {
   /**
    * Private helper methods
    */
+  private static getFunctionSchemaDefinitionSchema(): any {
+    return {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          pattern: '^[a-zA-Z_][a-zA-Z0-9_]*$',
+          minLength: 1
+        },
+        version: {
+          type: 'string',
+          pattern: '^\\d+\\.\\d+\\.\\d+$'
+        },
+        description: {
+          type: 'string',
+          minLength: 1
+        },
+        category: {
+          type: 'string',
+          enum: ['reports', 'integrations', 'integration', 'analytics', 'utility', 'automation']
+        },
+        method: {
+          type: 'string',
+          enum: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+        },
+        endpoint: {
+          type: 'string',
+          pattern: '^/.*'
+        },
+        permissions: {
+          type: 'array',
+          items: { type: 'string' },
+          minItems: 1
+        },
+        rateLimits: {
+          type: 'object',
+          properties: {
+            requests: { type: 'integer', minimum: 1 },
+            window: { type: 'string', pattern: '^\\d+[smhd]$' }
+          },
+          required: ['requests', 'window'],
+          additionalProperties: true
+        },
+        input: {
+          type: 'object',
+          properties: {
+            type: { type: 'string', enum: ['object'] },
+            properties: { type: 'object' },
+            required: { 
+              type: 'array',
+              items: { type: 'string' }
+            }
+          },
+          required: ['type'],
+          additionalProperties: true
+        },
+        output: {
+          type: 'object',
+          properties: {
+            type: { type: 'string', enum: ['object'] },
+            properties: { type: 'object' }
+          },
+          required: ['type'],
+          additionalProperties: true
+        },
+        steps: {
+          type: 'array',
+          items: {
+            $ref: '#/$defs/stepDefinition'
+          },
+          minItems: 1
+        },
+        hooks: {
+          type: 'object',
+          properties: {
+            beforeExecution: {
+              type: 'array',
+              items: { type: 'string' }
+            },
+            afterExecution: {
+              type: 'array',
+              items: { type: 'string' }
+            },
+            onError: {
+              type: 'array',
+              items: { type: 'string' }
+            }
+          },
+          additionalProperties: true
+        },
+        errorHandling: {
+          type: 'object',
+          additionalProperties: true
+        },
+        caching: {
+          type: 'object',
+          properties: {
+            enabled: { type: 'boolean' },
+            ttl: { type: 'integer', minimum: 0 },
+            key: { type: 'string' }
+          },
+          required: ['enabled'],
+          additionalProperties: true
+        },
+        timeout: {
+          type: 'integer',
+          minimum: 1000,
+          maximum: 300000
+        },
+        tags: {
+          type: 'array',
+          items: { type: 'string' },
+          uniqueItems: true
+        }
+      },
+      required: ['name', 'version', 'description', 'category', 'method', 'endpoint', 'permissions', 'input', 'output', 'steps'],
+      additionalProperties: true,
+      $defs: {
+        stepDefinition: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              pattern: '^[a-zA-Z_][a-zA-Z0-9_]*$'
+            },
+            type: {
+              type: 'string',
+              enum: ['find', 'findOne', 'insertOne', 'insertMany', 'updateOne', 'updateMany', 'deleteOne', 'deleteMany', 'aggregate', 'transform', 'conditional', 'http']
+            },
+            collection: {
+              type: 'string',
+              pattern: '^[a-zA-Z_][a-zA-Z0-9_]*$'
+            },
+            query: { type: 'object' },
+            filter: { type: 'object' },
+            document: { type: 'object' },
+            update: { type: 'object' },
+            pipeline: { type: 'array' },
+            script: { type: 'string' },
+            input: {},
+            options: { type: 'object' },
+            condition: { type: 'object' },
+            then: {
+              type: 'object',
+              additionalProperties: true
+            },
+            else: {
+              type: 'array',
+              items: {
+                type: 'object',
+                additionalProperties: true
+              }
+            },
+            method: {
+              type: 'string',
+              enum: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+            },
+            url: { type: 'string' },
+            headers: { type: 'object' },
+            body: {},
+            timeout: { type: 'integer', minimum: 0 }
+          },
+          required: ['id', 'type'],
+          additionalProperties: true
+        }
+      }
+    };
+  }
+
   private static getSchemaDefinitionSchema(): any {
     return {
       type: 'object',
@@ -491,6 +697,109 @@ export class SchemaValidator {
           });
         }
       }
+    }
+    
+    return errors;
+  }
+  
+  private static performFunctionCustomValidations(schema: any): ValidationError[] {
+    const errors: ValidationError[] = [];
+    
+    // Validate endpoint format for functions
+    if (schema.endpoint && !schema.endpoint.startsWith('/functions/')) {
+      errors.push({
+        name: "InvalidEndpointError",
+        field: 'endpoint',
+        error: 'INVALID_ENDPOINT_FORMAT',
+        message: `Function endpoint '${schema.endpoint}' should start with '/functions/'`,
+        severity: 'warning'
+      });
+    }
+    
+    // Validate step dependencies
+    if (schema.steps && Array.isArray(schema.steps)) {
+      const stepIds = new Set(schema.steps.map((step: any) => step.id));
+      
+      // Also collect nested step IDs from conditional branches
+      const collectNestedStepIds = (step: any): string[] => {
+        const nestedIds: string[] = [];
+        
+        if (step.then && step.then.id) {
+          nestedIds.push(step.then.id);
+        }
+        
+        if (step.else && Array.isArray(step.else)) {
+          for (const elseStep of step.else) {
+            if (elseStep.id) {
+              nestedIds.push(elseStep.id);
+            }
+          }
+        }
+        
+        return nestedIds;
+      };
+      
+      // Add nested step IDs to the main set
+      for (const step of schema.steps) {
+        if (step.type === 'conditional') {
+          const nestedIds = collectNestedStepIds(step);
+          nestedIds.forEach(id => stepIds.add(id));
+        }
+      }
+      
+      for (const step of schema.steps) {
+        // Check for template references to other steps
+        const stepStr = JSON.stringify(step);
+        const stepReferences = stepStr.match(/\{\{steps\.([^.}]+)\./g);
+        
+        if (stepReferences) {
+          for (const ref of stepReferences) {
+            const referencedStepId = ref.match(/\{\{steps\.([^.}]+)\./)?.[1];
+            if (referencedStepId && !stepIds.has(referencedStepId)) {
+              errors.push({
+                name: "InvalidStepReferenceError",
+                field: `steps.${step.id}`,
+                error: 'INVALID_STEP_REFERENCE',
+                message: `Step '${step.id}' references non-existent step '${referencedStepId}'`,
+                severity: 'error'
+              });
+            }
+          }
+        }
+        
+        // Validate transform steps have script
+        if (step.type === 'transform' && !step.script) {
+          errors.push({
+            name: "MissingTransformScriptError",
+            field: `steps.${step.id}`,
+            error: 'MISSING_TRANSFORM_SCRIPT',
+            message: `Transform step '${step.id}' must specify a script`,
+            severity: 'error'
+          });
+        }
+        
+        // Validate aggregate steps have pipeline
+        if (step.type === 'aggregate' && (!step.pipeline || !Array.isArray(step.pipeline))) {
+          errors.push({
+            name: "MissingAggregationPipelineError",
+            field: `steps.${step.id}`,
+            error: 'MISSING_AGGREGATION_PIPELINE',
+            message: `Aggregate step '${step.id}' must have a pipeline array`,
+            severity: 'error'
+          });
+        }
+      }
+    }
+    
+    // Validate version format
+    if (schema.version && !/^\d+\.\d+\.\d+$/.test(schema.version)) {
+      errors.push({
+        name: "InvalidVersionFormatError",
+        field: 'version',
+        error: 'INVALID_VERSION_FORMAT',
+        message: `Version '${schema.version}' must follow semantic versioning (x.y.z)`,
+        severity: 'error'
+      });
     }
     
     return errors;
