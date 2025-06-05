@@ -9,6 +9,7 @@ export class SchemaValidator {
   private static ajv: Ajv;
   private static schemaValidator: ValidateFunction<any>;
   private static functionSchemaValidator: ValidateFunction<any>;
+  private static rbacSchemaValidator: ValidateFunction<any>;
   
   static {
     // Initialize AJV instance
@@ -27,6 +28,9 @@ export class SchemaValidator {
     
     // Define the function schema validation schema
     this.functionSchemaValidator = this.ajv.compile(this.getFunctionSchemaDefinitionSchema());
+
+    // Define the RBAC schema validation schema
+    this.rbacSchemaValidator = this.ajv.compile(this.getRbacSchemaDefinitionSchema());
   }
   
   /**
@@ -101,6 +105,31 @@ export class SchemaValidator {
       errors: errors.length > 0 ? errors : undefined
     };
   }
+  
+  /**
+   * Validate rbac schema definition using AJV
+   */
+  
+  static validateRBACSchemaDefinition(schema: any): ValidationResult {
+    const isValid = this.rbacSchemaValidator(schema);
+    const errors: ValidationError[] = [];
+    if (!isValid && this.rbacSchemaValidator.errors) {
+      for (const error of this.rbacSchemaValidator.errors) {
+        errors.push({
+          name: "RBACSchemaValidationError",
+          field: error.instancePath?.replace('/', '') || error.keyword,
+          error: error.keyword?.toUpperCase() || 'VALIDATION_ERROR',
+          message: error.message || 'RBAC schema validation failed',
+          severity: 'error'
+        });
+      }
+    }
+    return {
+      valid: errors.length === 0,
+      errors: errors.length > 0 ? errors : undefined
+    };
+  }
+
   
   /**
    * Validate field definition using AJV
@@ -582,6 +611,93 @@ export class SchemaValidator {
           },
           required: ['fields'],
           additionalProperties: true
+        }
+      }
+    };
+  }
+  private static getRbacSchemaDefinitionSchema(): any {
+    return {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          minLength: 1
+        },
+        version: {
+          type: 'string',
+          pattern: '^\\d+\\.\\d+\\.\\d+$'
+        },
+        description: {
+          type: 'string',
+          minLength: 1
+        },
+        collections: {
+          type: 'array',
+          items: {
+            $ref: '#/$defs/collectionRbacDefinition'
+          },
+          minItems: 1
+        }
+      },
+      required: ['name', 'collections'],
+      additionalProperties: false,
+      $defs: {
+        collectionRbacDefinition: {
+          type: 'object',
+          properties: {
+            collection_name: {
+              type: 'string',
+              pattern: '^[a-zA-Z_][a-zA-Z0-9_]*$',
+              minLength: 1
+            },
+            rbac_config: {
+              $ref: '#/$defs/rbacConfig'
+            }
+          },
+          required: ['collection_name', 'rbac_config'],
+          additionalProperties: false
+        },
+        rbacConfig: {
+          type: 'object',
+          properties: {
+            read: {
+              type: 'array',
+              items: { $ref: '#/$defs/rbacRule' },
+              minItems: 1
+            },
+            write: {
+              type: 'array',
+              items: { $ref: '#/$defs/rbacRule' },
+              minItems: 1
+            },
+            delete: {
+              type: 'array',
+              items: { $ref: '#/$defs/rbacRule' },
+              minItems: 1
+            }
+          },
+          required: ['read', 'write', 'delete'],
+          additionalProperties: false
+        },
+        rbacRule: {
+          type: 'object',
+          properties: {
+            user_role: {
+              type: 'string',
+              pattern: '^[a-zA-Z_][a-zA-Z0-9_]*$',
+              minLength: 1
+            },
+            attributes: {
+              type: 'array',
+              items: {
+                type: 'string',
+                pattern: '^(none|[a-zA-Z_][a-zA-Z0-9_]*)$'
+              },
+              uniqueItems: true
+            }
+          },
+          required: ['user_role', 'attributes'],
+          additionalProperties: false
         }
       }
     };

@@ -5,6 +5,7 @@ export * from './relationship';
 
 // Schema Type Definitions
 export interface Schema {
+  type: string;
   name?: string;
   collection?: string;
   fields: Record<string, FieldDefinition>;

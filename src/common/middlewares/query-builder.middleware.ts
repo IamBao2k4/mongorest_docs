@@ -234,11 +234,11 @@ export async function queryBuilderMiddleware(request: FastifyRequest, reply: Fas
         const queryResult = handleSearch(request.query || {});
         
         // Attach processed query data to request object
-        (request as any).queryData = queryResult;
+        request.queryData = queryResult;
         
         // Extract limit and skip from query parameters
         const queryParams = request.query as any;
-        (request as any).pagination = {
+        request.pagination = {
             limit: queryParams.limit ? Number(queryParams.limit) : undefined,
             skip: queryParams.skip ? Number(queryParams.skip) : undefined
         };

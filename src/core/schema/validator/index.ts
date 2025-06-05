@@ -345,6 +345,7 @@ export class DocumentValidator {
    */
   private static validateFieldType(value: any, fieldDef: FieldDefinition, fieldName: string): ValidationResult {
     return DataValidator.validateDataTypes({ [fieldName]: value }, { 
+      type: fieldDef.type,
       collection: 'temp', 
       fields: { [fieldName]: fieldDef } 
     });
@@ -352,6 +353,7 @@ export class DocumentValidator {
   
   private static validateFieldConstraints(value: any, fieldDef: FieldDefinition, fieldName: string): ValidationResult {
     return DataValidator.validateConstraints({ [fieldName]: value }, { 
+      type: fieldDef.type,
       collection: 'temp', 
       fields: { [fieldName]: fieldDef } 
     });

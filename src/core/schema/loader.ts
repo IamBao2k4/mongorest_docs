@@ -21,7 +21,7 @@ export class SchemaLoader {
   /**
    * Tải schema từ file JSON
    */
-  static async loadSchema(filePath: string, isCollection: boolean): Promise<Schema> {
+  static async loadSchema(filePath: string, type: string): Promise<Schema> {
     try {
       // Check cache first
       const cacheKey = path.resolve(filePath);
@@ -48,8 +48,15 @@ export class SchemaLoader {
       }
 
       // Validate schema structure
-      const validation = isCollection? await SchemaLoader.validateSchemaDefinition(schema)
-                                     : await SchemaLoader.validateFunctionSchemaDefinition(schema);                              
+      const validation = type === 'collections'
+        ? await SchemaLoader.validateSchemaDefinition(schema)
+        : type === 'functions'
+          ? await SchemaLoader.validateFunctionSchemaDefinition(schema)
+          : type === 'rbac'
+            ? await SchemaLoader.validateRBACSchemaDefinition(schema)
+            : { valid: false, errors: [{ message: `Unknown schema type: ${type}` }] };
+
+      // Check validation result
       if (!validation.valid) {
         const errorMessages = validation.errors?.map(e => e.message).join(', ') || 'Unknown validation errors';
         throw new LoaderError(
@@ -76,7 +83,7 @@ export class SchemaLoader {
   /**
    * Tải tất cả schemas từ một thư mục
    */
-  static async loadAllSchemas(schemasDir: string, isCollection: boolean): Promise<Map<string, Schema>> {
+  static async loadAllSchemas(schemasDir: string, type: string): Promise<Map<string, Schema>> {
     try {
       const schemas = new Map<string, Schema>();
       const collectionNames = new Set<string>();
@@ -88,31 +95,49 @@ export class SchemaLoader {
 
       // Get all JSON files in directory
       const files = await SchemaLoader.getJsonFiles(schemasDir);
-      
+
       // Load schemas in parallel
       const loadPromises = files.map(async (file) => {
         const filePath = path.join(schemasDir, file);
         try {
-          const schema = await SchemaLoader.loadSchema(filePath, isCollection);
-          
+          const schema = await SchemaLoader.loadSchema(filePath, type);
+
           // Check for duplicate collection names or function names
-          if (isCollection && !schema.collection) {
+          if (type === "collections" && !schema.collection) {
             throw new LoaderError(`Schema file ${file} does not define a collection name`, filePath);
           }
-          if (!isCollection && !schema) {
+          if (type === "functions" && !schema.name) {
             throw new LoaderError(`Schema file ${file} does not define a function name`, filePath);
           }
-          const name = isCollection ? schema.collection : schema.name;
-            if (collectionNames.has(name!)) {
+          if (type === "rbac" && !schema.name) {
+            throw new LoaderError(`Schema file ${file} does not define an RBAC name`, filePath);
+          }
+
+          // Determine the schema key based on type
+          let schemaKey: string;
+          if (type === "collections" && schema.collection) {
+            schemaKey = schema.collection;
+          } else {
+            if (schema.name) {
+              schemaKey = schema.name;
+            } else {
+              throw new LoaderError(`Schema file ${file} does not define a valid name`, filePath);
+            }
+          }
+
+          // Check for duplicates (except for rbac which might be unique)
+          if (collectionNames.has(schemaKey)) {
             throw new LoaderError(
-              `Duplicate schema name '${name}' found in file ${file}`,
+              `Duplicate schema name '${schemaKey}' found in file ${file}`,
               filePath
             );
-            }
-          collectionNames.add(name!);
-          // Store schema in map
-          schemas.set(name!, schema);
+          }
+          collectionNames.add(schemaKey);
           
+          console.log("Loading schema:", schemaKey, "from file:", file);
+          // Store schema in map
+          schemas.set(schemaKey, schema);
+
           return { file, schema, success: true };
         } catch (error) {
           console.log(`Error loading schema from file ${file}:`, error);
@@ -121,7 +146,7 @@ export class SchemaLoader {
       });
 
       const results = await Promise.all(loadPromises);
-      
+
       // Check for errors
       const errors = results.filter(r => !r.success);
       if (errors.length > 0) {
@@ -159,6 +184,9 @@ export class SchemaLoader {
     return SchemaValidator.validateFunctionSchemaDefinition(func);
   }
 
+  private static async validateRBACSchemaDefinition(rbac: object): Promise<ValidationResult> {
+    return SchemaValidator.validateRBACSchemaDefinition(rbac);
+  }
   /**
    * Parse chi tiết definition của một field
    */
@@ -243,7 +271,7 @@ export class SchemaLoader {
   static async resolveSchemaReferences(schemas: Map<string, Schema>): Promise<Map<string, Schema>> {
     const resolvedSchemas = new Map<string, Schema>();
     const dependencyGraph = SchemaLoader.buildDependencyGraph(schemas);
-    
+
     // Detect circular dependencies
     SchemaLoader.detectCircularDependencies(dependencyGraph);
 
@@ -339,7 +367,7 @@ export class SchemaLoader {
     for (const file of files) {
       const filePath = path.join(directory, file);
       const stats = await stat(filePath);
-      
+
       if (stats.isFile() && path.extname(file) === '.json') {
         jsonFiles.push(file);
       }
@@ -403,9 +431,9 @@ export class SchemaLoader {
   }
 
   private static async handleFileChange(
-    event: string, 
-    filePath: string, 
-    schemasDir: string, 
+    event: string,
+    filePath: string,
+    schemasDir: string,
     callback: Function
   ): Promise<void> {
     try {
@@ -416,10 +444,9 @@ export class SchemaLoader {
       const parentDir = path.dirname(filePath);
       const dirName = path.basename(parentDir);
 
-      const isCollection = dirName === 'collections'? true : false;
       // Reload all schemas
-      const updatedSchemas = await SchemaLoader.loadAllSchemas(schemasDir, isCollection);
-      
+      const updatedSchemas = await SchemaLoader.loadAllSchemas(schemasDir, dirName);
+
       // Call callback with updated schemas
       callback({
         event,
@@ -433,6 +460,13 @@ export class SchemaLoader {
         error: error.message
       });
     }
+  }
+
+  static getAllCachedSchemas(): Map<string, Schema> {
+    if (SchemaLoader.schemaCache.size === 0) {
+      throw new LoaderError('No schemas loaded in cache');
+    }
+    return SchemaLoader.schemaCache;
   }
 }
 

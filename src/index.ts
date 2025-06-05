@@ -47,7 +47,7 @@ const loadSchemasFromSubfolders = async (schemasPath: string) => {
     const collectionsPath = path.join(schemasPath, 'collections');
     if (fs.existsSync(collectionsPath)) {
         console.log(`Loading collections from: ${collectionsPath}`);
-        const collectionSchemas = await SchemaLoader.loadAllSchemas(collectionsPath, true);
+        const collectionSchemas = await SchemaLoader.loadAllSchemas(collectionsPath, "collections");
         console.log(`Found ${collectionSchemas.size} collection schemas:`, Array.from(collectionSchemas.keys()));
         
         // Merge vào allSchemas
@@ -60,11 +60,23 @@ const loadSchemasFromSubfolders = async (schemasPath: string) => {
     const functionsPath = path.join(schemasPath, 'functions');
     if (fs.existsSync(functionsPath)) {
         console.log(`Loading functions from: ${functionsPath}`);
-        const functionSchemas = await SchemaLoader.loadAllSchemas(functionsPath, false);
+        const functionSchemas = await SchemaLoader.loadAllSchemas(functionsPath, "functions");
         console.log(`Found ${functionSchemas.size} function schemas:`, Array.from(functionSchemas.keys()));
         
         // Merge vào allSchemas
         for (const [key, value] of functionSchemas) {
+            allSchemas.set(key, value);
+        }
+    }
+
+    const rbacPath = path.join(schemasPath, 'rbac');
+    if (fs.existsSync(rbacPath)) {
+        console.log(`Loading RBAC schemas from: ${rbacPath}`);
+        const rbacSchemas = await SchemaLoader.loadAllSchemas(rbacPath, "rbac");
+        console.log(`Found ${rbacSchemas.size} RBAC schemas:`, Array.from(rbacSchemas.keys()));
+        
+        // Merge vào allSchemas
+        for (const [key, value] of rbacSchemas) {
             allSchemas.set(key, value);
         }
     }
@@ -84,6 +96,7 @@ const start = async () => {
             // Tạo folder structure
             fs.mkdirSync(path.join(schemasPath, 'collections'), { recursive: true });
             fs.mkdirSync(path.join(schemasPath, 'functions'), { recursive: true });
+            fs.mkdirSync(path.join(schemasPath, 'rbac'), { recursive: true });
             
             console.log('Schemas directory structure created');
         }

@@ -1,0 +1,279 @@
+{
+  "name": "mongorest_rbac_config",
+  "version": "1.0.0",
+  "description": "RBAC configuration for MongoDB REST API",
+  "collections": [
+    {
+      "collection_name": "products",
+      "rbac_config": {
+        "read": [
+          {
+            "user_role": "default",
+            "attributes": [
+              "att1",
+              "att3",
+              "att5",
+              "att4"
+            ]
+          },
+          {
+            "user_role": "userlv_1",
+            "attributes": [
+              "att6"
+            ]
+          },
+          {
+            "user_role": "userlv_2",
+            "attributes": [
+              "att2",
+              "att6",
+              "att7"
+            ]
+          }
+        ],
+        "write": [
+          {
+            "user_role": "default",
+            "attributes": [
+              "att1",
+              "att2"
+            ]
+          },
+          {
+            "user_role": "admin",
+            "attributes": [
+              "att3",
+              "att4",
+              "att6"
+            ]
+          }
+        ],
+        "delete": [
+          {
+            "user_role": "default",
+            "attributes": [
+              "none"
+            ]
+          },
+          {
+            "user_role": "manager",
+            "attributes": [
+              "att2",
+              "att3"
+            ]
+          },
+          {
+            "user_role": "admin",
+            "attributes": [
+              "att1",
+              "att2",
+              "att5",
+              "att6"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "collection_name": "reports",
+      "rbac_config": {
+        "read": [
+          {
+            "user_role": "default",
+            "attributes": [
+              "att1",
+              "att2",
+              "att3",
+              "att4",
+              "att5"
+            ]
+          }
+        ],
+        "write": [
+          {
+            "user_role": "default",
+            "attributes": [
+              "none"
+            ]
+          },
+          {
+            "user_role": "manager",
+            "attributes": [
+              "att1",
+              "att2",
+              "att3",
+              "att4"
+            ]
+          }
+        ],
+        "delete": [
+          {
+            "user_role": "default",
+            "attributes": [
+              "none"
+            ]
+          },
+          {
+            "user_role": "manager",
+            "attributes": [
+              "att1",
+              "att2"
+            ]
+          },
+          {
+            "user_role": "admin",
+            "attributes": [
+              "att1",
+              "att2",
+              "att3",
+              "att4"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "collection_name": "orders",
+      "rbac_config": {
+        "read": [
+          {
+            "user_role": "default",
+            "attributes": [
+              "att1",
+              "att2",
+              "att3",
+              "att4"
+            ]
+          },
+          {
+            "user_role": "manager",
+            "attributes": [
+              "att5"
+            ]
+          },
+          {
+            "user_role": "admin",
+            "attributes": [
+              "att5",
+              "att7"
+            ]
+          }
+        ],
+        "write": [
+          {
+            "user_role": "default",
+            "attributes": [
+              "att1",
+              "att2"
+            ]
+          },
+          {
+            "user_role": "manager",
+            "attributes": [
+              "att3",
+              "att5",
+              "att6"
+            ]
+          },
+          {
+            "user_role": "admin",
+            "attributes": [
+              "att2",
+              "att3",
+              "att5",
+              "att6"
+            ]
+          }
+        ],
+        "delete": [
+          {
+            "user_role": "default",
+            "attributes": [
+              "none"
+            ]
+          },
+          {
+            "user_role": "manager",
+            "attributes": [
+              "none"
+            ]
+          },
+          {
+            "user_role": "admin",
+            "attributes": [
+              "att3"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "collection_name": "users",
+      "rbac_config": {
+        "read": [
+          {
+            "user_role": "default",
+            "attributes": [
+              "att1",
+              "att2",
+              "att3"
+            ]
+          },
+          {
+            "user_role": "admin",
+            "attributes": [
+              "att4",
+              "att5",
+              "att6",
+              "att7"
+            ]
+          }
+        ],
+        "write": [
+          {
+            "user_role": "default",
+            "attributes": [
+              "att1",
+              "att2"
+            ]
+          },
+          {
+            "user_role": "manager",
+            "attributes": [
+              "att3",
+              "att4"
+            ]
+          },
+          {
+            "user_role": "admin",
+            "attributes": [
+              "att3",
+              "att4"
+            ]
+          }
+        ],
+        "delete": [
+          {
+            "user_role": "default",
+            "attributes": [
+              "none"
+            ]
+          },
+          {
+            "user_role": "manager",
+            "attributes": [
+              "none"
+            ]
+          },
+          {
+            "user_role": "admin",
+            "attributes": [
+              "att7",
+              "att6"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
