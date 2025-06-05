@@ -3,7 +3,7 @@ import { DataValidator } from '../data-validator';
 import { Collection } from 'mongodb';
 
 /**
- * Document Validator - Xác thực document hoàn chỉnh theo schema
+ * Document Validator - Validate complete document according to schema
  */
 export class DocumentValidator {
   

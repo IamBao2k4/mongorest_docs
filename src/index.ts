@@ -43,27 +43,27 @@ IndexRoute(app);
 const loadSchemasFromSubfolders = async (schemasPath: string) => {
     const allSchemas = new Map();
     
-    // Load từ folder collections
+    // Load from collections folder
     const collectionsPath = path.join(schemasPath, 'collections');
     if (fs.existsSync(collectionsPath)) {
         console.log(`Loading collections from: ${collectionsPath}`);
         const collectionSchemas = await SchemaLoader.loadAllSchemas(collectionsPath, "collections");
         console.log(`Found ${collectionSchemas.size} collection schemas:`, Array.from(collectionSchemas.keys()));
         
-        // Merge vào allSchemas
+        // Merge into allSchemas
         for (const [key, value] of collectionSchemas) {
             allSchemas.set(key, value);
         }
     }
     
-    // Load từ folder functions  
+    // Load from functions folder  
     const functionsPath = path.join(schemasPath, 'functions');
     if (fs.existsSync(functionsPath)) {
         console.log(`Loading functions from: ${functionsPath}`);
         const functionSchemas = await SchemaLoader.loadAllSchemas(functionsPath, "functions");
         console.log(`Found ${functionSchemas.size} function schemas:`, Array.from(functionSchemas.keys()));
         
-        // Merge vào allSchemas
+        // Merge into allSchemas
         for (const [key, value] of functionSchemas) {
             allSchemas.set(key, value);
         }
@@ -75,7 +75,7 @@ const loadSchemasFromSubfolders = async (schemasPath: string) => {
         const rbacSchemas = await SchemaLoader.loadAllSchemas(rbacPath, "rbac");
         console.log(`Found ${rbacSchemas.size} RBAC schemas:`, Array.from(rbacSchemas.keys()));
         
-        // Merge vào allSchemas
+        // Merge into allSchemas
         for (const [key, value] of rbacSchemas) {
             allSchemas.set(key, value);
         }
@@ -93,7 +93,7 @@ const start = async () => {
             console.log(`Schemas directory not found: ${schemasPath}`);
             console.log('Creating schemas directory structure...');
             
-            // Tạo folder structure
+            // Create folder structure
             fs.mkdirSync(path.join(schemasPath, 'collections'), { recursive: true });
             fs.mkdirSync(path.join(schemasPath, 'functions'), { recursive: true });
             fs.mkdirSync(path.join(schemasPath, 'rbac'), { recursive: true });

@@ -2,7 +2,7 @@ import { Schema, FieldDefinition, ValidationResult, ValidationError, ValidationO
 import { Types } from 'mongoose';
 
 /**
- * Data Validator - Xác thực dữ liệu theo schema
+ * Data Validator - Validate data according to schema
  */
 export class DataValidator {
   

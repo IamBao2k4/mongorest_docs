@@ -10,8 +10,8 @@ const readdir = promisify(fs.readdir);
 const stat = promisify(fs.stat);
 
 /**
- * Schema Loader - Tải và Xử lý Schema
- * Module này chịu trách nhiệm tải, parse và validate các file schema JSON
+ * Schema Loader - Load and Process Schema
+ * This module is responsible for loading, parsing and validating JSON schema files
  */
 export class SchemaLoader {
   private static schemaCache = new Map<string, Schema>();
@@ -19,7 +19,7 @@ export class SchemaLoader {
   private static watchers = new Map<string, any>();
 
   /**
-   * Tải schema từ file JSON
+   * Load schema from JSON file
    */
   static async loadSchema(filePath: string, type: string): Promise<Schema> {
     try {
@@ -81,7 +81,7 @@ export class SchemaLoader {
   }
 
   /**
-   * Tải tất cả schemas từ một thư mục
+   * Load all schemas from a directory
    */
   static async loadAllSchemas(schemasDir: string, type: string): Promise<Map<string, Schema>> {
     try {
@@ -170,16 +170,15 @@ export class SchemaLoader {
   }
 
   /**
-   * Validate cấu trúc của schema object
+   * Validate schema object structure
    */
   private static async validateSchemaDefinition(schema: object): Promise<ValidationResult> {
     return SchemaValidator.validateSchemaDefinition(schema);
   }
 
   /**
-   * Validate cấu trúc của schema function
+   * Validate function schema structure
    */
-
   private static async validateFunctionSchemaDefinition(func: object): Promise<ValidationResult> {
     return SchemaValidator.validateFunctionSchemaDefinition(func);
   }
@@ -188,7 +187,7 @@ export class SchemaLoader {
     return SchemaValidator.validateRBACSchemaDefinition(rbac);
   }
   /**
-   * Parse chi tiết definition của một field
+   * Parse detailed field definition
    */
   static parseFieldDefinition(fieldDef: any): any {
     const parsed = {
@@ -266,7 +265,7 @@ export class SchemaLoader {
   }
 
   /**
-   * Resolve các references giữa schemas
+   * Resolve references between schemas
    */
   static async resolveSchemaReferences(schemas: Map<string, Schema>): Promise<Map<string, Schema>> {
     const resolvedSchemas = new Map<string, Schema>();
@@ -299,7 +298,7 @@ export class SchemaLoader {
   }
 
   /**
-   * Watch changes trong schema files để auto-reload
+   * Watch changes in schema files for auto-reload
    */
   static watchSchemaChanges(schemasDir: string, callback: Function): void {
     if (SchemaLoader.watchers.has(schemasDir)) {
@@ -440,7 +439,7 @@ export class SchemaLoader {
       // Clear cache for changed file
       SchemaLoader.schemaCache.delete(path.resolve(filePath));
 
-      // modify parent directory to get the directory name if "collections" or "functions"
+      // Modify parent directory to get the directory name if "collections" or "functions"
       const parentDir = path.dirname(filePath);
       const dirName = path.basename(parentDir);
 

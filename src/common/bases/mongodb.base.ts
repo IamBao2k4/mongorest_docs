@@ -177,7 +177,7 @@ class MongoDBService {
       let timestamp = new Date(appSettings.timeZoneMongoDB.getCurrentTime())
       console.warn(`[${MongoDBService.name}] social_threads - ${timestamp} Collection "${collectionName}" has been successfully created.`);
     } catch (error: any) {
-      console.error(`Lỗi khi tạo collection: ${error.message}`);
+      console.error(`Error creating collection: ${error.message}`);
       throw error;
     }
   }
@@ -186,9 +186,9 @@ class MongoDBService {
     const db = await this.getDb();
     try {
       await db.dropCollection(collectionName);
-      console.log(`Collection ${collectionName} đã được xóa.`);
+      console.log(`Collection ${collectionName} has been deleted.`);
     } catch (error: any) {
-      console.error(`Lỗi khi xóa collection: ${error.message}`);
+      console.error(`Error deleting collection: ${error.message}`);
       throw error;
     }
   }
@@ -221,20 +221,20 @@ class MongoDBService {
   }
 
   /**
-   * Tạo collection mới với schema validation
-   * @param collectionName tên collection cần tạo
-   * @param schema schema validator theo chuẩn $jsonSchema
+   * Create new collection with schema validation
+   * @param collectionName name of collection to create
+   * @param schema validator schema according to $jsonSchema standard
    */
   async createCollectionWithSchema(collectionName: string, schema: any) {
     const db = await this.getDb();
     try {
-      // Kiểm tra xem collection có tồn tại chưa
+      // Check if collection already exists
       const collections = await db.listCollections({ name: collectionName }).toArray();
       if (collections.length > 0) {
-        throw new Error(`Collection ${collectionName} đã tồn tại`);
+        throw new Error(`Collection ${collectionName} already exists`);
       }
 
-      // Tạo collection với validator
+      // Create collection with validator
       await db.createCollection(collectionName, {
         validator: {
           $jsonSchema: schema
@@ -243,17 +243,17 @@ class MongoDBService {
         validationAction: "error",
       });
 
-      console.log(`Collection ${collectionName} đã được tạo thành công.`);
+      console.log(`Collection ${collectionName} has been created successfully.`);
     } catch (error: any) {
-      console.error(`Lỗi khi tạo collection: ${error.message}`);
+      console.error(`Error creating collection: ${error.message}`);
       throw error;
     }
   }
 
   /**
-   * Cập nhật schema validator cho một collection đã tồn tại
-   * @param collectionName tên collection cần cập nhật
-   * @param schema schema validator mới
+   * Update schema validator for an existing collection
+   * @param collectionName name of collection to update
+   * @param schema new validator schema
    */
   async updateCollectionSchema(collectionName: string, schema: any) {
     const db = await this.getDb();
@@ -266,16 +266,16 @@ class MongoDBService {
         validationLevel: "strict",
         validationAction: "error",
       });
-      console.log(`Schema của collection ${collectionName} đã được cập nhật.`);
+      console.log(`Schema of collection ${collectionName} has been updated.`);
     } catch (error: any) {
-      console.error(`Lỗi khi cập nhật schema: ${error.message}`);
+      console.error(`Error updating schema: ${error.message}`);
       throw error;
     }
   }
 
   /**
-  * Lấy danh sách các collection trong cơ sở dữ liệu
-  * @returns Danh sách tên các collection
+  * Get list of collections in the database
+  * @returns List of collection names
   */
   async listCollectionNames(): Promise<string[]> {
     const db = await this.getDb();
@@ -283,7 +283,7 @@ class MongoDBService {
       const collections = await db.listCollections().toArray();
       return collections.map(col => col.name);
     } catch (error: any) {
-      console.error(`Lỗi khi lấy danh sách collection: ${error.message}`);
+      console.error(`Error getting collection list: ${error.message}`);
       throw error;
     }
   }

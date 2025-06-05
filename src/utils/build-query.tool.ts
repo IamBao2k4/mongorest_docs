@@ -1,4 +1,4 @@
-// get populate fields from schema
+// Get populate fields from schema
 export async function getRelationFields(schema: any, parentPath = "") {
     const relations: string[] = [];
     function findRelations(obj: any, path: string) {
@@ -28,11 +28,11 @@ export async function generateAggregationPipeline(mappings: string[]) {
     mappings.forEach((mapping) => {
         const [sourcePath, targetCollection] = mapping.split(",");
         if (sourcePath.includes("@")) {
-            // Ví dụ: "permission@entity,entity"
+            // Example: "permission@entity,entity"
             const [arrayField, nestedField] = sourcePath.split("@"); // arrayField: "permission", nestedField: "entity"
 
-            // Stage 1: Chuyển đổi các giá trị trong nested field sang ObjectId.
-            // Nếu giá trị của nested field là string, chuyển thành mảng trước.
+            // Stage 1: Convert the values in the nested field to ObjectId.
+            // If the value of the nested field is a string, convert it to an array first.
             addFieldsStage.$addFields[arrayField] = {
                 $map: {
                     input: `$${arrayField}`,
@@ -51,15 +51,15 @@ export async function generateAggregationPipeline(mappings: string[]) {
                                 in: { $toObjectId: "$$id" }
                             }
                         },
-                        // Giữ lại các trường khác nếu có
+                        // Keep other fields if any
                         filter: "$$item.filter",
                         access_field: "$$item.access_field"
                     }
                 }
             };
 
-            // Stage 2: Lookup cho trường mảng
-            const alias = `${targetCollection}_data`; // ví dụ: "entity_data"
+            // Stage 2: Lookup for the array field
+            const alias = `${targetCollection}_data`; // example: "entity_data"
             lookupStages.push({
                 $lookup: {
                     from: targetCollection,
@@ -69,7 +69,7 @@ export async function generateAggregationPipeline(mappings: string[]) {
                 }
             });
 
-            // Stage 3: Ánh xạ lại các phần tử đã lookup cho trường mảng
+            // Stage 3: Remap the looked-up elements for the array field
             finalAddFieldsStage.$addFields[arrayField] = {
                 $map: {
                     input: `$${arrayField}`,
@@ -101,8 +101,8 @@ export async function generateAggregationPipeline(mappings: string[]) {
 
             unsetFields.push(alias);
         } else {
-            // Ví dụ: "created_by,user"
-            // Stage 1: Với field đơn, kiểm tra nếu là string thì chuyển thành mảng trước khi convert sang ObjectId.
+            // Example: "created_by,user"
+            // Stage 1: For single fields, check if it's a string then convert it to an array before converting to ObjectId.
             addFieldsStage.$addFields[sourcePath] = {
                 $let: {
                     vars: {
@@ -125,7 +125,7 @@ export async function generateAggregationPipeline(mappings: string[]) {
             };
 
 
-            // Stage 2: Lookup cho field đơn
+            // Stage 2: Lookup for single field
             const alias = `${sourcePath}_data`;
             lookupStages.push({
                 $lookup: {
@@ -136,7 +136,7 @@ export async function generateAggregationPipeline(mappings: string[]) {
                 }
             });
 
-            // Stage 3: Ánh xạ lại field đơn (lấy phần tử đầu tiên)
+            // Stage 3: Remap single field (take the first element)
             finalAddFieldsStage.$addFields[sourcePath] = `$${alias}`;
 
             unsetFields.push(alias);
