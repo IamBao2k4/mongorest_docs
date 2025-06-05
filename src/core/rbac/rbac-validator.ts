@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import { SchemaLoader } from "../schema/loader";
+import e from "express";
 
 interface RBACRule {
     user_role: string;
@@ -43,8 +44,6 @@ function loadRBACConfig(): CollectionRBAC[] {
             } else {
                 rbacConfigCache = []; // Fallback
             }
-            
-            console.log('RBAC config loaded:', rbacConfigCache);
         } catch (error) {
             console.error('Error loading RBAC config:', error);
             rbacConfigCache = [];
@@ -77,24 +76,27 @@ export function getAllowedAttributes(
     const operationRules = collectionConfig.rbac_config[operation];
     const allowedAttributes = new Set<string>();
     
-    // Always include default user permissions first
-    const defaultRule = operationRules.find(rule => rule.user_role === 'default');
-    
-    if (defaultRule && defaultRule.attributes.length > 0 && !defaultRule.attributes.includes("none")) {
-        defaultRule.attributes.forEach(attr => allowedAttributes.add(attr));
+    // If no user roles provided, default to 'default' role
+    if(userRoles.length === 0) {
+        console.warn(`No roles found for user, defaulting to 'default' role`);
+        userRoles = ['default'];
     }
-    
-    // Then add permissions for user's specific roles
-    for (const userRole of userRoles) {
-        if (userRole === 'default' || userRole === 'defaut') {
-            continue;
-        }
-        
-        const rule = operationRules.find(rule => rule.user_role === userRole);
-        if (rule && rule.attributes.length > 0 && !rule.attributes.includes("none")) {
-            rule.attributes.forEach(attr => allowedAttributes.add(attr));
-        }
+
+    // Always add default role attributes first if exists
+    const defaultRule = operationRules.find(rule => rule.user_role === "default");
+    if(!defaultRule?.attributes.includes("none")) {
+        defaultRule?.attributes.forEach(attr => allowedAttributes.add(attr));
     }
+
+    // Add attributes for each user role (excluding default since we already added it)
+    userRoles.forEach(role => {
+        if (role !== 'default') {
+            const rule = operationRules.find(r => r.user_role === role);
+            if (rule && !rule.attributes.includes("none")) {
+                rule.attributes.forEach(attr => allowedAttributes.add(attr));
+            }
+        }
+    });
     
     return Array.from(allowedAttributes);
 }

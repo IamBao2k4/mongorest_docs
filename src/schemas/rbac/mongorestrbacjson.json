@@ -25,9 +25,22 @@
           {
             "user_role": "userlv_2",
             "attributes": [
+              "att2"
+            ]
+          },
+          {
+            "user_role": "admin",
+            "attributes": [
               "att2",
               "att6",
               "att7"
+            ]
+          },
+          {
+            "user_role": "manager",
+            "attributes": [
+              "att2",
+              "att6"
             ]
           }
         ],
