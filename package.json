@@ -6,7 +6,10 @@
   "scripts": {
     "start": "ts-node dist/index.js",
     "dev": "concurrently \"tsc --watch\" \"nodemon\"",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "devDependencies": {
     "@types/cors": "^2.8.18",
