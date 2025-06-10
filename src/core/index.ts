@@ -23,6 +23,9 @@ export interface MongoQuery {
   pipeline?: any[];
   hasEmbeds?: boolean;
   embeddedTables?: string[];
+  limit?: number;       // ✅ new
+  skip?: number;        // ✅ new
+  count?: boolean;      // ✅ new
 }
 
 export interface ConvertOptions {

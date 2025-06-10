@@ -12,7 +12,7 @@
     "test:coverage": "jest --coverage"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.18",
+    "@types/cors": "^2.8.19",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.15.21",
     "concurrently": "^9.1.2",
@@ -33,6 +33,7 @@
     "fastify": "^5.3.3",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.16.0",
+    "mongodb-memory-server": "^10.1.4",
     "mongoose": "^8.15.0"
   }
 }

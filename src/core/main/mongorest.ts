@@ -25,51 +25,68 @@ export class PostgRESTToMongoConverter {
   /**
    * Convert PostgREST query parameters to MongoDB query
    */
-  convert(params: QueryParams, collection?: string): MongoQuery { // ✅ Added collection parameter
-    const result: MongoQuery = {
-      filter: {}
-    };
+  convert(params: QueryParams, collection?: string): MongoQuery {
+  const result: MongoQuery = {
+    filter: {}
+  };
 
-    const filterConditions: Record<string, any>[] = [];
+  const filterConditions: Record<string, any>[] = [];
 
-    Object.entries(params).forEach(([key, value]) => {
-      const paramValue = Array.isArray(value) ? value[0] : value;
+  Object.entries(params).forEach(([key, value]) => {
+    const paramValue = Array.isArray(value) ? value[0] : value;
 
-      // Handle special parameters
-      if (key === 'select') {
-        this.handleSelect(paramValue, collection, result); // ✅ Fixed method call
-        return;
-      }
-
-      if (key === 'order') {
-        result.sort = this.orderParser.parseOrder(paramValue);
-        return;
-      }
-
-      // Handle logical operations
-      if (key === 'or' || key === 'and' || key.startsWith('not.')) {
-        const logicalCondition = this.logicalParser.parseLogical(`${key}=${paramValue}`);
-        if (logicalCondition) {
-          filterConditions.push(logicalCondition);
-          return;
-        }
-      }
-
-      // Handle regular filters
-      const filter = this.filterParser.parseFilter(key, paramValue);
-      const mongoFilter = this.filterParser.convertFilter(filter);
-      filterConditions.push(mongoFilter);
-    });
-
-    // Combine all filter conditions
-    if (filterConditions.length === 1) {
-      result.filter = filterConditions[0];
-    } else if (filterConditions.length > 1) {
-      result.filter = { $and: filterConditions };
+    // ✅ Handle special parameters
+    if (key === 'select') {
+      this.handleSelect(paramValue, collection, result);
+      return;
     }
 
-    return result;
+    if (key === 'order') {
+      result.sort = this.orderParser.parseOrder(paramValue);
+      return;
+    }
+
+    // ✅ Handle pagination parameters
+    if (key === 'limit') {
+      result.limit = parseInt(paramValue);
+      return;
+    }
+
+    if (key === 'skip') {
+      result.skip = parseInt(paramValue);
+      return;
+    }
+
+    if (key === 'count') {
+      result.count = paramValue === 'true' || paramValue === 'exact';
+      return;
+    }
+
+    // ✅ Handle logical operations
+    if (key === 'or' || key === 'and' || key.startsWith('not.')) {
+      const logicalCondition = this.logicalParser.parseLogical(`${key}=${paramValue}`);
+      if (logicalCondition) {
+        filterConditions.push(logicalCondition);
+        return;
+      }
+    }
+
+    // ✅ Regular filters
+    const filter = this.filterParser.parseFilter(key, paramValue);
+    const mongoFilter = this.filterParser.convertFilter(filter);
+    filterConditions.push(mongoFilter);
+  });
+
+  // ✅ Combine all filter conditions
+  if (filterConditions.length === 1) {
+    result.filter = filterConditions[0];
+  } else if (filterConditions.length > 1) {
+    result.filter = { $and: filterConditions };
   }
+
+  return result;
+}
+
 
   // ✅ New helper method
   private handleSelect(selectValue: string, collection: string | undefined, result: MongoQuery): void {
@@ -81,7 +98,7 @@ export class PostgRESTToMongoConverter {
       // Use enhanced parsing with embeds
       const selectResult = this.selectParser.parseSelect(collection, selectValue);
       result.projection = selectResult.fields;
-      
+      console.log("selectResult", JSON.stringify(selectResult))
       if (selectResult.pipeline.length > 0) {
         result.pipeline = selectResult.pipeline;
         result.hasEmbeds = true;

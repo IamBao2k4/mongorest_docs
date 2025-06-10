@@ -28,16 +28,13 @@ export class ModularSelectParser {
     if (!selectClause || selectClause === "*") {
       return { fields: {}, pipeline: [], embeds: [] };
     }
-
     this.currentDepth = 0;
     const result = {
       fields: {} as Record<string, 1>,
       pipeline: [] as any[],
       embeds: [] as string[],
     };
-    console.log(selectClause)
     const tokens = this.tokenizeSelect(selectClause);
-    console.log(tokens)
     for (const token of tokens) {
       if (this.isEmbedExpression(token)) {
         if (this.currentDepth < this.maxEmbedDepth) {
@@ -62,7 +59,7 @@ export class ModularSelectParser {
         }
       }
     }
-
+    console.log("result", JSON.stringify(result))
     return result;
   }
 
@@ -114,76 +111,80 @@ export class ModularSelectParser {
   }
 
   private isEmbedExpression(token: string): boolean {
-  const trimmed = token.trim();
-  
-  // Must have both opening and closing parentheses
-  if (!trimmed.includes('(') || !trimmed.includes(')')) {
-    return false;
-  }
-  
-  // Must not be a quoted string
-  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-      (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
-    return false;
-  }
-  
-  // Check for proper parentheses pairing
-  let openCount = 0;
-  let closeCount = 0;
-  let lastClosePos = -1;
-  
-  for (let i = 0; i < trimmed.length; i++) {
-    if (trimmed[i] === '(') openCount++;
-    if (trimmed[i] === ')') {
-      closeCount++;
-      lastClosePos = i;
+    const trimmed = token.trim();
+
+    // Must have both opening and closing parentheses
+    if (!trimmed.includes("(") || !trimmed.includes(")")) {
+      return false;
     }
+
+    // Must not be a quoted string
+    if (
+      (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'"))
+    ) {
+      return false;
+    }
+
+    // Check for proper parentheses pairing
+    let openCount = 0;
+    let closeCount = 0;
+    let lastClosePos = -1;
+
+    for (let i = 0; i < trimmed.length; i++) {
+      if (trimmed[i] === "(") openCount++;
+      if (trimmed[i] === ")") {
+        closeCount++;
+        lastClosePos = i;
+      }
+    }
+
+    // Must have equal open/close and close at the end
+    return (
+      openCount === closeCount &&
+      openCount > 0 &&
+      lastClosePos === trimmed.length - 1
+    );
   }
-  
-  // Must have equal open/close and close at the end
-  return openCount === closeCount && 
-         openCount > 0 && 
-         lastClosePos === trimmed.length - 1;
-}
 
   private parseRegularField(token: string): Record<string, 1> | null {
-  let trimmed = token.trim();
-  
-  if (!trimmed || trimmed === '*') {
-    return {};
-  }
+    let trimmed = token.trim();
 
-  // Handle alias format: "alias:field_name"
-  if (trimmed.includes(':') && !trimmed.includes('::')) {
-    const [alias, fieldName] = trimmed.split(':');
-    const cleanFieldName = fieldName ? fieldName.trim() : '';
-    if (cleanFieldName) {
-      return { [cleanFieldName]: 1 };
+    if (!trimmed || trimmed === "*") {
+      return {};
     }
-  }
 
-  // Handle JSON path like "json_data->field" (simplified)
-  if (trimmed.includes('->')) {
-    const cleanField = trimmed.split('->')[0];
-    if (cleanField) {
-      return { [cleanField]: 1 };
+    // Handle alias format: "alias:field_name"
+    if (trimmed.includes(":") && !trimmed.includes("::")) {
+      const [alias, fieldName] = trimmed.split(":");
+      const cleanFieldName = fieldName ? fieldName.trim() : "";
+      if (cleanFieldName) {
+        return { [cleanFieldName]: 1 };
+      }
     }
-  }
 
-  // ✅ IMPROVED: Handle casting like "price::text"
-  if (trimmed.includes('::')) {
-    const parts = trimmed.split('::');
-    const fieldName = parts[0];
-    if (fieldName && fieldName.trim()) {
-      return { [fieldName.trim()]: 1 };
+    // Handle JSON path like "json_data->field" (simplified)
+    if (trimmed.includes("->")) {
+      const cleanField = trimmed.split("->")[0];
+      if (cleanField) {
+        return { [cleanField]: 1 };
+      }
     }
-    // If no field name before ::, skip this token
-    return null;
-  }
 
-  // Regular field
-  return { [trimmed]: 1 };
-}
+    // ✅ IMPROVED: Handle casting like "price::text"
+    if (trimmed.includes("::")) {
+      const parts = trimmed.split("::");
+      const fieldName = parts[0];
+      if (fieldName && fieldName.trim()) {
+        return { [fieldName.trim()]: 1 };
+      }
+      // If no field name before ::, skip this token
+      return null;
+    }
+
+    // Regular field
+    return { [trimmed]: 1 };
+  }
 }
 
 // Configuration helpers
