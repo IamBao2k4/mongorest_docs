@@ -33,5 +33,6 @@ export interface EmbedRequest {
   orderBy?: string[];
   limit?: number;
   offset?: number;
+  children?: (EmbedRequest | null)[] 
   joinHint?: string; // inner, left, right
 }
