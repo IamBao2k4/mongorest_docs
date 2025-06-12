@@ -22,7 +22,7 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
 
   // Users -> Reviews (1:many)
   registry.registerFromDefinition('users', {
-    name: 'reviews',
+    name: 'product_reviews',
     targetTable: 'product_reviews',
     localField: '_id',
     foreignField: 'userId',
@@ -99,7 +99,7 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
 
   // Products -> Reviews (1:many)
   registry.registerFromDefinition('products', {
-    name: 'reviews',
+    name: 'product_reviews',
     targetTable: 'product_reviews',
     localField: '_id',
     foreignField: 'productId',
@@ -120,7 +120,7 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   // ===== REVIEW RELATIONSHIPS =====
   
   // Reviews -> Product (many:1)
-  registry.registerFromDefinition('reviews', {
+  registry.registerFromDefinition('product_reviews', {
     name: 'products',
     targetTable: 'products',
     localField: 'productId',
@@ -129,7 +129,7 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   });
 
   // Reviews -> User (many:1)
-  registry.registerFromDefinition('reviews', {
+  registry.registerFromDefinition('product_reviews', {
     name: 'user',
     targetTable: 'users',
     localField: 'userId',
@@ -186,7 +186,7 @@ export function setupBasicRelationships(): RelationshipRegistry {
 
   // Products -> Reviews (1:many)
   registry.registerFromDefinition('products', {
-    name: 'reviews',
+    name: 'product_reviews',
     targetTable: 'product_reviews',
     localField: '_id',
     foreignField: 'productId',
@@ -227,7 +227,7 @@ export function setupRelationshipsFromConfig(): RelationshipRegistry {
         type: 'one-to-many'
       },
       {
-        name: 'reviews',
+        name: 'product_reviews',
         targetTable: 'product_reviews',
         localField: '_id',
         foreignField: 'userId',
@@ -294,7 +294,7 @@ export function setupRelationshipsFromConfig(): RelationshipRegistry {
         }
       },
       {
-        name: 'reviews',
+        name: 'product_reviews',
         targetTable: 'product_reviews',
         localField: '_id',
         foreignField: 'productId',
@@ -362,14 +362,14 @@ export function setupRelationshipsFromConfig(): RelationshipRegistry {
 export function validateRelationships(registry: RelationshipRegistry): boolean {
   const expectedRelationships = [
     ['users', 'orders'],
-    ['users', 'reviews'],
+    ['users', 'product_reviews'],
     ['categories', 'parent'],
     ['categories', 'children'],
     ['categories', 'products'],
     ['categories', 'primaryProducts'],
     ['products', 'primaryCategory'],
     ['products', 'categories'],
-    ['products', 'reviews'],
+    ['products', 'product_reviews'],
     ['orders', 'customer'],
     ['product_reviews', 'product'],
     ['product_reviews', 'user'],

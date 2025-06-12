@@ -519,15 +519,16 @@ export class RBACPatternHandler {
 
         // Start with empty result and only include allowed fields
         const result :any = [];
+        
 
-        for (let i = 0; i < data.length; i++) {
-            const temp = {};
-            for (const pattern of includes) {
-                const resolvedPattern = this.resolveContext(pattern, context);
-                this.includePatternInResult(data[i], resolvedPattern.segments, temp, []);
+            for (let i = 0; i < data.length; i++) {
+                const temp = {};
+                for (const pattern of includes) {
+                    const resolvedPattern = this.resolveContext(pattern, context);
+                    this.includePatternInResult(data[i], resolvedPattern.segments, temp, []);
+                }
+                result.push(temp);
             }
-            result.push(temp);
-        }
 
         return result;
     }
