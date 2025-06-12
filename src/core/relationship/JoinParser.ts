@@ -50,14 +50,11 @@ export class JoinParser {
     return result;
   }
 
-  /**
-   * Parse embedding expression like "posts(id,title,comments(id,content))"
-   */
   parseEmbedExpression(
     sourceTable: string,
     expression: string
   ): EmbedRequest | null {
-    // Extract table name and hint
+    // Extract table name and content in parentheses
     const match = expression.match(/^([^!(]+)(!([^(]+))?(\(.*\))?(.*)$/);
     if (!match) return null;
 
@@ -76,27 +73,27 @@ export class JoinParser {
     // Split and classify fields
     const allFields = this.splitFieldsSafely(fieldsContent);
 
-    // Phân loại các fields
+    // Classify fields
     const fields: string[] = [];
     const filters: Record<string, string> = {};
-    const functionFields: string[] = [];
+    const nestedJoins: string[] = [];
 
     allFields.forEach((field) => {
       if (this.isFilterExpression(field)) {
-        // Parse filter expression thành key-value
+        // Parse filter expression
         const filterObj = this.parseFilterExpression(field);
         Object.assign(filters, filterObj);
-      } else if (field.includes("(")) {
-        // Đây là nested join
-        functionFields.push(field);
+      } else if (this.isNestedJoin(field)) {
+        // This is a nested join (contains table name with parentheses)
+        nestedJoins.push(field);
       } else {
-        // Đây là field thông thường
+        // Regular field
         fields.push(field);
       }
     });
 
     // Parse nested children
-    const children = functionFields
+    const children = nestedJoins
       .map((f) => this.parseEmbedExpression(tableName, f))
       .filter((child) => child !== null) as EmbedRequest[];
 
@@ -104,28 +101,43 @@ export class JoinParser {
       table: tableName,
       children,
       fields,
-      filters, // Trả về filters riêng biệt
+      filters,
       joinHint: joinHint || "left",
     };
   }
 
-  // Helper function để parse filter expression thành object
+  // Helper function to parse filter expression into object
   private parseFilterExpression(field: string): Record<string, string> {
     const result: Record<string, string> = {};
 
-    // Tách key và value từ expression
+    // Handle special cases like "or=" and "and="
+    if (field.startsWith("or=") || field.startsWith("and=")) {
+      const key = field.substring(0, field.indexOf("="));
+      const value = field.substring(field.indexOf("=") + 1);
+      result[key] = value;
+      return result;
+    }
+
+    // Handle regular filter expressions
     const equalIndex = field.indexOf("=");
     if (equalIndex === -1) return result;
 
     const key = field.substring(0, equalIndex);
     const value = field.substring(equalIndex + 1);
-
     result[key] = value;
 
     return result;
   }
+
   private isFilterExpression(field: string): boolean {
-    // Kiểm tra các pattern thường gặp trong filter
+    // First check if it's a nested join (has parentheses)
+    // If it has parentheses, it's likely a nested join, not a filter
+    if (field.includes("(") && field.includes(")")) {
+      // Check if it starts with known filter prefixes when it has parentheses
+      return /^(or|and)=/.test(field);
+    }
+
+    // Check for filter patterns for non-parentheses expressions
     const filterPatterns = [
       /=eq\./, // equal
       /=neq\./, // not equal
@@ -144,7 +156,17 @@ export class JoinParser {
     return filterPatterns.some((pattern) => pattern.test(field));
   }
 
-  // Enhanced splitFieldsSafely để handle complex expressions
+  // New helper function to identify nested joins
+  private isNestedJoin(field: string): boolean {
+    // A nested join should contain parentheses and not be a filter expression
+    return (
+      field.includes("(") &&
+      field.includes(")") &&
+      !this.isFilterExpression(field)
+    );
+  }
+
+  // Enhanced splitFieldsSafely to handle complex expressions
   private splitFieldsSafely(content: string): string[] {
     if (!content) return [];
 
@@ -175,7 +197,7 @@ export class JoinParser {
         } else if (char === ")") {
           depth--;
         } else if (char === "," && depth === 0) {
-          // Đây là separator ở level root
+          // This is a separator at root level
           if (current.trim()) {
             fields.push(current.trim());
           }
@@ -198,88 +220,105 @@ export class JoinParser {
    * Build Advance
    */
   buildLookupNested(
-    lookupStage: any,
-    children: (EmbedRequest | null)[] = [],
-    parent: string,
-    filters: Record<string, any>
-  ): any {
-    console.log(filters);
-    if (Array.isArray(lookupStage)) {
-      lookupStage = lookupStage[1]; // hoặc return lookupStage;
-    }
-    const localField = lookupStage.$lookup.localField;
-    const foreignField = lookupStage.$lookup.foreignField;
-    const from = lookupStage.$lookup.from;
-    const as = lookupStage.$lookup.as;
-
-    const letVar = "local_value"; // Tên biến trong
-
-    const result = this.buildLogicNested(filters);
-
-    const pipeline: any[] = [
-      {
-        $match: {
-          $and: [
-            {
-              $expr: {
-                $eq: [`$${foreignField}`, `$$${letVar}`],
-              },
-            },
-            { ...result.filter },
-          ],
-        },
-      },
-    ];
-    console.log("pipeline", JSON.stringify(pipeline));
-
-    // Đệ quy thêm nested $lookup từ children
-    for (const child of children) {
-      if (!child) continue;
-      const relationship = this.registry.get(parent, child.table);
-
-      if (!relationship) {
-        throw new Error(`Relationship ${parent}.${child.table} not found`);
-      }
-
-      const lookupStage = relationship.generateLookupStage(child);
-      const childLookup = this.buildLookupNested(
-        lookupStage,
-        child.children,
-        child.table,
-        {}
-      );
-      if (Array.isArray(lookupStage)) {
-        pipeline.push(lookupStage[0]);
-        pipeline.push({
-          $unwind: {
-            path: "$_junction",
-            preserveNullAndEmptyArrays: true,
+  lookupStage: any,
+  children: (EmbedRequest | null)[] = [],
+  parent: string,
+  filters: Record<string, any>,
+  isMultiResult: boolean = false
+): any {
+  // Lưu trạng thái ban đầu của lookupStage
+  const isLookupStageArray = Array.isArray(lookupStage);
+  const currentLookupStage = isLookupStageArray ? lookupStage[1] : lookupStage;
+  
+  const localField = currentLookupStage.$lookup.localField;
+  const foreignField = currentLookupStage.$lookup.foreignField;
+  const from = currentLookupStage.$lookup.from;
+  const as = currentLookupStage.$lookup.as;
+  const letVar = "local_value";
+  
+  const result = this.buildLogicNested(filters);
+  
+  const pipeline: any[] = [
+    {
+      $match: {
+        $and: [
+          {
+            $expr: isMultiResult 
+              ? {
+                  $in: [`$${foreignField}`, {
+                    $cond: {
+                      if: { $isArray: `$$${letVar}` },
+                      then: `$$${letVar}`,
+                      else: [`$$${letVar}`]
+                    }
+                  }]
+                }
+              : {
+                  $eq: [`$${foreignField}`, `$$${letVar}`]
+                }
           },
-        });
-        pipeline.push(childLookup);
-        pipeline.push(lookupStage[2]);
-      }
-      // Push child lookup và $addFields vào pipeline
-      else {
-        pipeline.push(childLookup);
+          { ...result.filter }
+        ]
       }
     }
+  ];
 
-    return {
-      $lookup: {
-        from,
-        let: { [letVar]: `$${localField}` },
-        pipeline,
-        as,
-      },
-    };
+  // Đệ quy thêm nested $lookup từ children
+  for (const child of children) {
+    if (!child) continue;
+    
+    const relationship = this.registry.get(parent, child.table);
+    if (!relationship) {
+      throw new Error(`Relationship ${parent}.${child.table} not found`);
+    }
+    
+    console.log("isMultiResult", relationship.isMultiResult());
+    
+    // Đổi tên biến để tránh shadow
+    const childLookupStage = relationship.generateLookupStage(child);
+    const childLookup = this.buildLookupNested(
+      childLookupStage,
+      child.children,
+      child.table,
+      child.filters || {},
+      relationship.isMultiResult()
+    );
+
+    // Xử lý lookup stage dựa trên type
+    if (Array.isArray(childLookupStage)) {
+      pipeline.push(childLookupStage[0]);
+      pipeline.push(childLookup);
+      pipeline.push(childLookupStage[2]);
+    } else {
+      pipeline.push(childLookup);
+    }
+
+    // Thêm $unwind nếu không phải multi result
+    if (!relationship.isMultiResult()) {
+      pipeline.push({
+        $unwind: {
+          path: `$${child.table}`,
+          preserveNullAndEmptyArrays: true
+        }
+      });
+    }
   }
+
+  return {
+    $lookup: {
+      from,
+      let: { [letVar]: `$${localField}` },
+      pipeline,
+      as
+    }
+  };
+}
 
   /**
    * Generate MongoDB lookup stages for embed request
    */
   generateLookupStages(sourceTable: string, embedRequest: EmbedRequest): any[] {
-    console.log(embedRequest);
+    console.log("embedRequest", JSON.stringify(embedRequest));
     const relationship = this.registry.get(sourceTable, embedRequest.table);
 
     if (!relationship) {
@@ -290,6 +329,7 @@ export class JoinParser {
 
     const lookupStage = relationship.generateLookupStage(embedRequest);
     const stages = [];
+    console.log("isMultiResult", relationship.isMultiResult());
     if (embedRequest.children && embedRequest.children.length > 0) {
       stages.push(
         this.buildLookupNested(
@@ -304,7 +344,7 @@ export class JoinParser {
         ? stages.push(...lookupStage)
         : stages.push(lookupStage);
     }
-    if (embedRequest.joinHint === "inner") {
+    if (!relationship.isMultiResult() && embedRequest.joinHint === "inner") {
       stages.push({
         $unwind: {
           path: `$${embedRequest.alias || embedRequest.table}`,

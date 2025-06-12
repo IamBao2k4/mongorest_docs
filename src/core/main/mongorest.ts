@@ -83,7 +83,6 @@ export class PostgRESTToMongoConverter {
   } else if (filterConditions.length > 1) {
     result.filter = { $and: filterConditions };
   }
-
   return result;
 }
 

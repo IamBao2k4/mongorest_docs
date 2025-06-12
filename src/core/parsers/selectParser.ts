@@ -59,7 +59,6 @@ export class ModularSelectParser {
         }
       }
     }
-    console.log("result", JSON.stringify(result))
     return result;
   }
 
