@@ -199,7 +199,7 @@ export function getAllowedPatterns(
             }
         }
     });
-    
+
     return Array.from(allowedPatterns);
 }
 
@@ -410,7 +410,7 @@ export function filterByRBAC(
     }
     
     const result = processDataWithRBACPatterns(collectionName, operation, user_jwt, data);
-    
+
     if (!result.matched) {
         console.warn('RBAC filtering failed:', result.errors);
         return {};
@@ -525,15 +525,15 @@ export function getUserPermissions(user_jwt: string): Record<string, Record<stri
         const collectionName = collectionConfig.collection_name;
         permissions[collectionName] = {
             read: {
-                attributes: getAllowedAttributes(collectionName, 'read', userRoles),
+                attributes: getAllowedPatterns(collectionName, 'read', userRoles),
                 patterns: getAllowedPatterns(collectionName, 'read', userRoles)
             },
             write: {
-                attributes: getAllowedAttributes(collectionName, 'write', userRoles),
+                attributes: getAllowedPatterns(collectionName, 'write', userRoles),
                 patterns: getAllowedPatterns(collectionName, 'write', userRoles)
             },
             delete: {
-                attributes: getAllowedAttributes(collectionName, 'delete', userRoles),
+                attributes: getAllowedPatterns(collectionName, 'delete', userRoles),
                 patterns: getAllowedPatterns(collectionName, 'delete', userRoles)
             }
         };
@@ -725,7 +725,6 @@ export {
     
     processDataWithPatterns,
     
-    // Configuration and utilities
     loadRBACConfig,
     extractUserContext,
     parseJWTToken,

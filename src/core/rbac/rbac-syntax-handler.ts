@@ -104,9 +104,7 @@ export class RBACPatternHandler {
         // Type validation
         const typeMatches = pattern.match(/(?<!\[[\d*]*):(\w+)(?![\d*]*\])/g);
         if (typeMatches) {
-            console.log('*'.repeat(50), 'Type Matches:', typeMatches);
             for (const typeMatch of typeMatches) {
-                console.log('*'.repeat(50), 'Type Match:', typeMatch);
                 const type = typeMatch.substring(1);
                 if (!VALID_TYPES.includes(type)) {
                     errors.push(`Invalid type: ${type}`);
@@ -504,7 +502,7 @@ export class RBACPatternHandler {
     // DATA PROCESSING
     // ================================
 
-    private applyIncludes(data: any, includes: CompiledPattern[], context: UserContext): any {
+    private applyIncludes(data: Array<any>, includes: CompiledPattern[], context: UserContext): any {
         if (includes.length === 0) {
             return {};
         }
@@ -519,14 +517,296 @@ export class RBACPatternHandler {
             return data;
         }
 
-        const result = {};
-        
-        for (const pattern of includes) {
-            const resolvedPattern = this.resolveContext(pattern, context);
-            this.applyPatternToData(data, resolvedPattern.segments, result, []);
+        // Start with empty result and only include allowed fields
+        const result :any = [];
+
+        for (let i = 0; i < data.length; i++) {
+            const temp = {};
+            for (const pattern of includes) {
+                const resolvedPattern = this.resolveContext(pattern, context);
+                this.includePatternInResult(data[i], resolvedPattern.segments, temp, []);
+            }
+            result.push(temp);
         }
 
         return result;
+    }
+
+    /**
+     * Include only the specified pattern in the result, creating the path if needed
+     */
+    private includePatternInResult(
+        source: any, 
+        segments: PatternSegment[], 
+        target: any, 
+        currentPath: string[]
+    ): void {
+        if (!source || segments.length === 0) {
+            return;
+        }
+        const segment = segments[0];
+        const remainingSegments = segments.slice(1);
+        const isLastSegment = remainingSegments.length === 0;
+
+        switch (segment.type) {
+            case SegmentType.FIELD:
+                this.handleFieldInclusion(source, target, segment.name, remainingSegments, currentPath);
+                break;
+
+            case SegmentType.WILDCARD:
+                this.handleWildcardInclusion(source, target, remainingSegments, currentPath, isLastSegment);
+                break;
+
+            case SegmentType.ARRAY_INDEX:
+                this.handleArrayIndexInclusion(source, target, segment, remainingSegments, currentPath);
+                break;
+
+            case SegmentType.ARRAY_RANGE:
+                this.handleArrayRangeInclusion(source, target, segment, remainingSegments, currentPath);
+                break;
+
+            case SegmentType.DEEP_WILDCARD:
+                this.handleDeepWildcardInclusion(source, target, currentPath);
+                break;
+
+            case SegmentType.TYPE_CHECK:
+                this.handleTypeCheckInclusion(source, target, segment, remainingSegments, currentPath);
+                break;
+
+            case SegmentType.CONTEXT:
+                // Context should already be resolved at this point
+                break;
+        }
+    }
+
+    private handleFieldInclusion(
+        source: any, 
+        target: any, 
+        fieldName: string | undefined, 
+        remainingSegments: PatternSegment[], 
+        currentPath: string[]
+    ): void {
+        
+        if (!fieldName || !(fieldName in source)) {
+            return;
+        }
+
+        const sourceValue = source[fieldName];
+        
+        if (remainingSegments.length === 0) {
+            // Last segment - copy the value
+            if (Array.isArray(target)) {
+                return;
+            }
+            target[fieldName] = this.deepClone(sourceValue);
+        } else {
+            // More segments to process
+            if (!target[fieldName]) {
+                target[fieldName] = Array.isArray(sourceValue) ? [] : {};
+            }
+            this.includePatternInResult(
+                sourceValue, 
+                remainingSegments, 
+                target[fieldName], 
+                [...currentPath, fieldName]
+            );
+        }
+    }
+
+    private handleWildcardInclusion(
+        source: any, 
+        target: any, 
+        remainingSegments: PatternSegment[], 
+        currentPath: string[],
+        isLastSegment: boolean
+    ): void {
+        if (Array.isArray(source)) {
+            // Handle array wildcard
+            for (let i = 0; i < source.length; i++) {
+                if (!target[i]) {
+                    target[i] = Array.isArray(source[i]) ? [] : {};
+                }
+
+                if (isLastSegment) {
+                    target[i] = this.deepClone(source[i]);
+                } else {
+                    this.includePatternInResult(
+                        source[i], 
+                        remainingSegments, 
+                        target[i], 
+                        [...currentPath, i.toString()]
+                    );
+                }
+            }
+        } else if (source && typeof source === 'object') {
+            // Handle object wildcard
+            for (const key in source) {
+                if (source.hasOwnProperty(key)) {
+                    if (isLastSegment) {
+                        target[key] = this.deepClone(source[key]);
+                    } else {
+                        if (!target[key]) {
+                            target[key] = Array.isArray(source[key]) ? [] : {};
+                        }
+                        
+                        this.includePatternInResult(
+                            source[key], 
+                            remainingSegments, 
+                            target[key], 
+                            [...currentPath, key]
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    private handleArrayIndexInclusion(
+        source: any, 
+        target: any, 
+        segment: PatternSegment, 
+        remainingSegments: PatternSegment[], 
+        currentPath: string[]
+    ): void {
+        if (!Array.isArray(source) || segment.index === undefined) {
+            return;
+        }
+
+        const index = segment.index < 0 ? source.length + segment.index : segment.index;
+        if (index < 0 || index >= source.length) {
+            return;
+        }
+
+        const sourceItem = source[index];
+
+        if (remainingSegments.length === 0) {
+            // Last segment - add to target array
+            if (Array.isArray(target)) {
+                target.push(this.deepClone(sourceItem));
+            } else {
+                target[index] = this.deepClone(sourceItem);
+            }
+        } else {
+            // More segments to process
+            let targetItem;
+            if (Array.isArray(target)) {
+                targetItem = Array.isArray(sourceItem) ? [] : {};
+                target.push(targetItem);
+            } else {
+                if (!target[index]) {
+                    target[index] = Array.isArray(sourceItem) ? [] : {};
+                }
+                targetItem = target[index];
+            }
+            
+            this.includePatternInResult(
+                sourceItem, 
+                remainingSegments, 
+                targetItem, 
+                [...currentPath, index.toString()]
+            );
+        }
+    }
+
+    private handleArrayRangeInclusion(
+        source: any, 
+        target: any, 
+        segment: PatternSegment, 
+        remainingSegments: PatternSegment[], 
+        currentPath: string[]
+    ): void {
+        if (!Array.isArray(source)) {
+            return;
+        }
+
+        const { start = 0, end = source.length } = { start: segment.start, end: segment.end };
+        const actualStart = Math.max(0, start);
+        const actualEnd = Math.min(source.length, end);
+
+        for (let i = actualStart; i < actualEnd; i++) {
+            const sourceItem = source[i];
+            
+            if (remainingSegments.length === 0) {
+                // Last segment - add to target array
+                if (Array.isArray(target)) {
+                    target.push(this.deepClone(sourceItem));
+                } else {
+                    target[i] = this.deepClone(sourceItem);
+                }
+            } else {
+                // More segments to process
+                let targetItem;
+                if (Array.isArray(target)) {
+                    targetItem = Array.isArray(sourceItem) ? [] : {};
+                    target.push(targetItem);
+                } else {
+                    if (!target[i]) {
+                        target[i] = Array.isArray(sourceItem) ? [] : {};
+                    }
+                    targetItem = target[i];
+                }
+                
+                this.includePatternInResult(
+                    sourceItem, 
+                    remainingSegments, 
+                    targetItem, 
+                    [...currentPath, i.toString()]
+                );
+            }
+        }
+    }
+
+    private handleDeepWildcardInclusion(
+        source: any, 
+        target: any, 
+        currentPath: string[]
+    ): void {
+        if (currentPath.length > MAX_NESTING_DEPTH) {
+            return;
+        }
+
+        // Deep wildcard copies everything
+        if (Array.isArray(source)) {
+            for (let i = 0; i < Math.min(source.length, MAX_ARRAY_SIZE); i++) {
+                target[i] = this.deepClone(source[i]);
+            }
+        } else if (source && typeof source === 'object') {
+            for (const [key, value] of Object.entries(source)) {
+                target[key] = this.deepClone(value);
+            }
+        }
+    }
+
+    private handleTypeCheckInclusion(
+        source: any, 
+        target: any, 
+        segment: PatternSegment, 
+        remainingSegments: PatternSegment[], 
+        currentPath: string[]
+    ): void {
+        if (!source || typeof source !== 'object' || !segment.name || !segment.dataType) {
+            return;
+        }
+
+        const fieldValue = source[segment.name];
+        if (!this.checkType(fieldValue, segment.dataType)) {
+            return;
+        }
+
+        if (remainingSegments.length === 0) {
+            target[segment.name] = this.deepClone(fieldValue);
+        } else {
+            if (!target[segment.name]) {
+                target[segment.name] = Array.isArray(fieldValue) ? [] : {};
+            }
+            
+            this.includePatternInResult(
+                fieldValue, 
+                remainingSegments, 
+                target[segment.name], 
+                [...currentPath, segment.name]
+            );
+        }
     }
 
     private applyExcludes(data: any, excludes: CompiledPattern[], context: UserContext): any {
@@ -1175,9 +1455,55 @@ export class RBACPatternHandler {
        return data;
    }
 
-   // ================================
-   // DEBUG AND STATISTICS
-   // ================================
+    // ================================
+    // DEBUG METHODS (temporarily public for debugging)
+    // ================================
+
+    public debugCompilePattern(pattern: string): CompiledPattern {
+        return this.compilePattern(pattern);
+    }
+
+    public debugSeparatePatterns(patterns: CompiledPattern[]): { includes: CompiledPattern[], excludes: CompiledPattern[] } {
+        return this.separatePatterns(patterns);
+    }
+
+    public debugApplyIncludes(data: any, includes: CompiledPattern[], context: UserContext): any {
+        console.log('[DEBUG] applyIncludes called with:');
+        console.log('  Data:', JSON.stringify(data, null, 2));
+        console.log('  Includes count:', includes.length);
+        console.log('  Includes:', includes.map(inc => ({
+            segments: inc.segments,
+            isNegation: inc.isNegation,
+            hasContext: inc.hasContext
+        })));
+        console.log('  Context:', context);
+        
+        const result = this.applyIncludes(data, includes, context);
+        
+        console.log('[DEBUG] applyIncludes result:', JSON.stringify(result, null, 2));
+        return result;
+    }
+
+    public debugIncludePatternInResult(
+        source: any, 
+        segments: PatternSegment[], 
+        target: any, 
+        currentPath: string[]
+    ): void {
+        console.log('[DEBUG] includePatternInResult called with:');
+        console.log('  Source:', JSON.stringify(source, null, 2));
+        console.log('  Segments:', segments);
+        console.log('  Target before:', JSON.stringify(target, null, 2));
+        console.log('  Current path:', currentPath);
+        
+        this.includePatternInResult(source, segments, target, currentPath);
+        
+        console.log('  Target after:', JSON.stringify(target, null, 2));
+    }
+
+    // ================================
+    // DEBUG AND STATISTICS
+    // ================================
 
    public getPatternComplexity(pattern: string): number {
        try {

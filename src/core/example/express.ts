@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import { MongoClient } from 'mongodb';
 import { PostgRESTToMongoConverter } from '../main/mongorest'; 
 import setupEcommerceRelationships from '../config/relationships';
+import { filterByRBAC } from '../rbac/rbac-validator';
 import cors from 'cors';
 
 const app = express();
@@ -36,7 +37,7 @@ const mongoOptions = {
   connectTimeoutMS: 10000,
 };
 
-MongoClient.connect('mongodb://thaily:Th%40i2004@localhost:27017/mongorest?authSource=admin', mongoOptions)
+MongoClient.connect('mongodb://thaily:Th%40i2004@192.168.1.109:27017/mongorest?authSource=admin', mongoOptions)
   .then(client => {
     db = client.db('mongorest');
     console.log('Connected to MongoDB with optimized connection pool');
@@ -164,11 +165,18 @@ app.get('/api/:collection', postgrestToMongo, async (req: any, res: any) => {
       getCountParallel(collection, filter, pipeline),
       getDataParallel(collection, filter, projection, sort, pipeline, skip, limit)
     ]);
+
+    // collectionName: string,
+    // operation: 'read' | 'write' | 'delete',
+    // user_jwt: string,
+    // data: any
+
+    const rbacFilteredResults = filterByRBAC(collection, "read", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2RlZmF1bHRfMDAxIiwidXNlcklkIjoidXNlcl9kZWZhdWx0XzAwMSIsInVzZXJuYW1lIjoiZ3Vlc3RfdXNlciIsInJvbGVzIjoiZGVmYXVsdCIsImlzQWRtaW4iOmZhbHNlfQ.p21cymLG1Q-flME3vyB84TP1Whd1zqQOmhAbWA3bjPs', results);
     // const totalRecord = 0;
     const totalPage = Math.ceil(totalRecord / limit);
 
     res.json({
-      data: results,
+      data: rbacFilteredResults,
       totalRecord,
       totalPage,
       limit,

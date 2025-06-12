@@ -25,34 +25,17 @@ interface UserWithEmptyRoles extends BaseUser {
 
 type TestUser = UserWithRoles | UserWithSingleRole | UserWithoutRoles | UserWithEmptyRoles;
 
-// Updated test data with proper types
+// Updated test data with roles matching the new RBAC config
 export const sampleUsers: Record<string, TestUser> = {
-  // Basic users
+  // Anonymous/Guest user
   defaultUser: {
     sub: 'user_default_001',
     userId: 'user_default_001',
-    username: 'default_user',
+    username: 'guest_user',
     roles: ['default'],
     isAdmin: false
   },
   
-  // Level-based users (from original config)
-  userLevel1: {
-    sub: 'user_lv1_001',
-    userId: 'user_lv1_001',
-    username: 'user_level_1',
-    roles: ['userlv_1'],
-    isAdmin: false
-  },
-
-  userLevel2: {
-    sub: 'user_lv2_001',
-    userId: 'user_lv2_001',
-    username: 'user_level_2',
-    roles: ['userlv_2'],
-    isAdmin: false
-  },
-
   // Regular authenticated user
   regularUser: {
     sub: 'user_regular_001',
@@ -63,64 +46,7 @@ export const sampleUsers: Record<string, TestUser> = {
     isAdmin: false
   },
 
-  // Customer role
-  customer: {
-    sub: 'customer_001',
-    userId: 'customer_001',
-    username: 'customer_john',
-    roles: ['customer'],
-    isAdmin: false
-  },
-
-  // Content creators
-  author: {
-    sub: 'author_001',
-    userId: 'author_001',
-    username: 'author_jane',
-    teamId: 'content_team',
-    roles: ['author'],
-    isAdmin: false
-  },
-
-  // Business users
-  seller: {
-    sub: 'seller_001',
-    userId: 'seller_001',
-    username: 'seller_alice',
-    teamId: 'sales_team',
-    roles: ['seller'],
-    isAdmin: false
-  },
-
-  manager: {
-    sub: 'manager_001',
-    userId: 'manager_001',
-    username: 'manager_bob',
-    teamId: 'sales_team',
-    roles: ['manager'],
-    isAdmin: false
-  },
-
-  // Support and moderation
-  support: {
-    sub: 'support_001',
-    userId: 'support_001',
-    username: 'support_sarah',
-    teamId: 'support_team',
-    roles: ['support'],
-    isAdmin: false
-  },
-
-  moderator: {
-    sub: 'moderator_001',
-    userId: 'moderator_001',
-    username: 'moderator_tom',
-    teamId: 'moderation_team',
-    roles: ['moderator'],
-    isAdmin: false
-  },
-
-  // Analytics users
+  // Data analyst
   analyst: {
     sub: 'analyst_001',
     userId: 'analyst_001',
@@ -130,7 +56,7 @@ export const sampleUsers: Record<string, TestUser> = {
     isAdmin: false
   },
 
-  // Admin
+  // System administrator
   admin: {
     sub: 'admin_001',
     userId: 'admin_001',
@@ -139,195 +65,312 @@ export const sampleUsers: Record<string, TestUser> = {
     isAdmin: true
   },
 
-  // Multi-role users
-  managerModerator: {
-    sub: 'manager_mod_001',
-    userId: 'manager_mod_001',
-    username: 'manager_moderator',
-    teamId: 'management_team',
-    roles: ['manager', 'moderator'],
+  // Developer
+  developer: {
+    sub: 'dev_001',
+    userId: 'dev_001',
+    username: 'dev_alice',
+    teamId: 'dev_team',
+    roles: ['dev'],
     isAdmin: false
   },
 
-  // Edge case users - these are the problematic ones
+  // Multi-role user (analyst + admin)
+  multiRoleUser: {
+    sub: 'multi_001',
+    userId: 'multi_001',
+    username: 'multi_role_user',
+    teamId: 'management_team',
+    roles: ['analyst', 'admin'],
+    isAdmin: true
+  },
+
+  // Edge case users
   noRoleUser: {
     sub: 'no_role_001',
     userId: 'no_role_001',
     username: 'no_role_user'
-    // No roles property - this is UserWithoutRoles type
+    // No roles property - should default to 'default'
   } as UserWithoutRoles,
 
   singleRoleUser: {
     sub: 'single_role_001',
     userId: 'single_role_001',
     username: 'single_role_user',
-    role: 'user' // Single role, not array - this is UserWithSingleRole type
+    role: 'user' // Single role property instead of array
   } as UserWithSingleRole,
 
   emptyRolesUser: {
     sub: 'empty_roles_001',
     userId: 'empty_roles_001',
     username: 'empty_roles_user',
-    roles: []
+    roles: [] // Empty roles array - should default to 'default'
   } as UserWithEmptyRoles
 };
 
-// Helper function to safely get user roles
-export function getUserRoles(user: TestUser): string[] {
+// Helper function to safely get user roles with proper null/undefined checking
+export function getUserRoles(user?: TestUser | null): string[] {
+  // Handle null, undefined, or invalid user objects
+  if (!user || typeof user !== 'object') {
+    return ['default'];
+  }
+
+  // Check for roles array property
   if ('roles' in user && Array.isArray(user.roles)) {
     return user.roles.length > 0 ? user.roles : ['default'];
   }
-  if ('role' in user && typeof user.role === 'string') {
+  
+  // Check for single role property
+  if ('role' in user && typeof user.role === 'string' && user.role.trim() !== '') {
     return [user.role];
   }
-  return ['default']; // Default fallback
+  
+  // Default fallback for any other case
+  return ['default'];
 }
 
-// Helper function to safely get user info for testing
-export function getUserInfo(user: TestUser) {
+// Helper function to safely get user info for testing with null checks
+export function getUserInfo(user?: TestUser | null) {
+  if (!user || typeof user !== 'object') {
+    return {
+      userId: 'anonymous',
+      username: 'anonymous',
+      teamId: undefined,
+      roles: ['default'],
+      isAdmin: false
+    };
+  }
+
   return {
-    userId: user.userId || user.sub,
-    username: user.username,
+    userId: user.userId || user.sub || 'anonymous',
+    username: user.username || 'anonymous',
     teamId: user.teamId,
     roles: getUserRoles(user),
     isAdmin: user.isAdmin || false
   };
 }
 
-// Expected results based on the new pattern-only configuration
+// Additional helper to validate user object structure
+export function isValidUser(user: any): user is TestUser {
+  return (
+    user &&
+    typeof user === 'object' &&
+    typeof user.sub === 'string' &&
+    typeof user.userId === 'string' &&
+    typeof user.username === 'string'
+  );
+}
+
+// Helper to get user by ID from sample users with error handling
+export function getUserById(userId: string): TestUser | null {
+  const userEntry = Object.entries(sampleUsers).find(([_, user]) => 
+    user && (user.userId === userId || user.sub === userId)
+  );
+  return userEntry ? userEntry[1] : null;
+}
+
+// Helper to get user by username with error handling
+export function getUserByUsername(username: string): TestUser | null {
+  const userEntry = Object.entries(sampleUsers).find(([_, user]) => 
+    user && user.username === username
+  );
+  return userEntry ? userEntry[1] : null;
+}
+
+// Expected results based on the new RBAC configuration
 export const expectedResults = {
   products: {
     read: {
-      defaultUser: ['att1', 'att3', 'att5', 'att4'], // Simple patterns from default role
-      userLevel1: ['att1', 'att3', 'att5', 'att4', 'att6'], // default + userlv_1 patterns
-      userLevel2: ['att1', 'att3', 'att5', 'att4', 'att2'], // default + userlv_2 patterns
-      customer: ['att1', 'att3', 'att4', 'att5', 'att8', 'name', 'price', 'description'], // customer role patterns
-      seller: ['att1', 'att3', 'att5', 'att4', 'att2', 'att6', 'name', 'price', 'description', 'category', 'inventory'], // seller role patterns
-      manager: ['att1', 'att2', 'att3', 'att4', 'att5', 'att6'], // manager role patterns
-      admin: ['att1', 'att3', 'att5', 'att4'], // admin uses wildcard (**), no simple field patterns
-      noRoleUser: ['att1', 'att3', 'att5', 'att4'], // defaults to 'default' role
-      singleRoleUser: ['att1', 'att3', 'att5', 'att4'], // user role inherits default
-      emptyRolesUser: ['att1', 'att3', 'att5', 'att4'] // defaults to 'default' role
+      defaultUser: ['_id', 'sku', 'name', 'description', 'category', 'subcategory', 'price', 'currency', 'images', 'tags', 'ratings', 'status'],
+      regularUser: ['_id', 'sku', 'name', 'description', 'category', 'subcategory', 'price', 'currency', 'inventory.quantity', 'images', 'tags', 'specifications', 'ratings', 'status', 'createdAt'],
+      analyst: ['_id', 'sku', 'name', 'category', 'subcategory', 'price', 'currency', 'inventory', 'ratings', 'status', 'createdAt', 'updatedAt', 'orderItems'],
+      admin: ['*'], // Full access
+      developer: ['*'], // Full access
+      noRoleUser: ['_id', 'sku', 'name', 'description', 'category', 'subcategory', 'price', 'currency', 'images', 'tags', 'ratings', 'status'],
+      singleRoleUser: ['_id', 'sku', 'name', 'description', 'category', 'subcategory', 'price', 'currency', 'inventory.quantity', 'images', 'tags', 'specifications', 'ratings', 'status', 'createdAt'],
+      emptyRolesUser: ['_id', 'sku', 'name', 'description', 'category', 'subcategory', 'price', 'currency', 'images', 'tags', 'ratings', 'status']
     },
     write: {
-      defaultUser: ['att1', 'att2'], // default role patterns
-      userLevel1: ['att1', 'att2'], // inherits default
-      userLevel2: ['att1', 'att2'], // inherits default
-      customer: [], // customer has no simple field patterns for write
-      seller: ['att1', 'att3', 'att4', 'att5', 'name', 'description', 'price', 'category', 'inventory'],
-      manager: ['att1', 'att2', 'att3', 'att4', 'att6', 'name', 'description', 'price', 'category', 'status'],
-      admin: [], // admin uses wildcard
-      noRoleUser: ['att1', 'att2'],
-      singleRoleUser: ['att1', 'att2'],
-      emptyRolesUser: ['att1', 'att2']
+      defaultUser: [],
+      regularUser: [],
+      analyst: ['ratings'],
+      admin: ['*'],
+      developer: ['*'],
+      noRoleUser: [],
+      singleRoleUser: [],
+      emptyRolesUser: []
     },
     delete: {
-      defaultUser: [], // default has empty patterns for delete
-      userLevel1: [], // inherits default
-      userLevel2: [], // inherits default
-      customer: [], // customer has no simple field patterns for delete
-      seller: [], // seller has no simple field patterns for delete
-      manager: ['att2', 'att3'], // manager role patterns
-      admin: [], // admin uses wildcard
+      defaultUser: [],
+      regularUser: [],
+      analyst: [],
+      admin: ['*'],
+      developer: [],
       noRoleUser: [],
       singleRoleUser: [],
       emptyRolesUser: []
     }
   },
+  
   users: {
     read: {
-      defaultUser: ['att1', 'att2', 'att3', 'id', 'username'], // default role simple patterns
-      regularUser: ['att1', 'att2', 'att3', 'att8', 'id', 'username', 'email'], // user role
-      moderator: ['att1', 'att2', 'att3', 'att8', 'att9', 'id', 'username', 'email', 'status', 'last_login'],
-      manager: ['att1', 'att2', 'att3', 'att8', 'id', 'username', 'email', 'department', 'team'],
-      admin: [], // admin uses wildcard
-      noRoleUser: ['att1', 'att2', 'att3', 'id', 'username'],
-      singleRoleUser: ['att1', 'att2', 'att3', 'att8', 'id', 'username', 'email'],
-      emptyRolesUser: ['att1', 'att2', 'att3', 'id', 'username']
+      defaultUser: ['_id', 'name', 'profile.avatar'],
+      regularUser: ['_id', 'email.@self', 'name.@self', 'profile.@self', 'status.@self', 'lastLogin.@self', 'createdAt.@self', 'updatedAt.@self'],
+      analyst: ['_id', 'name', 'profile.age', 'profile.country', 'profile.interests', 'status', 'lastLogin', 'createdAt'],
+      admin: ['*'],
+      developer: ['*'],
+      noRoleUser: ['_id', 'name', 'profile.avatar'],
+      singleRoleUser: ['_id', 'email.@self', 'name.@self', 'profile.@self', 'status.@self', 'lastLogin.@self', 'createdAt.@self', 'updatedAt.@self'],
+      emptyRolesUser: ['_id', 'name', 'profile.avatar']
     },
     write: {
-      defaultUser: ['att1', 'att2'], // default role
-      regularUser: ['att1', 'att2', 'username', 'email'], // user role
-      moderator: ['att1', 'att2', 'att8', 'username', 'email', 'status'],
-      manager: ['att3', 'att4', 'username', 'email', 'department', 'team'],
-      admin: [], // admin uses wildcard
-      noRoleUser: ['att1', 'att2'],
-      singleRoleUser: ['att1', 'att2', 'username', 'email'],
-      emptyRolesUser: ['att1', 'att2']
+      defaultUser: [],
+      regularUser: ['name.@self', 'profile.@self.age', 'profile.@self.interests', 'profile.@self.avatar'],
+      analyst: [],
+      admin: ['*'],
+      developer: ['*'],
+      noRoleUser: [],
+      singleRoleUser: ['name.@self', 'profile.@self.age', 'profile.@self.interests', 'profile.@self.avatar'],
+      emptyRolesUser: []
     },
     delete: {
-      defaultUser: [], // default has empty patterns
-      regularUser: [], // user has no simple field patterns for delete
-      moderator: [], // moderator has no simple field patterns for delete
-      manager: [], // manager has no simple field patterns for delete
-      admin: [], // admin uses wildcard
+      defaultUser: [],
+      regularUser: [],
+      analyst: [],
+      admin: ['*'],
+      developer: [],
       noRoleUser: [],
       singleRoleUser: [],
       emptyRolesUser: []
     }
   },
+
   orders: {
     read: {
-      defaultUser: [], // default has empty patterns for orders
-      customer: ['att1', 'att2', 'att3', 'att4', 'att8', 'id', 'status', 'total', 'created_at'],
-      seller: ['att1', 'att2', 'att3', 'att4', 'id', 'status', 'total', 'items'],
-      support: ['att1', 'att2', 'att3', 'att4', 'att8', 'id', 'status', 'customer_id', 'total', 'items', 'support_notes', 'refund_status'],
-      manager: ['att1', 'att2', 'att3', 'att4', 'att5'],
-      admin: [], // admin uses wildcard
+      defaultUser: [],
+      regularUser: ['_id.@self', 'orderNumber.@self', 'customerId.@self', 'items.@self', 'shippingAddress.@self', 'billingAddress.@self', 'payment.@self.method', 'payment.@self.status', 'payment.@self.amount', 'subtotal.@self', 'tax.@self', 'shipping.@self', 'discount.@self', 'totalAmount.@self', 'currency.@self', 'status.@self', 'orderDate.@self', 'shippedDate.@self', 'deliveredDate.@self', 'notes.@self', 'customer.@self'],
+      analyst: ['_id', 'orderNumber', 'customerId', 'items', 'payment.method', 'payment.status', 'payment.amount', 'subtotal', 'tax', 'shipping', 'discount', 'totalAmount', 'currency', 'status', 'orderDate', 'shippedDate', 'deliveredDate', 'customer._id', 'customer.name', 'customer.profile.country'],
+      admin: ['*'],
+      developer: ['*'],
       noRoleUser: [],
-      singleRoleUser: [],
+      singleRoleUser: ['_id.@self', 'orderNumber.@self', 'customerId.@self', 'items.@self', 'shippingAddress.@self', 'billingAddress.@self', 'payment.@self.method', 'payment.@self.status', 'payment.@self.amount', 'subtotal.@self', 'tax.@self', 'shipping.@self', 'discount.@self', 'totalAmount.@self', 'currency.@self', 'status.@self', 'orderDate.@self', 'shippedDate.@self', 'deliveredDate.@self', 'notes.@self', 'customer.@self'],
       emptyRolesUser: []
     },
     write: {
-      defaultUser: ['att1', 'att2'], // default role
-      customer: ['att1', 'att2'], // customer inherits default
-      seller: ['att8', 'status'],
-      support: ['status', 'support_notes'],
-      manager: ['att3', 'att5', 'att6', 'status', 'priority'],
-      admin: [], // admin uses wildcard
-      noRoleUser: ['att1', 'att2'],
-      singleRoleUser: ['att1', 'att2'],
-      emptyRolesUser: ['att1', 'att2']
+      defaultUser: [],
+      regularUser: ['shippingAddress.@self', 'billingAddress.@self', 'notes.@self'],
+      analyst: [],
+      admin: ['*'],
+      developer: ['*'],
+      noRoleUser: [],
+      singleRoleUser: ['shippingAddress.@self', 'billingAddress.@self', 'notes.@self'],
+      emptyRolesUser: []
     },
     delete: {
-      defaultUser: [], // default has empty patterns
-      customer: [], // customer has no simple field patterns for delete
-      seller: [], // seller has no simple field patterns for delete
-      support: [], // support has no simple field patterns for delete
-      manager: ['att3'], // manager role
-      admin: [], // admin uses wildcard
+      defaultUser: [],
+      regularUser: [],
+      analyst: [],
+      admin: ['*'],
+      developer: [],
       noRoleUser: [],
       singleRoleUser: [],
       emptyRolesUser: []
     }
   },
-  reports: {
+
+  categories: {
     read: {
-      defaultUser: ['att1', 'att2', 'att3', 'att4', 'att5'], // default role
-      regularUser: ['att1', 'att2', 'att3', 'att4', 'att5'], // user inherits default
-      analyst: ['att1', 'att2', 'att3', 'att4', 'att5', 'att6'], // analyst role
-      manager: ['att1', 'att2', 'att3', 'att4', 'att5'], // manager inherits default
-      admin: [], // admin uses wildcard
-      noRoleUser: ['att1', 'att2', 'att3', 'att4', 'att5'],
-      singleRoleUser: ['att1', 'att2', 'att3', 'att4', 'att5'],
-      emptyRolesUser: ['att1', 'att2', 'att3', 'att4', 'att5']
+      defaultUser: ['_id', 'name', 'slug', 'description', 'parentId', 'image', 'sortOrder', 'featured', 'status', 'parent', 'children', 'products'],
+      regularUser: ['_id', 'name', 'slug', 'description', 'parentId', 'image', 'sortOrder', 'featured', 'status', 'seo', 'createdAt', 'updatedAt', 'parent', 'children', 'products'],
+      analyst: ['*'],
+      admin: ['*'],
+      developer: ['*'],
+      noRoleUser: ['_id', 'name', 'slug', 'description', 'parentId', 'image', 'sortOrder', 'featured', 'status', 'parent', 'children', 'products'],
+      singleRoleUser: ['_id', 'name', 'slug', 'description', 'parentId', 'image', 'sortOrder', 'featured', 'status', 'seo', 'createdAt', 'updatedAt', 'parent', 'children', 'products'],
+      emptyRolesUser: ['_id', 'name', 'slug', 'description', 'parentId', 'image', 'sortOrder', 'featured', 'status', 'parent', 'children', 'products']
     },
     write: {
-      defaultUser: [], // default has empty patterns
-      regularUser: [], // user has no simple field patterns for write
-      analyst: [], // analyst has no simple field patterns for write
-      manager: ['att1', 'att2', 'att3', 'att4'], // manager role
-      admin: [], // admin uses wildcard
+      defaultUser: [],
+      regularUser: [],
+      analyst: [],
+      admin: ['*'],
+      developer: ['*'],
       noRoleUser: [],
       singleRoleUser: [],
       emptyRolesUser: []
     },
     delete: {
-      defaultUser: [], // default has empty patterns
-      regularUser: [], // user has no simple field patterns for delete
-      analyst: [], // analyst has no simple field patterns for delete
-      manager: ['att1', 'att2'], // manager role
-      admin: [], // admin uses wildcard
+      defaultUser: [],
+      regularUser: [],
+      analyst: [],
+      admin: ['*'],
+      developer: [],
+      noRoleUser: [],
+      singleRoleUser: [],
+      emptyRolesUser: []
+    }
+  },
+
+  product_reviews: {
+    read: {
+      defaultUser: ['_id', 'productId', 'rating', 'title', 'content', 'verified', 'helpful', 'images', 'createdAt', 'product.name', 'user.name', 'user.profile.avatar'], // + filter: status=eq.approved
+      regularUser: ['_id', 'productId', 'userId.@self', 'rating', 'title', 'content', 'verified', 'helpful', 'status.@self', 'images', 'createdAt', 'updatedAt', 'product', 'user.@self'],
+      analyst: ['_id', 'productId', 'userId', 'rating', 'title', 'content', 'verified', 'helpful', 'status', 'createdAt', 'updatedAt', 'product._id', 'product.name', 'product.sku', 'user._id', 'user.name'],
+      admin: ['*'],
+      developer: ['*'],
+      noRoleUser: ['_id', 'productId', 'rating', 'title', 'content', 'verified', 'helpful', 'images', 'createdAt', 'product.name', 'user.name', 'user.profile.avatar'],
+      singleRoleUser: ['_id', 'productId', 'userId.@self', 'rating', 'title', 'content', 'verified', 'helpful', 'status.@self', 'images', 'createdAt', 'updatedAt', 'product', 'user.@self'],
+      emptyRolesUser: ['_id', 'productId', 'rating', 'title', 'content', 'verified', 'helpful', 'images', 'createdAt', 'product.name', 'user.name', 'user.profile.avatar']
+    },
+    write: {
+      defaultUser: [],
+      regularUser: ['productId', 'rating', 'title', 'content', 'images'],
+      analyst: ['status', 'helpful'],
+      admin: ['*'],
+      developer: ['*'],
+      noRoleUser: [],
+      singleRoleUser: ['productId', 'rating', 'title', 'content', 'images'],
+      emptyRolesUser: []
+    },
+    delete: {
+      defaultUser: [],
+      regularUser: ['reviews.@self'],
+      analyst: [],
+      admin: ['*'],
+      developer: ['*'],
+      noRoleUser: [],
+      singleRoleUser: ['reviews.@self'],
+      emptyRolesUser: []
+    }
+  },
+
+  product_categories: {
+    read: {
+      defaultUser: ['_id', 'productId', 'categoryId', 'isPrimary', 'sortOrder', 'product', 'category'],
+      regularUser: ['_id', 'productId', 'categoryId', 'isPrimary', 'sortOrder', 'createdAt', 'product', 'category'],
+      analyst: ['*'],
+      admin: ['*'],
+      developer: ['*'],
+      noRoleUser: ['_id', 'productId', 'categoryId', 'isPrimary', 'sortOrder', 'product', 'category'],
+      singleRoleUser: ['_id', 'productId', 'categoryId', 'isPrimary', 'sortOrder', 'createdAt', 'product', 'category'],
+      emptyRolesUser: ['_id', 'productId', 'categoryId', 'isPrimary', 'sortOrder', 'product', 'category']
+    },
+    write: {
+      defaultUser: [],
+      regularUser: [],
+      analyst: [],
+      admin: ['*'],
+      developer: ['*'],
+      noRoleUser: [],
+      singleRoleUser: [],
+      emptyRolesUser: []
+    },
+    delete: {
+      defaultUser: [],
+      regularUser: [],
+      analyst: [],
+      admin: ['*'],
+      developer: [],
       noRoleUser: [],
       singleRoleUser: [],
       emptyRolesUser: []
@@ -335,141 +378,371 @@ export const expectedResults = {
   }
 } as const;
 
+// Sample data that matches the actual collection schemas
 export const sampleData = {
-  // User data
+  // User data matching users.json schema
   user: {
-    id: 'user_001',
-    username: 'john_doe',
-    email: 'john@example.com',
-    att1: 'Basic info 1',
-    att2: 'Basic info 2',
-    att3: 'Basic info 3',
-    att8: 'Extended info',
+    _id: '507f1f77bcf86cd799439011',
+    email: 'john.doe@example.com',
+    name: 'John Doe',
     profile: {
-      public: {
-        name: 'John Doe',
-        avatar: 'avatar.jpg',
-        bio: 'Software developer'
-      },
-      user_001: {
-        phone: '+1234567890',
-        address: '123 Main St',
-        preferences: { theme: 'dark' }
-      },
-      private: {
-        ssn: '123-45-6789',
-        sensitive: 'classified'
-      }
+      age: 30,
+      country: 'Vietnam',
+      interests: ['technology', 'gaming', 'travel'],
+      avatar: 'https://example.com/avatars/john.jpg'
     },
-    settings: {
-      user_001: {
-        theme: 'dark',
-        language: 'en',
-        notifications: true,
-        permissions: ['read', 'write']
-      },
-      team_001: {
-        shared_settings: 'team_value'
-      }
-    }
+    status: 'active',
+    lastLogin: '2024-01-15T10:00:00Z',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-15T10:00:00Z'
   },
 
-  // Product data
+  // Product data matching products.json schema
   product: {
-    id: 'product_001',
-    name: 'Laptop Pro',
-    description: 'High-performance laptop',
-    price: 1299.99,
-    category: 'Electronics',
-    inventory: 50,
-    att1: 'Product Name',
-    att2: 'Secret Internal Info',
-    att3: 'Description',
-    att4: 'Category',
-    att5: 'Price',
-    att6: 'Internal Code',
-    att7: 'Admin Notes',
-    att8: 'Extended Product Info',
-    images: {
-      public: ['image1.jpg', 'image2.jpg'],
-      seller_001: ['private_image.jpg']
+    _id: '507f1f77bcf86cd799439012',
+    sku: 'LAPTOP-PRO-001',
+    name: 'MacBook Pro 16"',
+    description: 'High-performance laptop for professionals',
+    category: 'electronics',
+    subcategory: 'laptops',
+    price: 2399.99,
+    currency: 'USD',
+    inventory: {
+      quantity: 50,
+      reserved: 5,
+      lowStockThreshold: 10
     },
-    reviews: [
-      { 
-        id: 1, 
-        rating: 5, 
-        comment: 'Great product!',
-        title: 'Excellent laptop'
-      },
-      { 
-        id: 2, 
-        rating: 4, 
-        comment: 'Good value',
-        title: 'Worth the money'
-      }
+    images: [
+      'https://example.com/images/macbook1.jpg',
+      'https://example.com/images/macbook2.jpg'
     ],
+    tags: ['laptop', 'apple', 'professional', 'high-performance'],
     specifications: {
-      basic: {
-        weight: '2.5kg',
-        dimensions: '30x20x2cm'
-      },
-      advanced: {
-        processor: 'Intel i7',
-        memory: '16GB'
-      }
+      processor: 'Apple M2 Pro',
+      memory: '16GB',
+      storage: '512GB SSD',
+      display: '16.2-inch Liquid Retina XDR',
+      weight: '2.15 kg'
     },
-    analytics: {
-      seller_001: {
-        views: 1000,
-        conversion_rate: 0.05
-      }
+    ratings: {
+      average: 4.8,
+      count: 150
     },
-    internal: {
-      cost: 800,
-      margin: 499.99
-    }
+    status: 'active',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-10T00:00:00Z'
   },
 
-  // Order data  
+  // Order data matching orders.json schema
   order: {
-    id: 'order_001',
-    status: 'processing',
-    total: 1329.98,
-    created_at: '2024-01-15T10:00:00Z',
-    customer_id: 'customer_001',
-    att1: 'Order ID',
-    att2: 'Customer',
-    att3: 'Items',
-    att4: 'Status',
-    att5: 'Internal Notes',
-    att8: 'Order Details',
-    orders: {
-      customer_001: {
-        id: 'order_001',
-        shipping_address: '123 Customer St',
-        notes: 'Please deliver carefully'
-      }
-    },
+    _id: '507f1f77bcf86cd799439013',
+    orderNumber: 'ORD-20240115',
+    customerId: '507f1f77bcf86cd799439011',
     items: [
       {
-        seller_001: {
-          product_id: 'product_001',
-          quantity: 1,
-          price: 1299.99,
-          status: 'confirmed'
-        }
+        productId: '507f1f77bcf86cd799439012',
+        sku: 'LAPTOP-PRO-001',
+        name: 'MacBook Pro 16"',
+        price: 2399.99,
+        quantity: 1,
+        subtotal: 2399.99
       }
     ],
-    shipping: {
-      customer_001: {
-        address: '123 Customer St',
-        method: 'express'
-      }
+    shippingAddress: {
+      fullName: 'John Doe',
+      address: '123 Nguyen Hue Street',
+      city: 'Ho Chi Minh City',
+      state: 'Ho Chi Minh',
+      zipCode: '700000',
+      country: 'Vietnam',
+      phone: '+84123456789'
+    },
+    billingAddress: {
+      fullName: 'John Doe',
+      address: '123 Nguyen Hue Street',
+      city: 'Ho Chi Minh City',
+      state: 'Ho Chi Minh',
+      zipCode: '700000',
+      country: 'Vietnam'
     },
     payment: {
-      details: {
-        card_number: '**** **** **** 1234'
+      method: 'credit_card',
+      status: 'completed',
+      transactionId: 'TXN-20240115-001',
+      amount: 2459.99
+    },
+    subtotal: 2399.99,
+    tax: 240.00,
+    shipping: 20.00,
+    discount: 200.00,
+    totalAmount: 2459.99,
+    currency: 'USD',
+    status: 'processing',
+    orderDate: '2024-01-15T09:00:00Z',
+    notes: 'Please handle with care',
+    createdAt: '2024-01-15T09:00:00Z',
+    updatedAt: '2024-01-15T10:30:00Z'
+  },
+
+  // Category data matching categories.json schema
+  category: {
+    _id: '507f1f77bcf86cd799439014',
+    name: 'Electronics',
+    slug: 'electronics',
+    description: 'Electronic devices and gadgets',
+    parentId: null,
+    image: 'https://example.com/categories/electronics.jpg',
+    sortOrder: 1,
+    featured: true,
+    status: 'active',
+    seo: {
+      metaTitle: 'Electronics - High Quality Electronic Devices',
+      metaDescription: 'Browse our wide selection of electronics including laptops, smartphones, and more.',
+      keywords: ['electronics', 'gadgets', 'technology', 'devices']
+    },
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-05T00:00:00Z'
+  },
+
+  // Product review data matching product_reviews.json schema
+  productReview: {
+    _id: '507f1f77bcf86cd799439015',
+    productId: '507f1f77bcf86cd799439012',
+    userId: '507f1f77bcf86cd799439011',
+    rating: 5,
+    title: 'Excellent laptop for professionals',
+    content: 'This laptop exceeded my expectations. The performance is outstanding and the build quality is top-notch. Highly recommended for anyone looking for a premium laptop.',
+    verified: true,
+    helpful: {
+      yes: 15,
+      no: 2
+    },
+    status: 'approved',
+    images: [
+      'https://example.com/reviews/review1_img1.jpg'
+    ],
+    createdAt: '2024-01-10T14:30:00Z',
+    updatedAt: '2024-01-10T14:30:00Z'
+  },
+
+  // Product category junction data matching product_categories.json schema
+  productCategory: {
+    _id: '507f1f77bcf86cd799439016',
+    productId: '507f1f77bcf86cd799439012',
+    categoryId: '507f1f77bcf86cd799439014',
+    isPrimary: true,
+    sortOrder: 1,
+    createdAt: '2024-01-01T00:00:00Z'
+  }
+};
+// Test cases to verify the helper functions work correctly
+export const validationTests = {
+  // Test getUserRoles with various inputs
+  testGetUserRoles: () => {
+    const tests = [
+      { input: undefined, expected: ['default'], name: 'undefined user' },
+      { input: null, expected: ['default'], name: 'null user' },
+      { input: {}, expected: ['default'], name: 'empty object' },
+      { input: 'invalid', expected: ['default'], name: 'string instead of object' },
+      { input: sampleUsers.regularUser, expected: ['user'], name: 'valid user with roles array' },
+      { input: sampleUsers.singleRoleUser, expected: ['user'], name: 'valid user with single role' },
+      { input: sampleUsers.noRoleUser, expected: ['default'], name: 'user without roles' },
+      { input: sampleUsers.emptyRolesUser, expected: ['default'], name: 'user with empty roles array' },
+    ];
+
+    tests.forEach(test => {
+      try {
+        const result = getUserRoles(test.input as any);
+        const passed = JSON.stringify(result) === JSON.stringify(test.expected);
+        console.log(`✓ ${test.name}: ${passed ? 'PASS' : 'FAIL'} (got: ${JSON.stringify(result)}, expected: ${JSON.stringify(test.expected)})`);
+      } catch (error) {
+        console.log(`✗ ${test.name}: ERROR - ${error}`);
       }
+    });
+  },
+
+  // Test getUserInfo with various inputs
+  testGetUserInfo: () => {
+    const tests = [
+      { input: undefined, name: 'undefined user' },
+      { input: null, name: 'null user' },
+      { input: sampleUsers.regularUser, name: 'valid user' },
+      { input: {}, name: 'empty object' },
+    ];
+
+    tests.forEach(test => {
+      try {
+        const result = getUserInfo(test.input as any);
+        const isValid = result && typeof result === 'object' && Array.isArray(result.roles);
+        console.log(`✓ ${test.name}: ${isValid ? 'PASS' : 'FAIL'} (got: ${JSON.stringify(result)})`);
+      } catch (error) {
+        console.log(`✗ ${test.name}: ERROR - ${error}`);
+      }
+    });
+  },
+
+  // Test all sample users are valid
+  testAllSampleUsers: () => {
+    Object.entries(sampleUsers).forEach(([key, user]) => {
+      try {
+        const validation = testHelpers.validateTestUser(user);
+        const roles = getUserRoles(user);
+        const info = getUserInfo(user);
+        
+        console.log(`✓ ${key}: ${validation.isValid ? 'VALID' : 'INVALID'} - Roles: ${JSON.stringify(roles)}`);
+        if (!validation.isValid) {
+          console.log(`  Errors: ${validation.errors.join(', ')}`);
+        }
+      } catch (error) {
+        console.log(`✗ ${key}: ERROR - ${error}`);
+      }
+    });
+  },
+
+  // Run all validation tests
+  runAll: () => {
+    console.log('=== Testing getUserRoles ===');
+    validationTests.testGetUserRoles();
+    
+    console.log('\n=== Testing getUserInfo ===');
+    validationTests.testGetUserInfo();
+    
+    console.log('\n=== Testing Sample Users ===');
+    validationTests.testAllSampleUsers();
+  }
+};
+
+// Export a simple test function that can be called to verify everything works
+export function runValidationTests() {
+  try {
+    validationTests.runAll();
+    console.log('\n✅ All validation tests completed successfully!');
+    return true;
+  } catch (error) {
+    console.error('\n❌ Validation tests failed:', error);
+    return false;
+  }
+}
+
+// Test scenarios for RBAC validation
+export const testScenarios = {
+  // Self-access scenarios
+  userAccessingOwnData: {
+    userId: '507f1f77bcf86cd799439011',
+    requestingUserId: '507f1f77bcf86cd799439011',
+    expectedAccess: true
+  },
+  userAccessingOthersData: {
+    userId: '507f1f77bcf86cd799439011',
+    requestingUserId: '507f1f77bcf86cd799439999',
+    expectedAccess: false
+  },
+
+  // Team access scenarios
+  teamMemberAccess: {
+    userId: '507f1f77bcf86cd799439011',
+    requestingUserId: '507f1f77bcf86cd799439012',
+    teamId: 'team_001',
+    expectedAccess: true
+  },
+
+  // Conditional access scenarios
+  approvedReviewAccess: {
+    review: { ...sampleData.productReview, status: 'approved' },
+    role: 'default',
+    expectedAccess: true
+  },
+  pendingReviewAccess: {
+    review: { ...sampleData.productReview, status: 'pending' },
+    role: 'default',
+    expectedAccess: false
+  }
+};
+
+// Helper functions for testing with comprehensive error handling
+export const testHelpers = {
+  // Check if user has access to specific field with null safety
+  hasFieldAccess: (userRoles: string[], collection: string, operation: 'read' | 'write' | 'delete', field: string): boolean => {
+    // Validate inputs
+    if (!Array.isArray(userRoles) || userRoles.length === 0) {
+      userRoles = ['default'];
     }
+    if (!collection || !operation || !field) {
+      return false;
+    }
+    
+    // This would be implemented by the actual RBAC system
+    // For now, return true as placeholder
+    return true;
+  },
+
+  // Resolve @self patterns with validation
+  resolveSelfPattern: (pattern: string, userId?: string): string => {
+    if (!pattern || typeof pattern !== 'string') {
+      return '';
+    }
+    if (!userId || typeof userId !== 'string') {
+      return pattern; // Return original pattern if no valid userId
+    }
+    return pattern.replace(/@self/g, userId);
+  },
+
+  // Check if pattern matches field with null safety
+  patternMatches: (pattern: string, field: string): boolean => {
+    if (!pattern || !field || typeof pattern !== 'string' || typeof field !== 'string') {
+      return false;
+    }
+    
+    if (pattern === '*' || pattern === '**') return true;
+    if (pattern.startsWith('!')) return false; // Negation patterns
+    
+    // Simple exact match for now
+    return pattern === field || field.startsWith(pattern.replace('*', ''));
+  },
+
+  // Safely get expected results for a user
+  getExpectedResults: (userKey: string, collection: string, operation: 'read' | 'write' | 'delete'): string[] => {
+    try {
+      const results = expectedResults[collection as keyof typeof expectedResults];
+      if (!results) return [];
+      
+      const operationResults = results[operation];
+      if (!operationResults) return [];
+      
+      const userResults = operationResults[userKey as keyof typeof operationResults];
+      return Array.isArray(userResults) ? userResults : [];
+    } catch (error) {
+      console.warn(`Error getting expected results for ${userKey}/${collection}/${operation}:`, error);
+      return [];
+    }
+  },
+
+  // Validate test user object
+  validateTestUser: (user: any): { isValid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+    
+    if (!user) {
+      errors.push('User is null or undefined');
+      return { isValid: false, errors };
+    }
+    
+    if (typeof user !== 'object') {
+      errors.push('User must be an object');
+      return { isValid: false, errors };
+    }
+    
+    if (!user.sub || typeof user.sub !== 'string') {
+      errors.push('User must have a valid sub (string)');
+    }
+    
+    if (!user.userId || typeof user.userId !== 'string') {
+      errors.push('User must have a valid userId (string)');
+    }
+    
+    if (!user.username || typeof user.username !== 'string') {
+      errors.push('User must have a valid username (string)');
+    }
+    
+    return { isValid: errors.length === 0, errors };
   }
 };

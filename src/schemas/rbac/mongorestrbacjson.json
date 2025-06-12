@@ -1,7 +1,7 @@
 {
   "name": "mongorest_rbac_config",
-  "version": "1.0.0",
-  "description": "Pattern-based RBAC configuration with advanced syntax",
+  "version": "2.0.0",
+  "description": "RBAC configuration aligned with MongoREST collection schemas",
   "collections": [
     {
       "collection_name": "products",
@@ -10,102 +10,71 @@
           {
             "user_role": "default",
             "patterns": [
-              "att1",
-              "att3", 
-              "att5",
-              "att4",
-              "images.public.*",
-              "reviews[0:5].*"
-            ]
-          },
-          {
-            "user_role": "userlv_1",
-            "patterns": [
-              "att1",
-              "att3", 
-              "att5",
-              "att4",
-              "att6",
-              "images.public.*",
-              "reviews[0:10].*",
-              "specifications.basic.*"
-            ]
-          },
-          {
-            "user_role": "userlv_2", 
-            "patterns": [
-              "att1",
-              "att3", 
-              "att5",
-              "att4",
-              "att2",
-              "images.*",
-              "reviews.*",
-              "specifications.*",
-              "!internal.sensitive.*"
-            ]
-          },
-          {
-            "user_role": "customer",
-            "patterns": [
-              "att1",
-              "att3",
-              "att4", 
-              "att5",
-              "att8",
+              "_id",
+              "sku",
               "name",
-              "price",
-              "description",
-              "images.public.*",
-              "reviews[0:10].*",
-              "specifications.basic.*",
-              "related_products[0:5].*",
-              "!internal.*",
-              "!competitors.*"
-            ]
-          },
-          {
-            "user_role": "seller",
-            "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att4",
-              "att5",
-              "att6",
-              "name",
-              "price",
               "description",
               "category",
-              "inventory",
-              "images.*",
-              "reviews.*",
-              "specifications.*",
-              "analytics.@self.*",
-              "inventory.@self.*",
-              "!competitors.*",
-              "!financial.sensitive.*"
+              "subcategory",
+              "price",
+              "currency",
+              "images",
+              "tags",
+              "ratings.*",
+              "status",
+              "!specifications.*",
+              "!inventory.*"
             ]
           },
           {
-            "user_role": "manager",
+            "user_role": "user",
             "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att4",
-              "att5",
-              "att6",
-              "analytics.*",
+              "_id",
+              "sku",
+              "name",
+              "description",
+              "category",
+              "subcategory",
+              "price",
+              "currency",
+              "inventory.quantity",
+              "images",
+              "tags",
+              "specifications.*",
+              "ratings.*",
+              "status",
+              "createdAt",
+              "!inventory.reserved",
+              "!inventory.lowStockThreshold"
+            ]
+          },
+          {
+            "user_role": "analyst",
+            "patterns": [
+              "_id",
+              "sku",
+              "name",
+              "category",
+              "subcategory",
+              "price",
+              "currency",
               "inventory.*",
-              "sales.@team.*",
-              "reports.@team.*",
-              "competitors.*",
-              "!financial.sensitive.*"
+              "ratings.*",
+              "status",
+              "createdAt",
+              "updatedAt",
+              "orderItems.*",
+              "!specifications.internal.*"
             ]
           },
           {
             "user_role": "admin",
+            "patterns": [
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
             "patterns": [
               "*"
             ]
@@ -114,60 +83,28 @@
         "write": [
           {
             "user_role": "default",
-            "patterns": [
-              "att1",
-              "att2"
-            ]
+            "patterns": []
           },
           {
-            "user_role": "customer",
-            "patterns": [
-              "reviews.@self.*",
-              "wishlist.@self.*",
-              "ratings.@self.*"
-            ]
+            "user_role": "user",
+            "patterns": []
           },
           {
-            "user_role": "seller",
+            "user_role": "analyst",
             "patterns": [
-              "att1",
-              "att3",
-              "att4",
-              "att5",
-              "name",
-              "description",
-              "price",
-              "category",
-              "inventory",
-              "images.@self.*",
-              "specifications.@self.*",
-              "!price_history.*",
-              "!analytics.*"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att4",
-              "att6",
-              "name",
-              "description",
-              "price",
-              "category",
-              "status",
-              "analytics.@team.*",
-              "inventory.*",
-              "!financial.audit.*"
+              "ratings.*"
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "**",
-              "!system.core.*"
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": [
+              "*"
             ]
           }
         ],
@@ -177,182 +114,110 @@
             "patterns": []
           },
           {
-            "user_role": "customer",
-            "patterns": [
-              "reviews.@self.*",
-              "wishlist.@self.*",
-              "ratings.@self.*"
-            ]
+            "user_role": "user",
+            "patterns": []
           },
           {
-            "user_role": "seller",
-            "patterns": [
-              "products.@self.*.images.temp",
-              "products.@self.*.drafts",
-              "inventory.@self.*.temp_adjustments"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "att2",
-              "att3",
-              "products.*.images.temp",
-              "products.*.drafts",
-              "inventory.*.outdated",
-              "reviews.*.spam"
-            ]
+            "user_role": "analyst",
+            "patterns": []
           },
           {
             "user_role": "admin",
             "patterns": [
-              "**",
-              "!financial.archived.*",
-              "!audit_trail.*"
+              "*"
             ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": []
           }
         ]
       }
     },
     {
-      "collection_name": "users", 
+      "collection_name": "users",
       "rbac_config": {
         "read": [
           {
             "user_role": "default",
             "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "id",
-              "username",
-              "profile.public.*"
+              "_id",
+              "name",
+              "profile.avatar"
             ]
           },
           {
             "user_role": "user",
             "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att8",
-              "id",
-              "username",
-              "email",
+              "_id",
+              "email.@self",
+              "name.@self",
               "profile.@self.*",
-              "settings.@self.*",
-              "notifications.@self.*",
-              "posts.@self.*",
-              "friends.*.profile.public.*",
-              "!profile.@self.private.*",
-              "!settings.@self.admin_settings"
+              "status.@self",
+              "lastLogin.@self",
+              "createdAt.@self",
+              "updatedAt.@self"
             ]
           },
           {
-            "user_role": "moderator",
+            "user_role": "analyst",
             "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att8",
-              "att9",
-              "id",
-              "username", 
-              "email",
+              "_id",
+              "name",
+              "profile.age",
+              "profile.country",
+              "profile.interests",
               "status",
-              "last_login",
-              "profile.*",
-              "settings.*.basic.*",
-              "posts.*",
-              "reports.@team.*",
-              "!settings.*.permissions",
-              "!profile.*.private.sensitive"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att8",
-              "id",
-              "username",
-              "email",
-              "department",
-              "team",
-              "profile.*",
-              "employees.@team.*",
-              "analytics.@team.*",
-              "reports.@team.*",
-              "!profile.*.private.personal"
+              "lastLogin",
+              "createdAt",
+              "!email",
+              "!profile.avatar"
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "**"
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": [
+              "*"
             ]
           }
         ],
         "write": [
           {
             "user_role": "default",
-            "patterns": [
-              "att1",
-              "att2"
-            ]
+            "patterns": []
           },
           {
             "user_role": "user",
             "patterns": [
-              "att1",
-              "att2",
-              "username",
-              "email",
-              "profile.@self.*",
-              "settings.@self.*",
-              "!profile.@self.verified",
-              "!profile.@self.admin_notes",
-              "!settings.@self.permissions",
-              "!settings.@self.security_level"
+              "name.@self",
+              "profile.@self.age",
+              "profile.@self.interests",
+              "profile.@self.avatar",
+              "!email.@self",
+              "!profile.@self.country",
+              "!status.@self"
             ]
           },
           {
-            "user_role": "moderator",
-            "patterns": [
-              "att1",
-              "att2",
-              "att8",
-              "username",
-              "email",
-              "status",
-              "profile.@self.*",
-              "settings.@self.*",
-              "users.*.status",
-              "users.*.moderation_notes",
-              "reports.*.status"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "att3",
-              "att4",
-              "username",
-              "email",
-              "department",
-              "team",
-              "profile.@self.*",
-              "employees.@team.*",
-              "reports.@team.*"
-            ]
+            "user_role": "analyst",
+            "patterns": []
           },
           {
             "user_role": "admin",
             "patterns": [
-              "**",
-              "!system.core.*"
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": [
+              "*"
             ]
           }
         ],
@@ -363,38 +228,21 @@
           },
           {
             "user_role": "user",
-            "patterns": [
-              "profile.@self.temp.*",
-              "settings.@self.cache.*",
-              "posts.@self.*",
-              "comments.@self.*"
-            ]
+            "patterns": []
           },
           {
-            "user_role": "moderator",
-            "patterns": [
-              "users.*.spam_content",
-              "users.*.temp_bans",
-              "reports.*.resolved",
-              "posts.*",
-              "comments.*"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "employees.@team.*.inactive_records",
-              "reports.@team.*.temp",
-              "analytics.@team.*.cache"
-            ]
+            "user_role": "analyst",
+            "patterns": []
           },
           {
             "user_role": "admin",
             "patterns": [
-              "**",
-              "!users.*.audit_trail",
-              "!system.*"
+              "*"
             ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": []
           }
         ]
       }
@@ -408,259 +256,71 @@
             "patterns": []
           },
           {
-            "user_role": "customer", 
+            "user_role": "user",
             "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att4",
-              "att8",
-              "id",
-              "status",
-              "total",
-              "created_at",
-              "orders.@self.*",
-              "items.*",
-              "shipping.@self.*",
-              "customer.@self.*",
-              "!payment.details.*",
-              "!internal.*"
-            ]
-          },
-          {
-            "user_role": "seller",
-            "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att4",
-              "id",
-              "status",
-              "total",
-              "items",
-              "orders.*",
+              "_id.@self",
+              "orderNumber.@self",
+              "customerId.@self",
               "items.@self.*",
-              "shipping.address.*",
-              "customer.*",
-              "analytics.@self.*",
-              "!payment.*",
-              "!customer.private.*"
-            ]
-          },
-          {
-            "user_role": "support",
-            "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att4",
-              "att8",
-              "id",
-              "status",
-              "customer_id",
-              "total",
-              "items",
-              "orders.*",
-              "customer.*",
-              "shipping.*",
-              "issues.*",
-              "support_notes",
-              "refund_status",
-              "!payment.details.*",
-              "!customer.private.sensitive"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att4",
-              "att5",
-              "orders.*",
-              "analytics.*",
-              "reports.*",
-              "customer.*",
-              "shipping.*",
-              "payment.summary.*",
-              "!payment.processor.*"
-            ]
-          },
-          {
-            "user_role": "admin",
-            "patterns": [
-              "**"
-            ]
-          }
-        ],
-        "write": [
-          {
-            "user_role": "default",
-            "patterns": [
-              "att1",
-              "att2"
-            ]
-          },
-          {
-            "user_role": "customer",
-            "patterns": [
-              "att1",
-              "att2",
-              "orders.@self.shipping_address",
-              "orders.@self.notes",
-              "orders.@self.preferences"
-            ]
-          },
-          {
-            "user_role": "seller",
-            "patterns": [
-              "att8",
-              "status",
-              "orders.*.items.@self.status",
-              "orders.*.shipping.tracking",
-              "orders.*.seller_notes"
-            ]
-          },
-          {
-            "user_role": "support",
-            "patterns": [
-              "status",
-              "support_notes",
-              "orders.*.status",
-              "orders.*.support_notes",
-              "orders.*.refund_status",
-              "orders.*.issue_resolution"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "att3",
-              "att5",
-              "att6",
-              "status",
-              "priority",
-              "orders.*",
-              "analytics.notes",
-              "!payment.processor.*"
-            ]
-          },
-          {
-            "user_role": "admin",
-            "patterns": [
-              "**"
-            ]
-          }
-        ],
-        "delete": [
-          {
-            "user_role": "default",
-            "patterns": []
-          },
-          {
-            "user_role": "customer",
-            "patterns": [
-              "orders.@self.draft.*",
-              "orders.@self.temp_items"
-            ]
-          },
-          {
-            "user_role": "seller",
-            "patterns": [
-              "orders.*.items.@self.temp_data"
-            ]
-          },
-          {
-            "user_role": "support",
-            "patterns": [
-              "orders.*.temp_data",
-              "orders.*.session_cache"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "att3",
-              "orders.*.temp_data",
-              "orders.*.logs.system",
-              "orders.cancelled.*",
-              "analytics.*.temp"
-            ]
-          },
-          {
-            "user_role": "admin",
-            "patterns": [
-              "**",
-              "!orders.*.audit_trail"
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "collection_name": "reports",
-      "rbac_config": {
-        "read": [
-          {
-            "user_role": "default",
-            "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att4",
-              "att5",
-              "reports.public.*"
-            ]
-          },
-          {
-            "user_role": "user",
-            "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att4",
-              "att5",
-              "reports.@self.*",
-              "reports.public.*",
-              "summary.*"
+              "shippingAddress.@self.*",
+              "billingAddress.@self.*",
+              "payment.@self.method",
+              "payment.@self.status",
+              "payment.@self.amount",
+              "subtotal.@self",
+              "tax.@self",
+              "shipping.@self",
+              "discount.@self",
+              "totalAmount.@self",
+              "currency.@self",
+              "status.@self",
+              "orderDate.@self",
+              "shippedDate.@self",
+              "deliveredDate.@self",
+              "notes.@self",
+              "customer.@self.*",
+              "!payment.@self.transactionId"
             ]
           },
           {
             "user_role": "analyst",
             "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att4",
-              "att5",
-              "att6",
-              "reports.**",
-              "analytics.**",
-              "metrics.**",
-              "dashboards.*",
-              "!financial.sensitive.*"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att4",
-              "att5",
-              "reports.@team.*",
-              "reports.department.*",
-              "analytics.@team.*",
-              "financial.summary.*",
-              "!financial.detailed.*"
+              "_id",
+              "orderNumber",
+              "customerId",
+              "items.*",
+              "payment.method",
+              "payment.status",
+              "payment.amount",
+              "subtotal",
+              "tax",
+              "shipping",
+              "discount",
+              "totalAmount",
+              "currency",
+              "status",
+              "orderDate",
+              "shippedDate",
+              "deliveredDate",
+              "customer._id",
+              "customer.name",
+              "customer.profile.country",
+              "!shippingAddress.*",
+              "!billingAddress.*",
+              "!payment.transactionId",
+              "!notes"
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "**"
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": [
+              "*"
             ]
           }
         ],
@@ -672,36 +332,25 @@
           {
             "user_role": "user",
             "patterns": [
-              "reports.@self.personal.*",
-              "feedback.@self.*"
+              "shippingAddress.@self.*",
+              "billingAddress.@self.*",
+              "notes.@self"
             ]
           },
           {
             "user_role": "analyst",
-            "patterns": [
-              "reports.*",
-              "custom_metrics.*",
-              "dashboards.*",
-              "analytics.notes.*",
-              "!reports.*.approved"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "att1",
-              "att2",
-              "att3",
-              "att4",
-              "reports.@team.*",
-              "analytics.@team.notes",
-              "budget.@team.*"
-            ]
+            "patterns": []
           },
           {
             "user_role": "admin",
             "patterns": [
-              "**"
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": [
+              "*"
             ]
           }
         ],
@@ -712,271 +361,247 @@
           },
           {
             "user_role": "user",
-            "patterns": [
-              "reports.@self.draft.*",
-              "reports.@self.temp.*"
-            ]
+            "patterns": []
           },
           {
             "user_role": "analyst",
-            "patterns": [
-              "reports.temp.*",
-              "custom_metrics.draft.*",
-              "dashboards.*.cache"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "att1",
-              "att2",
-              "reports.@team.temp.*",
-              "analytics.@team.*.cache"
-            ]
+            "patterns": []
           },
           {
             "user_role": "admin",
             "patterns": [
-              "**",
-              "!reports.*.archived",
-              "!financial.historical.*"
+              "*"
             ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": []
           }
         ]
       }
     },
     {
-      "collection_name": "analytics",
-      "rbac_config": {
-        "read": [
-          {
-            "user_role": "default",
-            "patterns": []
-          },
-          {
-            "user_role": "user",
-            "patterns": [
-              "analytics.@self.basic.*",
-              "analytics.@self.posts.views",
-              "summary.@self.*"
-            ]
-          },
-          {
-            "user_role": "author",
-            "patterns": [
-              "views",
-              "likes", 
-              "comments_count",
-              "analytics.@self.*",
-              "performance.@self.*",
-              "engagement.@self.*",
-              "!revenue.*",
-              "!financial.*"
-            ]
-          },
-          {
-            "user_role": "analyst",
-            "patterns": [
-              "analytics.**",
-              "reports.**", 
-              "metrics.**",
-              "dashboards.**",
-              "trends.*",
-              "predictions.*",
-              "!financial.sensitive.*",
-              "!personal.private.*"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "analytics.@team.*",
-              "analytics.department.*",
-              "reports.*",
-              "metrics.@team.*",
-              "performance.@team.*",
-              "!analytics.*.personal",
-              "!financial.salary.*"
-            ]
-          },
-          {
-            "user_role": "admin",
-            "patterns": [
-              "**"
-            ]
-          }
-        ],
-        "write": [
-          {
-            "user_role": "default",
-            "patterns": []
-          },
-          {
-            "user_role": "user",
-            "patterns": [
-              "analytics.@self.preferences.*",
-              "feedback.@self.*"
-            ]
-          },
-          {
-            "user_role": "author",
-            "patterns": [
-              "analytics.@self.notes.*",
-              "goals.@self.*"
-            ]
-          },
-          {
-            "user_role": "analyst",
-            "patterns": [
-              "reports.*",
-              "custom_metrics.*",
-              "dashboards.*",
-              "models.*",
-              "predictions.*",
-              "!financial.*"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "reports.@team.*",
-              "analytics.@team.notes",
-              "metrics.@team.custom.*",
-              "goals.@team.*"
-            ]
-          },
-          {
-            "user_role": "admin",
-            "patterns": [
-              "**"
-            ]
-          }
-        ],
-        "delete": [
-          {
-            "user_role": "default",
-            "patterns": []
-          },
-          {
-            "user_role": "user",
-            "patterns": [
-              "analytics.@self.temp.*",
-              "cache.@self.*"
-            ]
-          },
-          {
-            "user_role": "author",
-            "patterns": [
-              "analytics.@self.draft.*",
-              "goals.@self.completed.*"
-            ]
-          },
-          {
-            "user_role": "analyst",
-            "patterns": [
-              "reports.temp.*",
-              "custom_metrics.draft.*",
-              "models.experimental.*",
-              "cache.system.*"
-            ]
-          },
-          {
-            "user_role": "manager",
-            "patterns": [
-              "reports.@team.temp.*",
-              "analytics.@team.cache.*"
-            ]
-          },
-          {
-            "user_role": "admin",
-            "patterns": [
-              "**",
-              "!analytics.*.historical",
-              "!financial.archived.*"
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "collection_name": "files",
+      "collection_name": "categories",
       "rbac_config": {
         "read": [
           {
             "user_role": "default",
             "patterns": [
-              "id",
+              "_id",
               "name",
-              "type", 
-              "size",
-              "files.public.*",
-              "metadata.basic.*"
-            ]
-          },
-          {
-            "user_role": "user",
-            "patterns": [
-              "id",
-              "name",
-              "type",
-              "size",
-              "created_at",
-              "files.@self.*",
-              "files.shared.@self.*",
-              "metadata.*",
-              "!metadata.system.*",
-              "!files.@self.private.sensitive"
-            ]
-          },
-          {
-            "user_role": "moderator",
-            "patterns": [
-              "files.**",
-              "metadata.**",
-              "reports.*",
-              "!files.*.personal",
-              "!metadata.*.private"
-            ]
-          },
-          {
-            "user_role": "admin",
-            "patterns": [
-              "**"
-            ]
-          }
-        ],
-        "write": [
-          {
-            "user_role": "default",
-            "patterns": []
-          },
-          {
-            "user_role": "user",
-            "patterns": [
-              "name",
-              "tags",
+              "slug",
               "description",
-              "files.@self.*",
-              "metadata.@self.*",
-              "!files.@self.permissions",
-              "!files.@self.system_flags"
+              "parentId",
+              "image",
+              "sortOrder",
+              "featured",
+              "status",
+              "parent.*",
+              "children.*",
+              "products.*"
             ]
           },
           {
-            "user_role": "moderator",
+            "user_role": "user",
             "patterns": [
+              "_id",
               "name",
-              "tags",
+              "slug",
+              "description",
+              "parentId",
+              "image",
+              "sortOrder",
+              "featured",
               "status",
-              "moderation_notes",
-              "files.*",
-              "metadata.*.moderation"
+              "seo.*",
+              "createdAt",
+              "updatedAt",
+              "parent.*",
+              "children.*",
+              "products.*"
+            ]
+          },
+          {
+            "user_role": "analyst",
+            "patterns": [
+              "*"
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "**"
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": [
+              "*"
+            ]
+          }
+        ],
+        "write": [
+          {
+            "user_role": "default",
+            "patterns": []
+          },
+          {
+            "user_role": "user",
+            "patterns": []
+          },
+          {
+            "user_role": "analyst",
+            "patterns": []
+          },
+          {
+            "user_role": "admin",
+            "patterns": [
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": [
+              "*"
+            ]
+          }
+        ],
+        "delete": [
+          {
+            "user_role": "default",
+            "patterns": []
+          },
+          {
+            "user_role": "user",
+            "patterns": []
+          },
+          {
+            "user_role": "analyst",
+            "patterns": []
+          },
+          {
+            "user_role": "admin",
+            "patterns": [
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": []
+          }
+        ]
+      }
+    },
+    {
+      "collection_name": "product_reviews",
+      "rbac_config": {
+        "read": [
+          {
+            "user_role": "default",
+            "patterns": [
+              "_id",
+              "productId",
+              "rating",
+              "title",
+              "content",
+              "verified",
+              "helpful.*",
+              "images",
+              "createdAt",
+              "product.name",
+              "user.name",
+              "user.profile.avatar"
+            ]
+          },
+          {
+            "user_role": "user",
+            "patterns": [
+              "_id",
+              "productId",
+              "userId.@self",
+              "rating",
+              "title",
+              "content",
+              "verified",
+              "helpful.*",
+              "status.@self",
+              "images",
+              "createdAt",
+              "updatedAt",
+              "product.*",
+              "user.@self.*"
+            ]
+          },
+          {
+            "user_role": "analyst",
+            "patterns": [
+              "_id",
+              "productId",
+              "userId",
+              "rating",
+              "title",
+              "content",
+              "verified",
+              "helpful.*",
+              "status",
+              "createdAt",
+              "updatedAt",
+              "product._id",
+              "product.name",
+              "product.sku",
+              "user._id",
+              "user.name"
+            ]
+          },
+          {
+            "user_role": "admin",
+            "patterns": [
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": [
+              "*"
+            ]
+          }
+        ],
+        "write": [
+          {
+            "user_role": "default",
+            "patterns": []
+          },
+          {
+            "user_role": "user",
+            "patterns": [
+              "productId",
+              "rating",
+              "title",
+              "content",
+              "images",
+              "!userId",
+              "!verified",
+              "!helpful.*",
+              "!status"
+            ]
+          },
+          {
+            "user_role": "analyst",
+            "patterns": [
+              "status",
+              "helpful.*"
+            ]
+          },
+          {
+            "user_role": "admin",
+            "patterns": [
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": [
+              "*"
             ]
           }
         ],
@@ -988,29 +613,176 @@
           {
             "user_role": "user",
             "patterns": [
-              "files.@self.*",
-              "!files.@self.shared",
-              "!files.@self.published"
+              "reviews.@self.*"
             ]
           },
           {
-            "user_role": "moderator",
+            "user_role": "analyst",
+            "patterns": []
+          },
+          {
+            "user_role": "admin",
             "patterns": [
-              "id",
-              "files.*.flagged",
-              "files.*.temp",
-              "files.*.spam"
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": [
+              "*"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "collection_name": "product_categories",
+      "rbac_config": {
+        "read": [
+          {
+            "user_role": "default",
+            "patterns": [
+              "_id",
+              "productId",
+              "categoryId",
+              "isPrimary",
+              "sortOrder",
+              "product.*",
+              "category.*"
+            ]
+          },
+          {
+            "user_role": "user",
+            "patterns": [
+              "_id",
+              "productId",
+              "categoryId",
+              "isPrimary",
+              "sortOrder",
+              "createdAt",
+              "product.*",
+              "category.*"
+            ]
+          },
+          {
+            "user_role": "analyst",
+            "patterns": [
+              "*"
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "**",
-              "!files.*.system"
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": [
+              "*"
+            ]
+          }
+        ],
+        "write": [
+          {
+            "user_role": "default",
+            "patterns": []
+          },
+          {
+            "user_role": "user",
+            "patterns": []
+          },
+          {
+            "user_role": "analyst",
+            "patterns": []
+          },
+          {
+            "user_role": "admin",
+            "patterns": [
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": [
+              "*"
+            ]
+          }
+        ],
+        "delete": [
+          {
+            "user_role": "default",
+            "patterns": []
+          },
+          {
+            "user_role": "user",
+            "patterns": []
+          },
+          {
+            "user_role": "analyst",
+            "patterns": []
+          },
+          {
+            "user_role": "admin",
+            "patterns": [
+              "*"
+            ]
+          },
+          {
+            "user_role": "dev",
+            "patterns": [
+              "*"
             ]
           }
         ]
       }
     }
-  ]
+  ],
+  "rbac_features": {
+    "pattern_syntax": {
+      "wildcard": "*",
+      "deep_wildcard": "**",
+      "negation": "!field.*",
+      "self_reference": "@self",
+      "team_reference": "@team",
+      "array_slicing": "field[0:5].*",
+      "conditional_filters": "status=eq.approved"
+    },
+    "permission_inheritance": {
+      "enabled": true,
+      "hierarchy": ["default", "user", "analyst", "admin", "dev"]
+    },
+    "dynamic_permissions": {
+      "enabled": true,
+      "context_aware": true,
+      "runtime_evaluation": true
+    }
+  },
+  "role_definitions": {
+    "default": {
+      "description": "Anonymous/guest users",
+      "level": 0,
+      "inherits_from": null
+    },
+    "user": {
+      "description": "Authenticated regular users",
+      "level": 1,
+      "inherits_from": "default"
+    },
+    "analyst": {
+      "description": "Data analysts and reporting users",
+      "level": 2,
+      "inherits_from": "user"
+    },
+    "admin": {
+      "description": "System administrators",
+      "level": 3,
+      "inherits_from": "analyst"
+    },
+    "dev": {
+      "description": "Developers with special access",
+      "level": 3,
+      "inherits_from": "analyst"
+    }
+  }
 }
