@@ -83,7 +83,6 @@ export class PostgRESTToMongoConverter {
   } else if (filterConditions.length > 1) {
     result.filter = { $and: filterConditions };
   }
-
   return result;
 }
 
@@ -93,12 +92,10 @@ export class PostgRESTToMongoConverter {
     if (!selectValue || selectValue === '*') {
       return;
     }
-    console.log(collection)
     if (collection) {
       // Use enhanced parsing with embeds
       const selectResult = this.selectParser.parseSelect(collection, selectValue);
       result.projection = selectResult.fields;
-      console.log("selectResult", JSON.stringify(selectResult))
       if (selectResult.pipeline.length > 0) {
         result.pipeline = selectResult.pipeline;
         result.hasEmbeds = true;
