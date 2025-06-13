@@ -236,7 +236,6 @@ export class JoinParser {
   const as = currentLookupStage.$lookup.as;
   const letVar = "local_value";
   
-  console.log("aaaaaaaaaaaaaaaaaa",filters)
   const result = this.buildLogicNested(filters);
   
   const pipeline: any[] = [

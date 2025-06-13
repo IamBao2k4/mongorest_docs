@@ -120,7 +120,7 @@ export class HttpServer {
     queryParams: Record<string, string>
   ): Promise<void> {
     try {
-      const mongoQuery = this.convertPostgrestQuery(queryParams, collection);
+      const mongoQuery = this.convertPostgrestQuery(queryParams, "look_"+collection);
       const result = await this.dbAdapter.find(collection, mongoQuery);
       this.sendResponse(res, 200, result);
     } catch (error: any) {

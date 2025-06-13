@@ -6,7 +6,7 @@ import { HttpServer } from './http';
 async function main() {
   // MongoDB configuration
   const mongoConfig = {
-    connectionString: 'mongodb://thaily:Th%40i2004@localhost:27017/mongorest?authSource=admin',
+    connectionString: 'mongodb://thaily:Th%40i2004@192.168.1.109:27017/mongorest?authSource=admin',
     databaseName: 'mongorest',
     options: {
       maxPoolSize: 50,

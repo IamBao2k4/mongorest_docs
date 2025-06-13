@@ -1,4 +1,4 @@
-import { LEGAL_TCP_SOCKET_OPTIONS } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import {
     CompiledPattern,
     ProcessingResult,
@@ -32,6 +32,10 @@ interface ParsedFieldSegment {
     isArrayAccess: boolean;
 }
 
+function isObjectId(value: any): boolean {
+    return value instanceof ObjectId || (typeof value === 'string' && ObjectId.isValid(value));
+}
+
 // ================================
 // RBAC SYNTAX HANDLER CLASS
 // ================================
@@ -63,7 +67,7 @@ export class RBACPatternHandler {
 
             let result = this.applyIncludes(data, includes, context, operation);
             result = this.applyExcludes(result, excludes, context, operation);
-            
+
             return {
                 data: this.cleanup(result),
                 matched: true,
@@ -313,7 +317,7 @@ export class RBACPatternHandler {
 
         const tokens = this.tokenize(pattern);
         const segments = this.parseTokens(tokens);
-        
+
         const compiled: CompiledPattern = {
             segments,
             isNegation: tokens.some(t => t.type === TokenType.NEGATION),
@@ -335,8 +339,6 @@ export class RBACPatternHandler {
 
         while (i < tokens.length) {
             const token = tokens[i];
-
-            console.log('token', token);
 
             switch (token.type) {
                 case TokenType.FIELD:
@@ -549,8 +551,8 @@ export class RBACPatternHandler {
         }
 
         // Check for wildcard access
-        const hasWildcard = includes.some(pattern => 
-            pattern.segments.length === 1 && 
+        const hasWildcard = includes.some(pattern =>
+            pattern.segments.length === 1 &&
             pattern.segments[0].type === SegmentType.WILDCARD
         );
 
@@ -559,16 +561,25 @@ export class RBACPatternHandler {
         }
 
         // Start with empty result and only include allowed fields
-        const result :any = [];
-        
+        let result: any;
 
-        for (let i = 0; i < data.length; i++) {
+        if (Array.isArray(data)) {
+            result = [];
+            for (let i = 0; i < data.length; i++) {
+                const temp = {};
+                for (const pattern of includes) {
+                    const resolvedPattern = this.resolveContext(pattern, context);
+                    this.includePatternInResult(data[i], resolvedPattern.segments, temp, [], operation, context);
+                }
+                result.push(temp);
+            }
+        } else {
             const temp = {};
             for (const pattern of includes) {
                 const resolvedPattern = this.resolveContext(pattern, context);
-                this.includePatternInResult(data[i], resolvedPattern.segments, temp, [], operation, context);
+                this.includePatternInResult(data, resolvedPattern.segments, temp, [], operation, context);
             }
-            result.push(temp);
+            result=temp;
         }
 
         return result;
@@ -578,9 +589,9 @@ export class RBACPatternHandler {
      * Include only the specified pattern in the result, creating the path if needed
      */
     private includePatternInResult(
-        source: any, 
-        segments: PatternSegment[], 
-        target: any, 
+        source: any,
+        segments: PatternSegment[],
+        target: any,
         currentPath: string[],
         operation: 'read' | 'write' | 'delete',
         context: UserContext
@@ -596,11 +607,11 @@ export class RBACPatternHandler {
             case SegmentType.FIELD:
                 this.handleFieldInclusion(source, target, segment.name, remainingSegments, currentPath, operation, context);
                 break;
-            
+
             case SegmentType.CROSS_COLLECTION:
-                this.handleCrossCollectionInclusion(source, target, segment, remainingSegments, currentPath, operation, context);
+                this.handleCrossCollectionInclusion(source, target, segment, operation, context);
                 break;
-                
+
             case SegmentType.WILDCARD:
                 this.handleWildcardInclusion(source, target, remainingSegments, currentPath, isLastSegment, operation, context);
                 break;
@@ -629,11 +640,9 @@ export class RBACPatternHandler {
 
     // NEW: Handle cross-collection field inclusion
     private handleCrossCollectionInclusion(
-        source: any, 
-        target: any, 
-        segment: PatternSegment, 
-        remainingSegments: PatternSegment[], 
-        currentPath: string[],
+        source: any,
+        target: any,
+        segment: PatternSegment,
         operation: 'read' | 'write' | 'delete',
         context: UserContext
     ): void {
@@ -642,7 +651,7 @@ export class RBACPatternHandler {
         }
 
         // Find all fields that start with the lookup pattern (e.g., 'look_')
-        const matchingFields = Object.keys(source).filter(key => 
+        const matchingFields = Object.keys(source).filter(key =>
             key.startsWith(segment.lookupPattern!)
         );
 
@@ -659,17 +668,19 @@ export class RBACPatternHandler {
 
             const compiledPatterns = this.compilePatterns(allAllowedPatterns);
 
-            const {includes}= this.separatePatterns(compiledPatterns);
+            const { includes } = this.separatePatterns(compiledPatterns);
 
-            target[fieldName] = this.applyIncludes(sourceValue, includes, context, operation);
+            const newFieldName = fieldName.replace(segment.lookupPattern!, '');
+
+            target[newFieldName] = this.applyIncludes(sourceValue, includes, context, operation);
         }
     }
 
     private handleFieldInclusion(
-        source: any, 
-        target: any, 
-        fieldName: string | undefined, 
-        remainingSegments: PatternSegment[], 
+        source: any,
+        target: any,
+        fieldName: string | undefined,
+        remainingSegments: PatternSegment[],
         currentPath: string[],
         operation: 'read' | 'write' | 'delete',
         context: UserContext
@@ -680,22 +691,29 @@ export class RBACPatternHandler {
         }
 
         const sourceValue = source[fieldName];
+
         
+
         if (remainingSegments.length === 0) {
             // Last segment - copy the value
             if (Array.isArray(target)) {
                 return;
             }
-            target[fieldName] = this.deepClone(sourceValue);
+            if (isObjectId(sourceValue)) {
+                target[fieldName] = String(sourceValue);
+            }
+            else{
+                target[fieldName] = this.deepClone(sourceValue);
+            }
         } else {
             // More segments to process
             if (!target[fieldName]) {
                 target[fieldName] = Array.isArray(sourceValue) ? [] : {};
             }
             this.includePatternInResult(
-                sourceValue, 
-                remainingSegments, 
-                target[fieldName], 
+                sourceValue,
+                remainingSegments,
+                target[fieldName],
                 [...currentPath, fieldName],
                 operation,
                 context
@@ -704,9 +722,9 @@ export class RBACPatternHandler {
     }
 
     private handleWildcardInclusion(
-        source: any, 
-        target: any, 
-        remainingSegments: PatternSegment[], 
+        source: any,
+        target: any,
+        remainingSegments: PatternSegment[],
         currentPath: string[],
         isLastSegment: boolean,
         operation: 'read' | 'write' | 'delete',
@@ -723,9 +741,9 @@ export class RBACPatternHandler {
                     target[i] = this.deepClone(source[i]);
                 } else {
                     this.includePatternInResult(
-                        source[i], 
-                        remainingSegments, 
-                        target[i], 
+                        source[i],
+                        remainingSegments,
+                        target[i],
                         [...currentPath, i.toString()],
                         operation,
                         context
@@ -742,11 +760,11 @@ export class RBACPatternHandler {
                         if (!target[key]) {
                             target[key] = Array.isArray(source[key]) ? [] : {};
                         }
-                        
+
                         this.includePatternInResult(
-                            source[key], 
-                            remainingSegments, 
-                            target[key], 
+                            source[key],
+                            remainingSegments,
+                            target[key],
                             [...currentPath, key],
                             operation,
                             context
@@ -758,10 +776,10 @@ export class RBACPatternHandler {
     }
 
     private handleArrayIndexInclusion(
-        source: any, 
-        target: any, 
-        segment: PatternSegment, 
-        remainingSegments: PatternSegment[], 
+        source: any,
+        target: any,
+        segment: PatternSegment,
+        remainingSegments: PatternSegment[],
         currentPath: string[],
         operation: 'read' | 'write' | 'delete',
         context: UserContext
@@ -796,11 +814,11 @@ export class RBACPatternHandler {
                 }
                 targetItem = target[index];
             }
-            
+
             this.includePatternInResult(
-                sourceItem, 
-                remainingSegments, 
-                targetItem, 
+                sourceItem,
+                remainingSegments,
+                targetItem,
                 [...currentPath, index.toString()],
                 operation,
                 context
@@ -809,10 +827,10 @@ export class RBACPatternHandler {
     }
 
     private handleArrayRangeInclusion(
-        source: any, 
-        target: any, 
-        segment: PatternSegment, 
-        remainingSegments: PatternSegment[], 
+        source: any,
+        target: any,
+        segment: PatternSegment,
+        remainingSegments: PatternSegment[],
         currentPath: string[],
         operation: 'read' | 'write' | 'delete',
         context: UserContext
@@ -827,7 +845,7 @@ export class RBACPatternHandler {
 
         for (let i = actualStart; i < actualEnd; i++) {
             const sourceItem = source[i];
-            
+
             if (remainingSegments.length === 0) {
                 // Last segment - add to target array
                 if (Array.isArray(target)) {
@@ -847,11 +865,11 @@ export class RBACPatternHandler {
                     }
                     targetItem = target[i];
                 }
-                
+
                 this.includePatternInResult(
-                    sourceItem, 
-                    remainingSegments, 
-                    targetItem, 
+                    sourceItem,
+                    remainingSegments,
+                    targetItem,
                     [...currentPath, i.toString()],
                     operation,
                     context
@@ -861,8 +879,8 @@ export class RBACPatternHandler {
     }
 
     private handleDeepWildcardInclusion(
-        source: any, 
-        target: any, 
+        source: any,
+        target: any,
         currentPath: string[]
     ): void {
         if (currentPath.length > MAX_NESTING_DEPTH) {
@@ -882,10 +900,10 @@ export class RBACPatternHandler {
     }
 
     private handleTypeCheckInclusion(
-        source: any, 
-        target: any, 
-        segment: PatternSegment, 
-        remainingSegments: PatternSegment[], 
+        source: any,
+        target: any,
+        segment: PatternSegment,
+        remainingSegments: PatternSegment[],
         currentPath: string[],
         operation: 'read' | 'write' | 'delete',
         context: UserContext
@@ -905,11 +923,11 @@ export class RBACPatternHandler {
             if (!target[segment.name]) {
                 target[segment.name] = Array.isArray(fieldValue) ? [] : {};
             }
-            
+
             this.includePatternInResult(
-                fieldValue, 
-                remainingSegments, 
-                target[segment.name], 
+                fieldValue,
+                remainingSegments,
+                target[segment.name],
                 [...currentPath, segment.name],
                 operation,
                 context
@@ -1104,7 +1122,7 @@ export class RBACPatternHandler {
         // Original behavior: continue processing with remaining segments
         for (let i = 0; i < Math.min(sourceData.length, MAX_ARRAY_SIZE); i++) {
             const item = sourceData[i];
-            
+
             if (!(targetData as any)[i]) {
                 (targetData as any)[i] = Array.isArray(item) ? [] : {};
             }
@@ -1144,7 +1162,7 @@ export class RBACPatternHandler {
                 Object.setPrototypeOf(targetData, Array.prototype);
                 targetData.length = 0;
             }
-            
+
             // Add item to the end of array (compact, no empty slots)
             targetData.push(item);
         } else {
@@ -1164,7 +1182,7 @@ export class RBACPatternHandler {
             if (!targetData[index]) {
                 targetData[index] = Array.isArray(item) ? [] : {};
             }
-            
+
             this.applyPatternToData(
                 item,
                 remainingSegments,
@@ -1210,7 +1228,7 @@ export class RBACPatternHandler {
                     newTarget,
                     [...currentPath, i.toString()]
                 );
-                
+
                 // Only add non-empty results
                 if (Array.isArray(newTarget) ? newTarget.length > 0 : Object.keys(newTarget).length > 0) {
                     targetData.push(newTarget);
@@ -1313,7 +1331,7 @@ export class RBACPatternHandler {
     private parseFieldSegment(fieldSegment: string): ParsedFieldSegment {
         // Check for array access pattern: fieldName[index]
         const arrayMatch = fieldSegment.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]$/);
-        
+
         if (arrayMatch) {
             return {
                 fieldName: arrayMatch[1],
@@ -1321,7 +1339,7 @@ export class RBACPatternHandler {
                 isArrayAccess: true
             };
         }
-        
+
         // MODIFIED: Accept any field name including pure numbers
         // This allows "0", "1", "2" etc. to be treated as field names
         if (/^[a-zA-Z_0-9][a-zA-Z0-9_]*$/.test(fieldSegment)) {
@@ -1330,250 +1348,250 @@ export class RBACPatternHandler {
                 isArrayAccess: false
             };
         }
-        
+
         throw new Error(`Invalid field segment: ${fieldSegment}`);
     }
 
     /**
     * Check if a pattern segment matches a parsed field segment
     */
-   private segmentMatches(
-       patternSegment: PatternSegment,
-       parsedField: ParsedFieldSegment
-   ): boolean {
-       switch (patternSegment.type) {
-           case SegmentType.FIELD:
-               // Simple field name match (no array access)
-               return !parsedField.isArrayAccess && 
-                      patternSegment.name === parsedField.fieldName;
-           
-           case SegmentType.ARRAY_INDEX:
-               // Exact array index match
-               return parsedField.isArrayAccess && 
-                      parsedField.arrayIndex === patternSegment.index;
-           
-           case SegmentType.ARRAY_RANGE:
-               // Array range contains the field's array index
-               if (!parsedField.isArrayAccess || parsedField.arrayIndex === undefined) {
-                   return false;
-               }
-               
-               const start = patternSegment.start ?? 0;
-               const end = patternSegment.end ?? Number.MAX_SAFE_INTEGER;
-               
-               return parsedField.arrayIndex >= start && parsedField.arrayIndex < end;
-           
-           case SegmentType.WILDCARD:
-               // Wildcard matches any single field (with or without array access)
-               return true;
-           
-           case SegmentType.DEEP_WILDCARD:
-               // Deep wildcard matches everything
-               return true;
-           
-           case SegmentType.TYPE_CHECK:
-               // Type check with optional array access
-               return patternSegment.name === parsedField.fieldName;
-           
-           // NEW: Cross-collection segment matching
-           case SegmentType.CROSS_COLLECTION:
-               // Match any field that starts with the lookup pattern
-               return parsedField.fieldName.startsWith(patternSegment.lookupPattern || 'look_');
-           
-           default:
-               return false;
-       }
-   }
+    private segmentMatches(
+        patternSegment: PatternSegment,
+        parsedField: ParsedFieldSegment
+    ): boolean {
+        switch (patternSegment.type) {
+            case SegmentType.FIELD:
+                // Simple field name match (no array access)
+                return !parsedField.isArrayAccess &&
+                    patternSegment.name === parsedField.fieldName;
 
-   /**
-    * Check if a pattern segment is an array-related segment
-    */
-   private isArraySegment(segment: PatternSegment): boolean {
-       return segment.type === SegmentType.ARRAY_INDEX ||
-              segment.type === SegmentType.ARRAY_RANGE ||
-              segment.type === SegmentType.ARRAY_WILDCARD;
-   }
+            case SegmentType.ARRAY_INDEX:
+                // Exact array index match
+                return parsedField.isArrayAccess &&
+                    parsedField.arrayIndex === patternSegment.index;
 
-   // ================================
-   // UTILITY METHODS
-   // ================================
+            case SegmentType.ARRAY_RANGE:
+                // Array range contains the field's array index
+                if (!parsedField.isArrayAccess || parsedField.arrayIndex === undefined) {
+                    return false;
+                }
 
-   /**
-    * MODIFIED: Enhanced pathMatches method with terminal wildcard support
-    * Key changes:
-    * - If WILDCARD (*) is the last segment, it matches any remaining path segments
-    * - This allows "images.public.*" to match "images.public.0", "images.public.0.url", etc.
-    */
-   private pathMatches(fieldPath: string[], segments: PatternSegment[]): boolean {
-       // Base cases
-       if (segments.length === 0) {
-           return fieldPath.length === 0;
-       }
-       
-       if (fieldPath.length === 0) {
-           // Check if remaining segments are all optional or deep wildcards
-           return segments.every(seg => 
-               seg.type === SegmentType.DEEP_WILDCARD ||
-               seg.isOptional
-           );
-       }
+                const start = patternSegment.start ?? 0;
+                const end = patternSegment.end ?? Number.MAX_SAFE_INTEGER;
 
-       const [currentField, ...remainingFields] = fieldPath;
-       const [currentSegment, ...remainingSegments] = segments;
+                return parsedField.arrayIndex >= start && parsedField.arrayIndex < end;
 
-       try {
-           // Parse current field segment
-           const parsedField = this.parseFieldSegment(currentField);
-           
-           // Handle different pattern segment types
-           switch (currentSegment.type) {
-               case SegmentType.FIELD:
-                   // For FIELD patterns, we need to handle the case where
-                   // the field might have array access that needs to be matched
-                   // by the NEXT pattern segment
-                   if (parsedField.fieldName === currentSegment.name) {
-                       if (parsedField.isArrayAccess) {
-                           // Field has array access, next pattern segment should handle it
-                           if (remainingSegments.length === 0) {
-                               // No more pattern segments to handle array access
-                               return false;
-                           }
-                           
-                           const nextSegment = remainingSegments[0];
-                           if (this.isArraySegment(nextSegment)) {
-                               // Create a virtual parsed field for array index matching
-                               const arrayField: ParsedFieldSegment = {
-                                   fieldName: '',
-                                   arrayIndex: parsedField.arrayIndex,
-                                   isArrayAccess: true
-                               };
-                               
-                               if (this.segmentMatches(nextSegment, arrayField)) {
-                                   // Both field name and array index matched
-                                   return this.pathMatches(remainingFields, remainingSegments.slice(1));
-                               }
-                           }
-                           return false;
-                       } else {
-                           // Simple field name match, continue with remaining
-                           return this.pathMatches(remainingFields, remainingSegments);
-                       }
-                   }
-                   return false;
-               
-               case SegmentType.ARRAY_INDEX:
-               case SegmentType.ARRAY_RANGE:
-                   // Direct array segment matching
-                   if (this.segmentMatches(currentSegment, parsedField)) {
-                       return this.pathMatches(remainingFields, remainingSegments);
-                   }
-                   return false;
-               
-               case SegmentType.WILDCARD:
-                   // MODIFIED: Enhanced wildcard behavior for terminal wildcards
-                   // If this is the last segment in the pattern (no remaining segments),
-                   // then it should match any remaining path segments (including multiple levels)
-                   if (remainingSegments.length === 0) {
-                       // Terminal wildcard matches any remaining path
-                       // This allows "images.public.*" to match "images.public.0", "images.public.anything", etc.
-                       return true;
-                   }
-                   
-                   // Non-terminal wildcard: matches current field and continues with remaining segments
-                   return this.pathMatches(remainingFields, remainingSegments);
-               
-               case SegmentType.DEEP_WILDCARD:
-                   // Deep wildcard can match multiple fields
-                   // Try matching with remaining segments at each position
-                   for (let i = 0; i <= remainingFields.length; i++) {
-                       if (this.pathMatches(remainingFields.slice(i), remainingSegments)) {
-                           return true;
-                       }
-                   }
-                   return false;
-               
-               case SegmentType.TYPE_CHECK:
-                   // Type check with field name matching
-                   if (this.segmentMatches(currentSegment, parsedField)) {
-                       return this.pathMatches(remainingFields, remainingSegments);
-                   }
-                   return false;
-               
-               case SegmentType.CROSS_COLLECTION:
-                   // Cross-collection matching - check if field starts with lookup pattern
-                   if (this.segmentMatches(currentSegment, parsedField)) {
-                       return this.pathMatches(remainingFields, remainingSegments);
-                   }
-                   return false;
-               
-               default:
-                   return false;
-           }
-           
-       } catch (error) {
-           // Invalid field segment format
-           if (this.debugMode) {
-               this.debugLog(`Field parsing error: ${error instanceof Error ? error.message : String(error)}`);
-           }
-           return false;
-       }
-   }
+            case SegmentType.WILDCARD:
+                // Wildcard matches any single field (with or without array access)
+                return true;
 
-   private checkType(value: any, expectedType: string): boolean {
-       switch (expectedType) {
-           case 'str':
-               return typeof value === 'string';
-           case 'num':
-               return typeof value === 'number' && !isNaN(value);
-           case 'bool':
-               return typeof value === 'boolean';
-           case 'arr':
-               return Array.isArray(value);
-           case 'obj':
-               return typeof value === 'object' && value !== null && !Array.isArray(value);
-           default:
-               return true;
-       }
-   }
+            case SegmentType.DEEP_WILDCARD:
+                // Deep wildcard matches everything
+                return true;
 
-   private deepClone(obj: any): any {
-       if (obj === null || typeof obj !== 'object') {
-           return obj;
-       }
+            case SegmentType.TYPE_CHECK:
+                // Type check with optional array access
+                return patternSegment.name === parsedField.fieldName;
 
-       if (Array.isArray(obj)) {
-           return obj.map(item => this.deepClone(item));
-       }
+            // NEW: Cross-collection segment matching
+            case SegmentType.CROSS_COLLECTION:
+                // Match any field that starts with the lookup pattern
+                return parsedField.fieldName.startsWith(patternSegment.lookupPattern || 'look_');
 
-       const cloned: any = {};
-       for (const [key, value] of Object.entries(obj)) {
-           cloned[key] = this.deepClone(value);
-       }
+            default:
+                return false;
+        }
+    }
 
-       return cloned;
-   }
+    /**
+     * Check if a pattern segment is an array-related segment
+     */
+    private isArraySegment(segment: PatternSegment): boolean {
+        return segment.type === SegmentType.ARRAY_INDEX ||
+            segment.type === SegmentType.ARRAY_RANGE ||
+            segment.type === SegmentType.ARRAY_WILDCARD;
+    }
 
-   private cleanup(data: any): any {
-       if (data === null || data === undefined) {
-           return data;
-       }
+    // ================================
+    // UTILITY METHODS
+    // ================================
 
-       if (Array.isArray(data)) {
-           return data.filter(item => item !== undefined).map(item => this.cleanup(item));
-       }
+    /**
+     * MODIFIED: Enhanced pathMatches method with terminal wildcard support
+     * Key changes:
+     * - If WILDCARD (*) is the last segment, it matches any remaining path segments
+     * - This allows "images.public.*" to match "images.public.0", "images.public.0.url", etc.
+     */
+    private pathMatches(fieldPath: string[], segments: PatternSegment[]): boolean {
+        // Base cases
+        if (segments.length === 0) {
+            return fieldPath.length === 0;
+        }
 
-       if (typeof data === 'object') {
-           const cleaned: any = {};
-           for (const [key, value] of Object.entries(data)) {
-               if (value !== undefined) {
-                   cleaned[key] = this.cleanup(value);
-               }
-           }
-           return cleaned;
-       }
+        if (fieldPath.length === 0) {
+            // Check if remaining segments are all optional or deep wildcards
+            return segments.every(seg =>
+                seg.type === SegmentType.DEEP_WILDCARD ||
+                seg.isOptional
+            );
+        }
 
-       return data;
-   }
+        const [currentField, ...remainingFields] = fieldPath;
+        const [currentSegment, ...remainingSegments] = segments;
+
+        try {
+            // Parse current field segment
+            const parsedField = this.parseFieldSegment(currentField);
+
+            // Handle different pattern segment types
+            switch (currentSegment.type) {
+                case SegmentType.FIELD:
+                    // For FIELD patterns, we need to handle the case where
+                    // the field might have array access that needs to be matched
+                    // by the NEXT pattern segment
+                    if (parsedField.fieldName === currentSegment.name) {
+                        if (parsedField.isArrayAccess) {
+                            // Field has array access, next pattern segment should handle it
+                            if (remainingSegments.length === 0) {
+                                // No more pattern segments to handle array access
+                                return false;
+                            }
+
+                            const nextSegment = remainingSegments[0];
+                            if (this.isArraySegment(nextSegment)) {
+                                // Create a virtual parsed field for array index matching
+                                const arrayField: ParsedFieldSegment = {
+                                    fieldName: '',
+                                    arrayIndex: parsedField.arrayIndex,
+                                    isArrayAccess: true
+                                };
+
+                                if (this.segmentMatches(nextSegment, arrayField)) {
+                                    // Both field name and array index matched
+                                    return this.pathMatches(remainingFields, remainingSegments.slice(1));
+                                }
+                            }
+                            return false;
+                        } else {
+                            // Simple field name match, continue with remaining
+                            return this.pathMatches(remainingFields, remainingSegments);
+                        }
+                    }
+                    return false;
+
+                case SegmentType.ARRAY_INDEX:
+                case SegmentType.ARRAY_RANGE:
+                    // Direct array segment matching
+                    if (this.segmentMatches(currentSegment, parsedField)) {
+                        return this.pathMatches(remainingFields, remainingSegments);
+                    }
+                    return false;
+
+                case SegmentType.WILDCARD:
+                    // MODIFIED: Enhanced wildcard behavior for terminal wildcards
+                    // If this is the last segment in the pattern (no remaining segments),
+                    // then it should match any remaining path segments (including multiple levels)
+                    if (remainingSegments.length === 0) {
+                        // Terminal wildcard matches any remaining path
+                        // This allows "images.public.*" to match "images.public.0", "images.public.anything", etc.
+                        return true;
+                    }
+
+                    // Non-terminal wildcard: matches current field and continues with remaining segments
+                    return this.pathMatches(remainingFields, remainingSegments);
+
+                case SegmentType.DEEP_WILDCARD:
+                    // Deep wildcard can match multiple fields
+                    // Try matching with remaining segments at each position
+                    for (let i = 0; i <= remainingFields.length; i++) {
+                        if (this.pathMatches(remainingFields.slice(i), remainingSegments)) {
+                            return true;
+                        }
+                    }
+                    return false;
+
+                case SegmentType.TYPE_CHECK:
+                    // Type check with field name matching
+                    if (this.segmentMatches(currentSegment, parsedField)) {
+                        return this.pathMatches(remainingFields, remainingSegments);
+                    }
+                    return false;
+
+                case SegmentType.CROSS_COLLECTION:
+                    // Cross-collection matching - check if field starts with lookup pattern
+                    if (this.segmentMatches(currentSegment, parsedField)) {
+                        return this.pathMatches(remainingFields, remainingSegments);
+                    }
+                    return false;
+
+                default:
+                    return false;
+            }
+
+        } catch (error) {
+            // Invalid field segment format
+            if (this.debugMode) {
+                this.debugLog(`Field parsing error: ${error instanceof Error ? error.message : String(error)}`);
+            }
+            return false;
+        }
+    }
+
+    private checkType(value: any, expectedType: string): boolean {
+        switch (expectedType) {
+            case 'str':
+                return typeof value === 'string';
+            case 'num':
+                return typeof value === 'number' && !isNaN(value);
+            case 'bool':
+                return typeof value === 'boolean';
+            case 'arr':
+                return Array.isArray(value);
+            case 'obj':
+                return typeof value === 'object' && value !== null && !Array.isArray(value);
+            default:
+                return true;
+        }
+    }
+
+    private deepClone(obj: any): any {
+        if (obj === null || typeof obj !== 'object') {
+            return obj;
+        }
+
+        if (Array.isArray(obj)) {
+            return obj.map(item => this.deepClone(item));
+        }
+
+        const cloned: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+            cloned[key] = this.deepClone(value);
+        }
+
+        return cloned;
+    }
+
+    private cleanup(data: any): any {
+        if (data === null || data === undefined) {
+            return data;
+        }
+
+        if (Array.isArray(data)) {
+            return data.filter(item => item !== undefined).map(item => this.cleanup(item));
+        }
+
+        if (typeof data === 'object') {
+            const cleaned: any = {};
+            for (const [key, value] of Object.entries(data)) {
+                if (value !== undefined) {
+                    cleaned[key] = this.cleanup(value);
+                }
+            }
+            return cleaned;
+        }
+
+        return data;
+    }
 
     // ================================
     // DEBUG METHODS (temporarily public for debugging)
@@ -1597,9 +1615,9 @@ export class RBACPatternHandler {
     //         hasContext: inc.hasContext
     //     })));
     //     console.log('  Context:', context);
-        
+
     //     const result = this.applyIncludes(data, includes, context);
-        
+
     //     console.log('[DEBUG] applyIncludes result:', JSON.stringify(result, null, 2));
     //     return result;
     // }
@@ -1615,9 +1633,9 @@ export class RBACPatternHandler {
     //     console.log('  Segments:', segments);
     //     console.log('  Target before:', JSON.stringify(target, null, 2));
     //     console.log('  Current path:', currentPath);
-        
+
     //     this.includePatternInResult(source, segments, target, currentPath);
-        
+
     //     console.log('  Target after:', JSON.stringify(target, null, 2));
     // }
 
@@ -1625,35 +1643,35 @@ export class RBACPatternHandler {
     // DEBUG AND STATISTICS
     // ================================
 
-   public getPatternComplexity(pattern: string): number {
-       try {
-           const compiled = this.compilePattern(pattern);
-           return compiled.complexity;
-       } catch {
-           return -1;
-       }
-   }
+    public getPatternComplexity(pattern: string): number {
+        try {
+            const compiled = this.compilePattern(pattern);
+            return compiled.complexity;
+        } catch {
+            return -1;
+        }
+    }
 
-   public getCacheStats(): { size: number, patterns: string[] } {
-       return {
-           size: this.compiledPatternCache.size,
-           patterns: Array.from(this.compiledPatternCache.keys())
-       };
-   }
+    public getCacheStats(): { size: number, patterns: string[] } {
+        return {
+            size: this.compiledPatternCache.size,
+            patterns: Array.from(this.compiledPatternCache.keys())
+        };
+    }
 
-   public clearCache(): void {
-       this.compiledPatternCache.clear();
-   }
+    public clearCache(): void {
+        this.compiledPatternCache.clear();
+    }
 
-   public enableDebug(enabled: boolean = true): void {
-       this.debugMode = enabled;
-   }
+    public enableDebug(enabled: boolean = true): void {
+        this.debugMode = enabled;
+    }
 
-   private debugLog(message: string, data?: any): void {
-       if (this.debugMode) {
-           console.log(`[RBAC Debug] ${message}`, data || '');
-       }
-   }
+    private debugLog(message: string, data?: any): void {
+        if (this.debugMode) {
+            console.log(`[RBAC Debug] ${message}`, data || '');
+        }
+    }
 }
 
 // ================================
@@ -1664,43 +1682,43 @@ export class RBACPatternHandler {
 * Create a new RBACPatternHandler instance
 */
 export function createRBACHandler(debugMode: boolean = false): RBACPatternHandler {
-   return new RBACPatternHandler(debugMode);
+    return new RBACPatternHandler(debugMode);
 }
 
 /**
 * Quick validation function for patterns
 */
 export function validateRBACPattern(pattern: string): { isValid: boolean, errors: string[] } {
-   const handler = new RBACPatternHandler();
-   console.log('pattern:', pattern);
-   const errors = handler.validatePattern(pattern);
-   return {
-       isValid: errors.length === 0,
-       errors
-   };
+    const handler = new RBACPatternHandler();
+    console.log('pattern:', pattern);
+    const errors = handler.validatePattern(pattern);
+    return {
+        isValid: errors.length === 0,
+        errors
+    };
 }
 
 /**
 * Quick check if pattern matches a path
 */
 export function patternMatchesPath(
-   pattern: string, 
-   fieldPath: string, 
-   context?: UserContext
+    pattern: string,
+    fieldPath: string,
+    context?: UserContext
 ): boolean {
-   const handler = new RBACPatternHandler();
-   return handler.matchesPath(pattern, fieldPath, context);
+    const handler = new RBACPatternHandler();
+    return handler.matchesPath(pattern, fieldPath, context);
 }
 
 /**
 * Process data with patterns (simplified interface)
 */
 export function processDataWithRBAC(
-   data: any,
-   patterns: string[],
-   context: UserContext
+    data: any,
+    patterns: string[],
+    context: UserContext
 ): any {
-   const handler = new RBACPatternHandler();
-   const result = handler.process(data, patterns, context);
-   return result.matched ? result.data : null;
+    const handler = new RBACPatternHandler();
+    const result = handler.process(data, patterns, context);
+    return result.matched ? result.data : null;
 }

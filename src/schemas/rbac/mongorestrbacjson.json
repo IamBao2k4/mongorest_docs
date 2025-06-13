@@ -10,7 +10,6 @@
           {
             "user_role": "default",
             "patterns": [
-              "_id",
               "sku",
               "name",
               "description",
@@ -18,8 +17,6 @@
               "subcategory",
               "price",
               "currency",
-              "images",
-              "tags",
               "ratings.*",
               "status",
               "!specifications.*",

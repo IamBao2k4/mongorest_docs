@@ -12,6 +12,9 @@ import {
   SingleUpdateResult,
   SingleDeleteResult
 } from './types';
+import {
+  filterByRBAC
+} from '../../rbac/rbac-validator'
 
 export interface MongoDBConfig {
   connectionString: string;
@@ -169,8 +172,10 @@ export class MongoDBAdapter implements IDatabaseAdapter {
 
     const totalPage = Math.ceil(totalRecord / limit);
 
+    const rbacFilteredResults = filterByRBAC(collection, "read", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2RlZmF1bHRfMDAxIiwidXNlcklkIjoidXNlcl9kZWZhdWx0XzAwMSIsInVzZXJuYW1lIjoiZ3Vlc3RfdXNlciIsInJvbGVzIjoiZGVmYXVsdCIsImlzQWRtaW4iOmZhbHNlfQ.p21cymLG1Q-flME3vyB84TP1Whd1zqQOmhAbWA3bjPs', results);
+
     return {
-      data: results,
+      data: rbacFilteredResults,
       totalRecord,
       totalPage,
       limit,
