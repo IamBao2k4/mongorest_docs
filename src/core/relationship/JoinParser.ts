@@ -236,6 +236,7 @@ export class JoinParser {
   const as = currentLookupStage.$lookup.as;
   const letVar = "local_value";
   
+  console.log("aaaaaaaaaaaaaaaaaa",filters)
   const result = this.buildLogicNested(filters);
   
   const pipeline: any[] = [
@@ -329,7 +330,7 @@ export class JoinParser {
 
     const lookupStage = relationship.generateLookupStage(embedRequest);
     const stages = [];
-    console.log("isMultiResult", relationship.isMultiResult());
+    console.log("embedRequest", JSON.stringify(embedRequest))
     if (embedRequest.children && embedRequest.children.length > 0) {
       stages.push(
         this.buildLookupNested(
