@@ -393,7 +393,7 @@ export function processDataWithRBACPatterns(
 
     // Use pattern handler for processing
     const handler = initializePatternHandler();
-    return handler.process(data, allowedPatterns, userContext);
+    return handler.process(data, allowedPatterns, userContext, operation);
 }
 
 /**

@@ -26,7 +26,9 @@ export enum TokenType {
     AND = 'AND',
     OR = 'OR',
     COMMA = 'COMMA',
-    PIPE = 'PIPE'
+    PIPE = 'PIPE',
+    LOOK = 'LOOK',
+    CROSS_COLLECTION = 'CROSS_COLLECTION',
 }
 
 export interface PatternSegment {
@@ -39,6 +41,7 @@ export interface PatternSegment {
     isOptional?: boolean;
     isNegation?: boolean;
     context?: string;
+    lookupPattern?: string;  // NEW: For cross-collection patterns
 }
 
 export enum SegmentType {
@@ -49,7 +52,8 @@ export enum SegmentType {
     ARRAY_INDEX = 'ARRAY_INDEX',
     ARRAY_RANGE = 'ARRAY_RANGE',
     CONTEXT = 'CONTEXT',
-    TYPE_CHECK = 'TYPE_CHECK'
+    TYPE_CHECK = 'TYPE_CHECK',
+    CROSS_COLLECTION = 'CROSS_COLLECTION',
 }
 
 export interface CompiledPattern {

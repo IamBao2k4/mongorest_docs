@@ -22,7 +22,7 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
 
   // Users -> Reviews (1:many)
   registry.registerFromDefinition('users', {
-    name: 'product_reviews',
+    name: 'look_product_reviews',
     targetTable: 'product_reviews',
     localField: '_id',
     foreignField: 'userId',
@@ -51,7 +51,7 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
 
   // Categories -> Products (many:many) via junction table
   registry.registerFromDefinition('categories', {
-    name: 'products',
+    name: 'look_products',
     targetTable: 'products',
     localField: '_id',
     foreignField: '_id',

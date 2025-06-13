@@ -1,3 +1,4 @@
+import { LEGAL_TCP_SOCKET_OPTIONS } from 'mongodb';
 import {
     CompiledPattern,
     ProcessingResult,
@@ -5,8 +6,12 @@ import {
     Token,
     TokenType,
     SegmentType,
-    PatternSegment
+    PatternSegment,
 } from './rbac-syntax'
+
+import {
+    getAllowedPatterns
+} from './rbac-validator'
 
 // ================================
 // CONSTANTS
@@ -49,14 +54,15 @@ export class RBACPatternHandler {
     public process(
         data: any,
         patterns: string[],
-        context: UserContext
+        context: UserContext,
+        operation: 'read' | 'write' | 'delete' = 'read'
     ): ProcessingResult {
         try {
             const compiledPatterns = this.compilePatterns(patterns);
             const { includes, excludes } = this.separatePatterns(compiledPatterns);
 
-            let result = this.applyIncludes(data, includes, context);
-            result = this.applyExcludes(result, excludes, context);
+            let result = this.applyIncludes(data, includes, context, operation);
+            result = this.applyExcludes(result, excludes, context, operation);
             
             return {
                 data: this.cleanup(result),
@@ -89,6 +95,15 @@ export class RBACPatternHandler {
 
         if (pattern.includes('[]')) {
             errors.push('Empty array brackets not allowed');
+        }
+
+        // Cross-collection validation
+        if (pattern.includes('look_')) {
+            // Validate that look_~ is used correctly
+            const lookWildcardCount = (pattern.match(/look_/g) || []).length;
+            if (lookWildcardCount > 1) {
+                errors.push('Only one look_ pattern allowed per expression');
+            }
         }
 
         // Context validation
@@ -247,6 +262,12 @@ export class RBACPatternHandler {
                 continue;
             }
 
+            if (pattern.startsWith('look_', position)) {
+                tokens.push({ type: TokenType.CROSS_COLLECTION, value: 'look_', position });
+                position += 5; // Length of 'look_~'
+                continue;
+            }
+
             // Field name (with optional type check) - MODIFIED to accept numeric field names
             const fieldMatch = pattern.substring(position).match(/^[a-zA-Z_0-9][a-zA-Z0-9_]*(?::\w+)?/);
             if (fieldMatch) {
@@ -259,7 +280,6 @@ export class RBACPatternHandler {
                 position += fieldValue.length;
                 continue;
             }
-
             // Optional modifier
             if (char === '?') {
                 tokens.push({ type: TokenType.OPTIONAL, value: '?', position });
@@ -316,6 +336,8 @@ export class RBACPatternHandler {
         while (i < tokens.length) {
             const token = tokens[i];
 
+            console.log('token', token);
+
             switch (token.type) {
                 case TokenType.FIELD:
                     segments.push({
@@ -369,6 +391,22 @@ export class RBACPatternHandler {
                     });
                     break;
 
+                // NEW: Handle cross-collection tokens
+                case TokenType.CROSS_COLLECTION:
+                    segments.push({
+                        type: SegmentType.CROSS_COLLECTION,
+                        lookupPattern: 'look_'  // Pattern to match against field names
+                    });
+                    break;
+
+                case TokenType.LOOK:
+                    // Handle specific look_ patterns as regular fields for now
+                    segments.push({
+                        type: SegmentType.FIELD,
+                        name: token.value
+                    });
+                    break;
+
                 case TokenType.NEGATION:
                     // Handle negation by marking the next segment
                     if (i + 1 < tokens.length) {
@@ -415,6 +453,9 @@ export class RBACPatternHandler {
                     break;
                 case SegmentType.TYPE_CHECK:
                     complexity += 2;
+                    break;
+                case SegmentType.CROSS_COLLECTION:
+                    complexity += 6; // Higher complexity due to multiple field matching
                     break;
             }
         }
@@ -502,7 +543,7 @@ export class RBACPatternHandler {
     // DATA PROCESSING
     // ================================
 
-    private applyIncludes(data: Array<any>, includes: CompiledPattern[], context: UserContext): any {
+    private applyIncludes(data: Array<any>, includes: CompiledPattern[], context: UserContext, operation: 'read' | 'write' | 'delete'): any {
         if (includes.length === 0) {
             return {};
         }
@@ -521,14 +562,14 @@ export class RBACPatternHandler {
         const result :any = [];
         
 
-            for (let i = 0; i < data.length; i++) {
-                const temp = {};
-                for (const pattern of includes) {
-                    const resolvedPattern = this.resolveContext(pattern, context);
-                    this.includePatternInResult(data[i], resolvedPattern.segments, temp, []);
-                }
-                result.push(temp);
+        for (let i = 0; i < data.length; i++) {
+            const temp = {};
+            for (const pattern of includes) {
+                const resolvedPattern = this.resolveContext(pattern, context);
+                this.includePatternInResult(data[i], resolvedPattern.segments, temp, [], operation, context);
             }
+            result.push(temp);
+        }
 
         return result;
     }
@@ -540,7 +581,9 @@ export class RBACPatternHandler {
         source: any, 
         segments: PatternSegment[], 
         target: any, 
-        currentPath: string[]
+        currentPath: string[],
+        operation: 'read' | 'write' | 'delete',
+        context: UserContext
     ): void {
         if (!source || segments.length === 0) {
             return;
@@ -551,19 +594,23 @@ export class RBACPatternHandler {
 
         switch (segment.type) {
             case SegmentType.FIELD:
-                this.handleFieldInclusion(source, target, segment.name, remainingSegments, currentPath);
+                this.handleFieldInclusion(source, target, segment.name, remainingSegments, currentPath, operation, context);
                 break;
-
+            
+            case SegmentType.CROSS_COLLECTION:
+                this.handleCrossCollectionInclusion(source, target, segment, remainingSegments, currentPath, operation, context);
+                break;
+                
             case SegmentType.WILDCARD:
-                this.handleWildcardInclusion(source, target, remainingSegments, currentPath, isLastSegment);
+                this.handleWildcardInclusion(source, target, remainingSegments, currentPath, isLastSegment, operation, context);
                 break;
 
             case SegmentType.ARRAY_INDEX:
-                this.handleArrayIndexInclusion(source, target, segment, remainingSegments, currentPath);
+                this.handleArrayIndexInclusion(source, target, segment, remainingSegments, currentPath, operation, context);
                 break;
 
             case SegmentType.ARRAY_RANGE:
-                this.handleArrayRangeInclusion(source, target, segment, remainingSegments, currentPath);
+                this.handleArrayRangeInclusion(source, target, segment, remainingSegments, currentPath, operation, context);
                 break;
 
             case SegmentType.DEEP_WILDCARD:
@@ -571,7 +618,7 @@ export class RBACPatternHandler {
                 break;
 
             case SegmentType.TYPE_CHECK:
-                this.handleTypeCheckInclusion(source, target, segment, remainingSegments, currentPath);
+                this.handleTypeCheckInclusion(source, target, segment, remainingSegments, currentPath, operation, context);
                 break;
 
             case SegmentType.CONTEXT:
@@ -580,14 +627,54 @@ export class RBACPatternHandler {
         }
     }
 
+    // NEW: Handle cross-collection field inclusion
+    private handleCrossCollectionInclusion(
+        source: any, 
+        target: any, 
+        segment: PatternSegment, 
+        remainingSegments: PatternSegment[], 
+        currentPath: string[],
+        operation: 'read' | 'write' | 'delete',
+        context: UserContext
+    ): void {
+        if (!source || typeof source !== 'object' || !segment.lookupPattern) {
+            return;
+        }
+
+        // Find all fields that start with the lookup pattern (e.g., 'look_')
+        const matchingFields = Object.keys(source).filter(key => 
+            key.startsWith(segment.lookupPattern!)
+        );
+
+        if (this.debugMode) {
+            console.log(`[CROSS_COLLECTION] Found ${matchingFields.length} matching fields:`, matchingFields);
+        }
+
+        for (const fieldName of matchingFields) {
+            const sourceValue = source[fieldName];
+
+            const collection_name = fieldName.replace(segment.lookupPattern!, '');
+
+            const allAllowedPatterns = getAllowedPatterns(collection_name, operation, context.roles);
+
+            const compiledPatterns = this.compilePatterns(allAllowedPatterns);
+
+            const {includes}= this.separatePatterns(compiledPatterns);
+
+            target[fieldName] = this.applyIncludes(sourceValue, includes, context, operation);
+        }
+    }
+
     private handleFieldInclusion(
         source: any, 
         target: any, 
         fieldName: string | undefined, 
         remainingSegments: PatternSegment[], 
-        currentPath: string[]
+        currentPath: string[],
+        operation: 'read' | 'write' | 'delete',
+        context: UserContext
     ): void {
-        
+
         if (!fieldName || !(fieldName in source)) {
             return;
         }
@@ -609,7 +696,9 @@ export class RBACPatternHandler {
                 sourceValue, 
                 remainingSegments, 
                 target[fieldName], 
-                [...currentPath, fieldName]
+                [...currentPath, fieldName],
+                operation,
+                context
             );
         }
     }
@@ -619,7 +708,9 @@ export class RBACPatternHandler {
         target: any, 
         remainingSegments: PatternSegment[], 
         currentPath: string[],
-        isLastSegment: boolean
+        isLastSegment: boolean,
+        operation: 'read' | 'write' | 'delete',
+        context: UserContext
     ): void {
         if (Array.isArray(source)) {
             // Handle array wildcard
@@ -635,7 +726,9 @@ export class RBACPatternHandler {
                         source[i], 
                         remainingSegments, 
                         target[i], 
-                        [...currentPath, i.toString()]
+                        [...currentPath, i.toString()],
+                        operation,
+                        context
                     );
                 }
             }
@@ -654,7 +747,9 @@ export class RBACPatternHandler {
                             source[key], 
                             remainingSegments, 
                             target[key], 
-                            [...currentPath, key]
+                            [...currentPath, key],
+                            operation,
+                            context
                         );
                     }
                 }
@@ -667,7 +762,9 @@ export class RBACPatternHandler {
         target: any, 
         segment: PatternSegment, 
         remainingSegments: PatternSegment[], 
-        currentPath: string[]
+        currentPath: string[],
+        operation: 'read' | 'write' | 'delete',
+        context: UserContext
     ): void {
         if (!Array.isArray(source) || segment.index === undefined) {
             return;
@@ -704,7 +801,9 @@ export class RBACPatternHandler {
                 sourceItem, 
                 remainingSegments, 
                 targetItem, 
-                [...currentPath, index.toString()]
+                [...currentPath, index.toString()],
+                operation,
+                context
             );
         }
     }
@@ -714,7 +813,9 @@ export class RBACPatternHandler {
         target: any, 
         segment: PatternSegment, 
         remainingSegments: PatternSegment[], 
-        currentPath: string[]
+        currentPath: string[],
+        operation: 'read' | 'write' | 'delete',
+        context: UserContext
     ): void {
         if (!Array.isArray(source)) {
             return;
@@ -751,7 +852,9 @@ export class RBACPatternHandler {
                     sourceItem, 
                     remainingSegments, 
                     targetItem, 
-                    [...currentPath, i.toString()]
+                    [...currentPath, i.toString()],
+                    operation,
+                    context
                 );
             }
         }
@@ -783,7 +886,9 @@ export class RBACPatternHandler {
         target: any, 
         segment: PatternSegment, 
         remainingSegments: PatternSegment[], 
-        currentPath: string[]
+        currentPath: string[],
+        operation: 'read' | 'write' | 'delete',
+        context: UserContext
     ): void {
         if (!source || typeof source !== 'object' || !segment.name || !segment.dataType) {
             return;
@@ -805,12 +910,14 @@ export class RBACPatternHandler {
                 fieldValue, 
                 remainingSegments, 
                 target[segment.name], 
-                [...currentPath, segment.name]
+                [...currentPath, segment.name],
+                operation,
+                context
             );
         }
     }
 
-    private applyExcludes(data: any, excludes: CompiledPattern[], context: UserContext): any {
+    private applyExcludes(data: any, excludes: CompiledPattern[], context: UserContext, operation: 'read' | 'write' | 'delete'): any {
         if (excludes.length === 0 || !data) {
             return data;
         }
@@ -1268,6 +1375,11 @@ export class RBACPatternHandler {
                // Type check with optional array access
                return patternSegment.name === parsedField.fieldName;
            
+           // NEW: Cross-collection segment matching
+           case SegmentType.CROSS_COLLECTION:
+               // Match any field that starts with the lookup pattern
+               return parsedField.fieldName.startsWith(patternSegment.lookupPattern || 'look_');
+           
            default:
                return false;
        }
@@ -1387,6 +1499,13 @@ export class RBACPatternHandler {
                    }
                    return false;
                
+               case SegmentType.CROSS_COLLECTION:
+                   // Cross-collection matching - check if field starts with lookup pattern
+                   if (this.segmentMatches(currentSegment, parsedField)) {
+                       return this.pathMatches(remainingFields, remainingSegments);
+                   }
+                   return false;
+               
                default:
                    return false;
            }
@@ -1468,39 +1587,39 @@ export class RBACPatternHandler {
         return this.separatePatterns(patterns);
     }
 
-    public debugApplyIncludes(data: any, includes: CompiledPattern[], context: UserContext): any {
-        console.log('[DEBUG] applyIncludes called with:');
-        console.log('  Data:', JSON.stringify(data, null, 2));
-        console.log('  Includes count:', includes.length);
-        console.log('  Includes:', includes.map(inc => ({
-            segments: inc.segments,
-            isNegation: inc.isNegation,
-            hasContext: inc.hasContext
-        })));
-        console.log('  Context:', context);
+    // public debugApplyIncludes(data: any, includes: CompiledPattern[], context: UserContext): any {
+    //     console.log('[DEBUG] applyIncludes called with:');
+    //     console.log('  Data:', JSON.stringify(data, null, 2));
+    //     console.log('  Includes count:', includes.length);
+    //     console.log('  Includes:', includes.map(inc => ({
+    //         segments: inc.segments,
+    //         isNegation: inc.isNegation,
+    //         hasContext: inc.hasContext
+    //     })));
+    //     console.log('  Context:', context);
         
-        const result = this.applyIncludes(data, includes, context);
+    //     const result = this.applyIncludes(data, includes, context);
         
-        console.log('[DEBUG] applyIncludes result:', JSON.stringify(result, null, 2));
-        return result;
-    }
+    //     console.log('[DEBUG] applyIncludes result:', JSON.stringify(result, null, 2));
+    //     return result;
+    // }
 
-    public debugIncludePatternInResult(
-        source: any, 
-        segments: PatternSegment[], 
-        target: any, 
-        currentPath: string[]
-    ): void {
-        console.log('[DEBUG] includePatternInResult called with:');
-        console.log('  Source:', JSON.stringify(source, null, 2));
-        console.log('  Segments:', segments);
-        console.log('  Target before:', JSON.stringify(target, null, 2));
-        console.log('  Current path:', currentPath);
+    // public debugIncludePatternInResult(
+    //     source: any, 
+    //     segments: PatternSegment[], 
+    //     target: any, 
+    //     currentPath: string[]
+    // ): void {
+    //     console.log('[DEBUG] includePatternInResult called with:');
+    //     console.log('  Source:', JSON.stringify(source, null, 2));
+    //     console.log('  Segments:', segments);
+    //     console.log('  Target before:', JSON.stringify(target, null, 2));
+    //     console.log('  Current path:', currentPath);
         
-        this.includePatternInResult(source, segments, target, currentPath);
+    //     this.includePatternInResult(source, segments, target, currentPath);
         
-        console.log('  Target after:', JSON.stringify(target, null, 2));
-    }
+    //     console.log('  Target after:', JSON.stringify(target, null, 2));
+    // }
 
     // ================================
     // DEBUG AND STATISTICS
@@ -1553,6 +1672,7 @@ export function createRBACHandler(debugMode: boolean = false): RBACPatternHandle
 */
 export function validateRBACPattern(pattern: string): { isValid: boolean, errors: string[] } {
    const handler = new RBACPatternHandler();
+   console.log('pattern:', pattern);
    const errors = handler.validatePattern(pattern);
    return {
        isValid: errors.length === 0,
