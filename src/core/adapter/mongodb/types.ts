@@ -1,6 +1,6 @@
-// types/mongodb.types.ts
+// src/adapters/interfaces/IDatabaseAdapter.ts
 
-export interface MongoQuery {
+export interface QueryOptions {
   filter: Record<string, any>;
   projection?: Record<string, 1 | 0>;
   sort?: Record<string, 1 | -1>;
@@ -10,93 +10,61 @@ export interface MongoQuery {
   count?: boolean;
 }
 
-export interface QueryResult {
-  data: any[];
+export interface QueryResult<T = any> {
+  data: T[];
   totalRecord: number;
   totalPage: number;
   limit: number;
   currentPage: number;
 }
 
-export interface MultiCollectionQuery {
-  filter?: Record<string, any>;
-  projection?: Record<string, 1 | 0>;
-  sort?: Record<string, 1 | -1>;
-  pipeline?: Record<string, any>[];
-  skip?: number;
-  limit?: number;
-}
-
-export interface MultiCollectionConfig {
-  [collectionName: string]: MultiCollectionQuery;
-}
-
-export interface MultiCollectionResult {
-  collection: string;
-  count: number;
-  data: any[];
-  query: MultiCollectionQuery;
-}
-
-export interface MultiCollectionResponse {
-  collections: MultiCollectionResult[];
-  totalCollections: number;
-  executionTime: string;
-}
-
-export interface BulkInsertResponse {
+export interface BulkInsertResult {
   insertedCount: number;
   insertedIds: any[];
 }
 
-export interface BulkUpdateResponse {
+export interface BulkUpdateResult {
   matchedCount: number;
   modifiedCount: number;
   operations: number;
 }
 
-export interface BulkDeleteResponse {
+export interface BulkDeleteResult {
   deletedCount: number;
   operations: number;
 }
 
-export interface SingleInsertResponse {
+export interface SingleInsertResult {
   insertedId: any;
 }
 
-export interface SingleUpdateResponse {
+export interface SingleUpdateResult {
   matchedCount: number;
   modifiedCount: number;
 }
 
-export interface SingleDeleteResponse {
+export interface SingleDeleteResult {
   deletedCount: number;
 }
 
-export interface BulkUpdateOperation {
-  filter: Record<string, any>;
-  update: Record<string, any>;
-}
+export interface IDatabaseAdapter {
+  // Connection methods
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  isConnected(): boolean;
 
-export interface MongoConnectionOptions {
-  maxPoolSize: number;
-  minPoolSize: number;
-  maxIdleTimeMS: number;
-  serverSelectionTimeoutMS: number;
-  connectTimeoutMS: number;
-}
-
-export interface HealthCheckCollection {
-  collection: string;
-  status: "ok" | "error";
-  count?: number;
-  error?: string;
-}
-
-export interface HealthCheckResponse {
-  status: "healthy" | "unhealthy";
-  database: string;
-  collections?: HealthCheckCollection[];
-  timestamp: string;
-  error?: string;
+  // Query methods 
+  find(collection: string, options: QueryOptions): Promise<QueryResult>;
+  
+  // Insert methods
+  insertOne(collection: string, document: any): Promise<SingleInsertResult>;
+  insertMany(collection: string, documents: any[]): Promise<BulkInsertResult>;
+  
+  // Update methods
+  updateOne(collection: string, id: any, updateFields: any): Promise<SingleUpdateResult>;
+  updateMany(collection: string, updates: Array<{filter: any, update: any}>): Promise<BulkUpdateResult>;
+  
+  // Delete methods
+  deleteOne(collection: string, id: any): Promise<SingleDeleteResult>;
+  deleteMany(collection: string, filters: any[]): Promise<BulkDeleteResult>;
 }

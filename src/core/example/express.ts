@@ -144,6 +144,12 @@ async function getDataParallel(
   }
 }
 
+// GET endpoint với params = câu lệnh query đã được mã hóa md5
+app.get('/api/:collection/query', () => {
+  
+})
+
+
 // ✅ GET endpoint với parallel processing
 app.get('/api/:collection', postgrestToMongo, async (req: any, res: any) => {
   try {
@@ -334,76 +340,6 @@ app.delete('/api/:collection/:id', async (req, res) => {
   }
 });
 
-// ✅ Multiple collections query với parallel processing
-app.get('/api/multi/:collections', postgrestToMongo, async (req: any, res: any) => {
-  try {
-    const { collections } = req.params;
-    const collectionList = collections.split(',');
-    
-    // Chạy query trên nhiều collections song song
-    const queries = collectionList.map(async (collection: any) => {
-      const mongoQuery = converter.convert(req.query as Record<string, string>, collection);
-      const { filter, projection, sort, limit = 10, skip = 0 } = mongoQuery;
-      
-      const [count, data] = await Promise.all([
-        db.collection(collection).countDocuments(filter || {}),
-        db.collection(collection)
-          .find(filter || {}, { projection })
-          .sort(sort || {})
-          .skip(skip)
-          .limit(limit)
-          .toArray()
-      ]);
-      
-      return {
-        collection,
-        count,
-        data
-      };
-    });
-
-    const results = await Promise.all(queries);
-    
-    res.json({
-      collections: results,
-      totalCollections: results.length
-    });
-  } catch (error: any) {
-    console.error('Multi-collection query error:', error);
-    res.status(500).json({ error: 'Multi-collection query error', details: error.message });
-  }
-});
-
-// ✅ Health check endpoint
-app.get('/health', async (req, res) => {
-  try {
-    // Kiểm tra kết nối database song song với multiple collections
-    const healthChecks = ['users', 'products', 'orders'].map(async (collection) => {
-      try {
-        const count = await db.collection(collection).countDocuments({});
-        return { collection, status: 'ok', count };
-      } catch (error: any) {
-        return { collection, status: 'error', error: error.message };
-      }
-    });
-
-    const results = await Promise.all(healthChecks);
-    
-    res.json({
-      status: 'healthy',
-      database: 'connected',
-      collections: results,
-      timestamp: new Date().toISOString()
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      status: 'unhealthy',
-      error: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
-});
-
 // Graceful shutdown
 process.on('SIGINT', async () => {
   console.log('Shutting down gracefully...');
@@ -415,16 +351,4 @@ process.on('SIGINT', async () => {
 
 app.listen(3000, () => {
   console.log('Server running on port 3000 with parallel processing optimization');
-  console.log('Available endpoints:');
-  console.log('- GET /api/:collection - Optimized with parallel count + data fetch');
-  console.log('- POST /api/:collection/bulk - Bulk insert with batching');
-  console.log('- PATCH /api/:collection/bulk - Bulk update with parallel processing');
-  console.log('- DELETE /api/:collection/bulk - Bulk delete with parallel processing');
-  console.log('- GET /api/multi/:collections - Query multiple collections in parallel');
-  console.log('- GET /health - Health check with parallel collection status');
-  console.log('');
-  console.log('Example URLs:');
-  console.log('- http://localhost:3000/api/users?age=gte.18&status=eq.active&select=id,name,email');
-  console.log('- http://localhost:3000/api/multi/users,products,orders?limit=5');
-  console.log('- http://localhost:3000/health');
 });
