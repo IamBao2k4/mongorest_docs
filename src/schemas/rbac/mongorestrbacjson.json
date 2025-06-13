@@ -23,7 +23,8 @@
               "ratings.*",
               "status",
               "!specifications.*",
-              "!inventory.*"
+              "!inventory.*",
+              "look_"
             ]
           },
           {
@@ -45,7 +46,8 @@
               "status",
               "createdAt",
               "!inventory.reserved",
-              "!inventory.lowStockThreshold"
+              "!inventory.lowStockThreshold",
+              "look_"
             ]
           },
           {
@@ -64,19 +66,22 @@
               "createdAt",
               "updatedAt",
               "orderItems.*",
-              "!specifications.internal.*"
+              "!specifications.internal.*",
+              "look_"
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ],
@@ -92,19 +97,22 @@
           {
             "user_role": "analyst",
             "patterns": [
-              "ratings.*"
+              "ratings.*",
+              "look_"
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ],
@@ -124,7 +132,8 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
@@ -157,7 +166,8 @@
               "status.@self",
               "lastLogin.@self",
               "createdAt.@self",
-              "updatedAt.@self"
+              "updatedAt.@self",
+              "look_"
             ]
           },
           {
@@ -172,19 +182,22 @@
               "lastLogin",
               "createdAt",
               "!email",
-              "!profile.avatar"
+              "!profile.avatar",
+              "look_"
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ],
@@ -202,7 +215,8 @@
               "profile.@self.avatar",
               "!email.@self",
               "!profile.@self.country",
-              "!status.@self"
+              "!status.@self",
+              "look_"
             ]
           },
           {
@@ -212,13 +226,15 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ],
@@ -238,7 +254,8 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
@@ -280,7 +297,8 @@
               "deliveredDate.@self",
               "notes.@self",
               "customer.@self.*",
-              "!payment.@self.transactionId"
+              "!payment.@self.transactionId",
+              "look_"
             ]
           },
           {
@@ -309,19 +327,22 @@
               "!shippingAddress.*",
               "!billingAddress.*",
               "!payment.transactionId",
-              "!notes"
+              "!notes",
+              "look_"
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ],
@@ -335,7 +356,8 @@
             "patterns": [
               "shippingAddress.@self.*",
               "billingAddress.@self.*",
-              "notes.@self"
+              "notes.@self",
+              "look_"
             ]
           },
           {
@@ -345,13 +367,15 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ],
@@ -371,7 +395,8 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
@@ -399,7 +424,8 @@
               "status",
               "parent.*",
               "children.*",
-              "products.*"
+              "products.*",
+              "look_"
             ]
           },
           {
@@ -419,25 +445,29 @@
               "updatedAt",
               "parent.*",
               "children.*",
-              "products.*"
+              "products.*",
+              "look_"
             ]
           },
           {
             "user_role": "analyst",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ],
@@ -457,13 +487,15 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ],
@@ -483,7 +515,8 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
@@ -510,7 +543,8 @@
               "createdAt",
               "product.name",
               "user.name",
-              "user.profile.avatar"
+              "user.profile.avatar",
+              "look_"
             ]
           },
           {
@@ -529,7 +563,8 @@
               "createdAt",
               "updatedAt",
               "product.*",
-              "user.@self.*"
+              "user.@self.*",
+              "look_"
             ]
           },
           {
@@ -550,19 +585,22 @@
               "product.name",
               "product.sku",
               "user._id",
-              "user.name"
+              "user.name",
+              "look_"
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ],
@@ -582,26 +620,30 @@
               "!userId",
               "!verified",
               "!helpful.*",
-              "!status"
+              "!status",
+              "look_"
             ]
           },
           {
             "user_role": "analyst",
             "patterns": [
               "status",
-              "helpful.*"
+              "helpful.*",
+              "look_"
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ],
@@ -613,7 +655,8 @@
           {
             "user_role": "user",
             "patterns": [
-              "reviews.@self.*"
+              "reviews.@self.*",
+              "look_"
             ]
           },
           {
@@ -623,13 +666,15 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ]
@@ -648,7 +693,8 @@
               "isPrimary",
               "sortOrder",
               "product.*",
-              "category.*"
+              "category.*",
+              "look_"
             ]
           },
           {
@@ -661,25 +707,29 @@
               "sortOrder",
               "createdAt",
               "product.*",
-              "category.*"
+              "category.*",
+              "look_"
             ]
           },
           {
             "user_role": "analyst",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ],
@@ -699,13 +749,15 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ],
@@ -725,13 +777,15 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              "*",
+              "look_"
             ]
           }
         ]
