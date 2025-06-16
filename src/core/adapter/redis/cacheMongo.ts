@@ -133,8 +133,8 @@ export class CachedMongoDBAdapter implements IDatabaseAdapter {
     return result;
   }
 
-  async insertOne(collection: string, document: any): Promise<SingleInsertResult> {
-    const result = await this.mongoAdapter.insertOne(collection, document);
+  async insertOne(collection: string, document: any, jwt: string): Promise<SingleInsertResult> {
+    const result = await this.mongoAdapter.insertOne(collection, document, jwt);
     
     // Invalidate cache for this collection
     await this.invalidateCache(collection);
@@ -142,8 +142,8 @@ export class CachedMongoDBAdapter implements IDatabaseAdapter {
     return result;
   }
 
-  async insertMany(collection: string, documents: any[]): Promise<BulkInsertResult> {
-    const result = await this.mongoAdapter.insertMany(collection, documents);
+  async insertMany(collection: string, documents: any[], jwt: string): Promise<BulkInsertResult> {
+    const result = await this.mongoAdapter.insertMany(collection, documents, jwt);
     
     // Invalidate cache for this collection
     await this.invalidateCache(collection);
@@ -151,8 +151,8 @@ export class CachedMongoDBAdapter implements IDatabaseAdapter {
     return result;
   }
 
-  async updateOne(collection: string, id: any, updateFields: any): Promise<SingleUpdateResult> {
-    const result = await this.mongoAdapter.updateOne(collection, id, updateFields);
+  async updateOne(collection: string, id: any, updateFields: any, jwt: string): Promise<SingleUpdateResult> {
+    const result = await this.mongoAdapter.updateOne(collection, id, updateFields, jwt);
     
     // Invalidate cache for this collection
     await this.invalidateCache(collection);
@@ -169,8 +169,8 @@ export class CachedMongoDBAdapter implements IDatabaseAdapter {
     return result;
   }
 
-  async deleteOne(collection: string, id: any): Promise<SingleDeleteResult> {
-    const result = await this.mongoAdapter.deleteOne(collection, id);
+  async deleteOne(collection: string, id: any, jwt: string): Promise<SingleDeleteResult> {
+    const result = await this.mongoAdapter.deleteOne(collection, id, jwt);
     
     // Invalidate cache for this collection
     await this.invalidateCache(collection);
@@ -178,8 +178,8 @@ export class CachedMongoDBAdapter implements IDatabaseAdapter {
     return result;
   }
 
-  async deleteMany(collection: string, filters: any[]): Promise<BulkDeleteResult> {
-    const result = await this.mongoAdapter.deleteMany(collection, filters);
+  async deleteMany(collection: string, filters: any[], jwt: string): Promise<BulkDeleteResult> {
+    const result = await this.mongoAdapter.deleteMany(collection, filters, jwt);
     
     // Invalidate cache for this collection
     await this.invalidateCache(collection);

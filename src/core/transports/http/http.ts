@@ -163,7 +163,7 @@ export class HttpServer {
       let jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2RlZmF1bHRfMDAxIiwidXNlcklkIjoidXNlcl9kZWZhdWx0XzAwMSIsInVzZXJuYW1lIjoiZ3Vlc3RfdXNlciIsInJvbGVzIjoiZGVmYXVsdCIsImlzQWRtaW4iOmZhbHNlfQ.p21cymLG1Q-flME3vyB84TP1Whd1zqQOmhAbWA3bjPs"
       if (res.getHeader("Bearer Token")) {
         jwt =
-        (res.getHeader("Bearer Token") as string).split(" ")[1]
+          (res.getHeader("Bearer Token") as string).split(" ")[1]
       }
       const result = await this.dbAdapter.find(collection, mongoQuery, jwt);
 
@@ -191,11 +191,17 @@ export class HttpServer {
     try {
       const body = await this.parseBody(req);
 
+      let jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2RlZmF1bHRfMDAxIiwidXNlcklkIjoidXNlcl9kZWZhdWx0XzAwMSIsInVzZXJuYW1lIjoiZ3Vlc3RfdXNlciIsInJvbGVzIjoiZGVmYXVsdCIsImlzQWRtaW4iOmZhbHNlfQ.p21cymLG1Q-flME3vyB84TP1Whd1zqQOmhAbWA3bjPs"
+      if (res.getHeader("Bearer Token")) {
+        jwt =
+          (res.getHeader("Bearer Token") as string).split(" ")[1]
+      }
+
       if (isBulk) {
-        const result = await this.dbAdapter.insertMany(collection, body);
+        const result = await this.dbAdapter.insertMany(collection, body, jwt);
         this.sendResponse(res, 201, result);
       } else {
-        const result = await this.dbAdapter.insertOne(collection, body);
+        const result = await this.dbAdapter.insertOne(collection, body, jwt);
         this.sendResponse(res, 201, result);
       }
     } catch (error: any) {
@@ -214,11 +220,17 @@ export class HttpServer {
     try {
       const body = await this.parseBody(req);
 
+      let jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2RlZmF1bHRfMDAxIiwidXNlcklkIjoidXNlcl9kZWZhdWx0XzAwMSIsInVzZXJuYW1lIjoiZ3Vlc3RfdXNlciIsInJvbGVzIjoiZGVmYXVsdCIsImlzQWRtaW4iOmZhbHNlfQ.p21cymLG1Q-flME3vyB84TP1Whd1zqQOmhAbWA3bjPs"
+      if (res.getHeader("Bearer Token")) {
+        jwt =
+          (res.getHeader("Bearer Token") as string).split(" ")[1]
+      }
+
       if (isBulk) {
         const result = await this.dbAdapter.updateMany(collection, body);
         this.sendResponse(res, 200, result);
       } else if (id) {
-        const result = await this.dbAdapter.updateOne(collection, id, body);
+        const result = await this.dbAdapter.updateOne(collection, id, body, jwt);
         this.sendResponse(res, 200, result);
       } else {
         this.sendError(res, 400, "ID required for single update operation");
@@ -236,13 +248,20 @@ export class HttpServer {
     id: string | undefined,
     isBulk: boolean
   ): Promise<void> {
+
+    let jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2RlZmF1bHRfMDAxIiwidXNlcklkIjoidXNlcl9kZWZhdWx0XzAwMSIsInVzZXJuYW1lIjoiZ3Vlc3RfdXNlciIsInJvbGVzIjoiZGVmYXVsdCIsImlzQWRtaW4iOmZhbHNlfQ.p21cymLG1Q-flME3vyB84TP1Whd1zqQOmhAbWA3bjPs"
+    if (res.getHeader("Bearer Token")) {
+      jwt =
+        (res.getHeader("Bearer Token") as string).split(" ")[1]
+    }
+
     try {
       if (isBulk) {
         const body = await this.parseBody(req);
-        const result = await this.dbAdapter.deleteMany(collection, body);
+        const result = await this.dbAdapter.deleteMany(collection, body, jwt);
         this.sendResponse(res, 200, result);
       } else if (id) {
-        const result = await this.dbAdapter.deleteOne(collection, id);
+        const result = await this.dbAdapter.deleteOne(collection, id, jwt);
         this.sendResponse(res, 200, result);
       } else {
         this.sendError(res, 400, "ID required for single delete operation");
@@ -330,8 +349,7 @@ export class HttpServer {
             : "no cache layer";
 
         console.log(
-          `Server running on ${this.config.host || "localhost"}:${
-            this.config.port
+          `Server running on ${this.config.host || "localhost"}:${this.config.port
           } ${cacheStatus}`
         );
 

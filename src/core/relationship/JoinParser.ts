@@ -62,6 +62,10 @@ export class JoinParser {
     const joinHint = match[3];
     const fieldsContent = match[4] ? match[4].slice(1, -1) : ""; // Remove outer parentheses
 
+    if (!sourceTable.includes("look_")) {
+      sourceTable = "look_" + sourceTable;
+    }
+
     // Check if relationship exists
     if (!this.registry.has(sourceTable, tableName)) {
       console.warn(
@@ -267,6 +271,10 @@ export class JoinParser {
   for (const child of children) {
     if (!child) continue;
     
+    if(!parent.includes("look_")) {
+      parent = "look_" + parent;
+    }
+
     const relationship = this.registry.get(parent, child.table);
     if (!relationship) {
       throw new Error(`Relationship ${parent}.${child.table} not found`);
@@ -319,6 +327,11 @@ export class JoinParser {
    */
   generateLookupStages(sourceTable: string, embedRequest: EmbedRequest): any[] {
     console.log("embedRequest", JSON.stringify(embedRequest));
+
+    if (!sourceTable.includes("look_")) {
+      sourceTable = "look_" + sourceTable;
+    }
+
     const relationship = this.registry.get(sourceTable, embedRequest.table);
 
     if (!relationship) {

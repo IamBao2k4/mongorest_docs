@@ -533,7 +533,6 @@
               "_id",
               "productId",
               "rating",
-              "title",
               "content",
               "helpful.*",
               "images",

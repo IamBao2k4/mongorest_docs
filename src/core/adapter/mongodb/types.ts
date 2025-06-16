@@ -57,14 +57,14 @@ export interface IDatabaseAdapter {
   find(collection: string, options: QueryOptions, jwt: string): Promise<QueryResult>;
   
   // Insert methods
-  insertOne(collection: string, document: any): Promise<SingleInsertResult>;
-  insertMany(collection: string, documents: any[]): Promise<BulkInsertResult>;
+  insertOne(collection: string, document: any, jwt: string): Promise<SingleInsertResult>;
+  insertMany(collection: string, documents: any[], jwt: string): Promise<BulkInsertResult>;
   
   // Update methods
-  updateOne(collection: string, id: any, updateFields: any): Promise<SingleUpdateResult>;
+  updateOne(collection: string, id: any, updateFields: any, jwt: string): Promise<SingleUpdateResult>;
   updateMany(collection: string, updates: Array<{filter: any, update: any}>): Promise<BulkUpdateResult>;
   
   // Delete methods
-  deleteOne(collection: string, id: any): Promise<SingleDeleteResult>;
-  deleteMany(collection: string, filters: any[]): Promise<BulkDeleteResult>;
+  deleteOne(collection: string, id: any, jwt: string): Promise<SingleDeleteResult>;
+  deleteMany(collection: string, filters: any[], jwt: string): Promise<BulkDeleteResult>;
 }
