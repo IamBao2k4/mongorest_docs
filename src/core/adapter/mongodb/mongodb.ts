@@ -1,4 +1,5 @@
 // src/adapters/mongodb/MongoDBAdapter.ts
+// explain("executionStats");
 
 import { MongoClient, Db } from 'mongodb';
 import { 
@@ -12,9 +13,7 @@ import {
   SingleUpdateResult,
   SingleDeleteResult
 } from './types';
-import {
-  filterByRBAC
-} from '../../rbac/rbac-validator'
+import { DataBase } from '../database/database';
 
 export interface MongoDBConfig {
   connectionString: string;
@@ -28,12 +27,13 @@ export interface MongoDBConfig {
   };
 }
 
-export class MongoDBAdapter implements IDatabaseAdapter {
+export class MongoDBAdapter extends DataBase implements IDatabaseAdapter {
   private client: MongoClient | null = null;
   private db: Db | null = null;
   private config: MongoDBConfig;
 
   constructor(config: MongoDBConfig) {
+    super()
     this.config = config;
   }
 
@@ -150,7 +150,7 @@ export class MongoDBAdapter implements IDatabaseAdapter {
     }
   }
 
-  async find(collection: string, options: QueryOptions): Promise<QueryResult> {
+  async find(collection: string, options: QueryOptions, jwt: string): Promise<QueryResult> {
     this.ensureConnection();
 
     const {
@@ -172,10 +172,12 @@ export class MongoDBAdapter implements IDatabaseAdapter {
 
     const totalPage = Math.ceil(totalRecord / limit);
 
-    const rbacFilteredResults = filterByRBAC(collection, "read", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2RlZmF1bHRfMDAxIiwidXNlcklkIjoidXNlcl9kZWZhdWx0XzAwMSIsInVzZXJuYW1lIjoiZ3Vlc3RfdXNlciIsInJvbGVzIjoiZGVmYXVsdCIsImlzQWRtaW4iOmZhbHNlfQ.p21cymLG1Q-flME3vyB84TP1Whd1zqQOmhAbWA3bjPs', results);
+    const resultRBAC = this.RbacDatabase(results,jwt, collection)
+
+    console.log("RBAC", resultRBAC)
 
     return {
-      data: rbacFilteredResults,
+      data: resultRBAC,
       totalRecord,
       totalPage,
       limit,
