@@ -1,4 +1,5 @@
 // src/adapters/mongodb/MongoDBAdapter.ts
+// explain("executionStats");
 
 import { MongoClient, Db } from 'mongodb';
 import { 

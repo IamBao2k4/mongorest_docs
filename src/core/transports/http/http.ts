@@ -3,7 +3,9 @@
 import * as http from 'http';
 import * as url from 'url';
 import { IDatabaseAdapter } from '../../adapter/mongodb/types'; 
+import { CachedMongoDBAdapter } from '../../adapter/redis/cacheMongo'; 
 import { PostgRESTToMongoConverter } from '../../main/mongorest';
+import { CacheRoutes } from './cache'; 
 import setupEcommerceRelationships from '../../config/relationships'; 
 
 export interface HttpServerConfig {
@@ -16,10 +18,16 @@ export class HttpServer {
   private dbAdapter: IDatabaseAdapter;
   private converter: PostgRESTToMongoConverter;
   private config: HttpServerConfig;
+  private cacheRoutes: CacheRoutes | null = null;
 
   constructor(dbAdapter: IDatabaseAdapter, config: HttpServerConfig) {
     this.dbAdapter = dbAdapter;
     this.config = config;
+    
+    // Setup cache routes if using CachedMongoDBAdapter
+    if (dbAdapter instanceof CachedMongoDBAdapter) {
+      this.cacheRoutes = new CacheRoutes(dbAdapter);
+    }
     
     // Setup relationships and converter
     const registry = setupEcommerceRelationships();
@@ -99,6 +107,12 @@ export class HttpServer {
       const end = process.hrtime.bigint();
       const durationMs = Number(end - start) / 1_000_000;
       res.setHeader('X-Response-Time', `${durationMs.toFixed(2)}ms`);
+      
+      // Add cache hit/miss header if available
+      if (res.getHeader('X-Cache-Status')) {
+        // Cache status already set by cache layer
+      }
+      
       return originalEnd.apply(this, args as any);
     };
   }
@@ -121,7 +135,14 @@ export class HttpServer {
   ): Promise<void> {
     try {
       const mongoQuery = this.convertPostgrestQuery(queryParams, collection);
+      
       const result = await this.dbAdapter.find(collection, mongoQuery);
+      
+      // Add cache status header if using cached adapter
+      if (this.dbAdapter instanceof CachedMongoDBAdapter) {
+        res.setHeader('X-Cache-Enabled', this.dbAdapter.isCacheActive() ? 'true' : 'false');
+      }
+      
       this.sendResponse(res, 200, result);
     } catch (error: any) {
       console.error('Database error:', error);
@@ -216,6 +237,14 @@ export class HttpServer {
     const pathname = parsedUrl.pathname || '';
     const queryParams = parsedUrl.query as Record<string, string>;
     
+    // Check if this is a cache management request
+    if (this.cacheRoutes && pathname.startsWith('/api/cache')) {
+      const handled = await this.cacheRoutes.handleCacheRequest(req, res);
+      if (handled) {
+        return;
+      }
+    }
+    
     const { collection, id, isBulk } = this.parsePath(pathname);
 
     if (!collection) {
@@ -258,7 +287,16 @@ export class HttpServer {
 
     return new Promise((resolve) => {
       this.server.listen(this.config.port, this.config.host, () => {
-        console.log(`Server running on ${this.config.host || 'localhost'}:${this.config.port} with parallel processing optimization`);
+        const cacheStatus = this.dbAdapter instanceof CachedMongoDBAdapter 
+          ? (this.dbAdapter.isCacheActive() ? 'with Redis cache' : 'cache disabled')
+          : 'no cache layer';
+          
+        console.log(`Server running on ${this.config.host || 'localhost'}:${this.config.port} ${cacheStatus}`);
+        
+        if (this.cacheRoutes) {
+          console.log('Cache management endpoints available at /api/cache/*');
+        }
+        
         resolve();
       });
     });
