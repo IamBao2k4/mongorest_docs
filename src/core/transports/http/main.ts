@@ -19,20 +19,20 @@ async function main() {
       }
     },
     // Redis configuration (optional - remove this section to run without cache)
-    redis: {
-      host: 'localhost',
-      port: 6379,
-      // password: 'your-redis-password', // if Redis has password
-      database: 0,
-      keyPrefix: 'mongorest:',
-      ttl: 300 // 5 minutes default TTL
-    },
-    cacheOptions: {
-      enableReadCache: true,
-      enableWriteThrough: true,
-      defaultTTL: 300,
-      cacheOnWrite: false
-    }
+    // redis: {
+    //   host: 'localhost',
+    //   port: 6379,
+    //   // password: 'your-redis-password', // if Redis has password
+    //   database: 0,
+    //   keyPrefix: 'mongorest:',
+    //   ttl: 300 // 5 minutes default TTL
+    // },
+    // cacheOptions: {
+    //   enableReadCache: true,
+    //   enableWriteThrough: true,
+    //   defaultTTL: 300,
+    //   cacheOnWrite: false
+    // }
   };
 
   // HTTP Server configuration
@@ -83,7 +83,7 @@ async function main() {
 }
 
 // Optional: Function to warm up cache with common queries
-async function warmupCommonQueries(dbAdapter: CachedMongoDBAdapter) {
+async function warmupCommonQueries(dbAdapter: CachedMongoDBAdapter, jwt: string) {
   try {
     // Example: warm up cache for products collection
     const commonProductQueries: QueryOptions[] = [
@@ -105,7 +105,7 @@ async function warmupCommonQueries(dbAdapter: CachedMongoDBAdapter) {
       }
     ];
 
-    await dbAdapter.warmupCache('products', commonProductQueries);
+    await dbAdapter.warmupCache('products', commonProductQueries, jwt);
 
     // Example: warm up cache for users collection
     const commonUserQueries: QueryOptions[] = [
@@ -117,7 +117,7 @@ async function warmupCommonQueries(dbAdapter: CachedMongoDBAdapter) {
       }
     ];
 
-    await dbAdapter.warmupCache('users', commonUserQueries);
+    await dbAdapter.warmupCache('users', commonUserQueries, jwt);
 
     console.log('Cache warmup completed');
   } catch (error) {
