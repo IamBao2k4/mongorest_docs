@@ -8,7 +8,7 @@ async function main() {
   // Database configuration with Redis cache
   const dbConfig = {
     mongodb: {
-      connectionString: 'mongodb://thaily:Th%40i2004@192.168.1.109:27017/mongorest?authSource=admin',
+      connectionString: 'mongodb://localhost:27017/mongorest?authSource=admin',
       databaseName: 'mongorest',
       options: {
         maxPoolSize: 50,
@@ -19,14 +19,14 @@ async function main() {
       }
     },
     // Redis configuration (optional - remove this section to run without cache)
-    redis: {
-      host: '192.168.1.109',
-      port: 6379,
-      // password: 'your-redis-password', // if Redis has password
-      database: 0,
-      keyPrefix: 'mongorest:',
-      ttl: 300 // 5 minutes default TTL
-    },
+    // redis: {
+    //   host: 'localhost',
+    //   port: 6379,
+    //   // password: 'your-redis-password', // if Redis has password
+    //   database: 0,
+    //   keyPrefix: 'mongorest:',
+    //   ttl: 300 // 5 minutes default TTL
+    // },
     cacheOptions: {
       enableReadCache: true,
       enableWriteThrough: true,

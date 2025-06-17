@@ -103,7 +103,6 @@ export class RBACPatternHandler {
 
         // Cross-collection validation
         if (pattern.includes('look_')) {
-            // Validate that look_~ is used correctly
             const lookWildcardCount = (pattern.match(/look_/g) || []).length;
             if (lookWildcardCount > 1) {
                 errors.push('Only one look_ pattern allowed per expression');
@@ -266,6 +265,12 @@ export class RBACPatternHandler {
                 continue;
             }
 
+            if (char === '~') {
+                tokens.push({ type: TokenType.CROSS_COLLECTION, value: '~', position });
+                position++;
+                continue;
+            }
+
             if (pattern.startsWith('look_', position)) {
                 tokens.push({ type: TokenType.CROSS_COLLECTION, value: 'look_', position });
                 position += 5; // Length of 'look_~'
@@ -397,7 +402,7 @@ export class RBACPatternHandler {
                 case TokenType.CROSS_COLLECTION:
                     segments.push({
                         type: SegmentType.CROSS_COLLECTION,
-                        lookupPattern: 'look_'  // Pattern to match against field names
+                        name: token.value  // Pattern to match against field names
                     });
                     break;
 
@@ -569,6 +574,7 @@ export class RBACPatternHandler {
                 const temp = {};
                 for (const pattern of includes) {
                     const resolvedPattern = this.resolveContext(pattern, context);
+                    console.log('resolvedPattern', resolvedPattern.segments);
                     this.includePatternInResult(data[i], resolvedPattern.segments, temp, [], operation, context);
                 }
                 result.push(temp);
@@ -646,9 +652,11 @@ export class RBACPatternHandler {
         operation: 'read' | 'write' | 'delete',
         context: UserContext
     ): void {
-        if (!source || typeof source !== 'object' || !segment.lookupPattern) {
+        if (!source || typeof source !== 'object' || !segment.name) {
             return;
         }
+
+        console.log(`[CROSS_COLLECTION] Processing segment: ${segment.name}`);
 
         // Find all fields that start with the lookup pattern (e.g., 'look_')
         const matchingFields = Object.keys(source).filter(key =>

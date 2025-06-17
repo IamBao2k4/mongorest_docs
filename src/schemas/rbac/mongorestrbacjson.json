@@ -44,7 +44,7 @@
               "createdAt",
               "!inventory.reserved",
               "!inventory.lowStockThreshold",
-              "look_"
+              "product_reviews~"
             ]
           },
           {
@@ -150,7 +150,7 @@
               "_id",
               "name",
               "profile.avatar",
-              "look_"
+              "product_reviews~"
             ]
           },
           {
