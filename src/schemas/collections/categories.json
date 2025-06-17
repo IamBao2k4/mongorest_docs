@@ -13,70 +13,162 @@
   "properties": {
     "_id": {
       "type": "string",
+      "widget": "shortAnswer",
+      "title": "index",
+      "minLength": 2,
+      "maxLength": 100,
       "pattern": "^[0-9a-fA-F]{24}$",
-      "description": "MongoDB ObjectId"
+      "description": "MongoDB ObjectId",
+      "format-data": "none"
     },
     "name": {
       "type": "string",
+      "widget": "shortAnswer",
+      "title": "Category Name",
       "minLength": 2,
       "maxLength": 100,
-      "description": "Category name"
+      "pattern": "^.{2,100}$",
+      "description": "Category name",
+      "format-data": "none"
     },
     "slug": {
       "type": "string",
-      "pattern": "^[a-z0-9-]+$",
+      "widget": "UriKeyGen",
+      "title": "URL Slug",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
       "description": "URL-friendly category identifier"
     },
     "description": {
       "type": "string",
+      "widget": "textarea",
+      "title": "Description",
       "maxLength": 500,
-      "description": "Category description"
+      "pattern": "^[\\s\\S]{0,500}$",
+      "description": "Category description",
+      "customRole": "textarea"
     },
     "parentId": {
       "type": "string",
+      "widget": "relation",
+      "title": "Parent Category",
       "pattern": "^[0-9a-fA-F]{24}$",
-      "description": "Parent category ID for hierarchical categories"
+      "description": "Parent category ID for hierarchical categories",
+      "typeRelation": {
+        "title": "Parent Category",
+        "entity": "categories",
+        "type": "n-1",
+        "filter": {
+          "combinator": "and",
+          "rules": [],
+          "id": "parent-category-filter"
+        }
+      }
     },
     "image": {
       "type": "string",
+      "widget": "file",
+      "title": "Category Image",
       "format": "uri",
-      "description": "Category image URL"
+      "pattern": "^(https?://|/).*\\.(jpg|jpeg|png|gif|webp|svg)$",
+      "description": "Category image URL",
+      "meta": "Upload category image"
     },
     "sortOrder": {
       "type": "integer",
+      "widget": "numberInput",
+      "title": "Sort Order",
       "minimum": 0,
       "default": 0,
-      "description": "Display order"
+      "pattern": "^\\d+$",
+      "description": "Display order",
+      "format-data": "none"
     },
     "featured": {
       "type": "boolean",
+      "widget": "boolean",
+      "title": "Featured Category",
       "default": false,
-      "description": "Whether this category is featured"
+      "pattern": "^(true|false)$",
+      "description": "Whether this category is featured",
+      "appearance": "checkbox"
     },
     "status": {
       "type": "string",
+      "widget": "select",
+      "title": "Status",
       "enum": ["active", "inactive"],
-      "default": "active"
+      "default": "active",
+      "pattern": "^(active|inactive)$",
+      "choices": [
+        {
+          "key": "active",
+          "value": "Active"
+        },
+        {
+          "key": "inactive",
+          "value": "Inactive"
+        }
+      ],
+      "allowNull": false,
+      "isMultiple": false
     },
     "seo": {
       "type": "object",
+      "title": "SEO Settings",
       "properties": {
-        "metaTitle": { "type": "string", "maxLength": 60 },
-        "metaDescription": { "type": "string", "maxLength": 160 },
+        "metaTitle": { 
+          "type": "string",
+          "widget": "shortAnswer",
+          "title": "Meta Title",
+          "maxLength": 60,
+          "pattern": "^.{0,60}$",
+          "format-data": "none"
+        },
+        "metaDescription": { 
+          "type": "string",
+          "widget": "textarea",
+          "title": "Meta Description",
+          "maxLength": 160,
+          "pattern": "^[\\s\\S]{0,160}$",
+          "customRole": "textarea"
+        },
         "keywords": {
           "type": "array",
-          "items": { "type": "string" },
-          "maxItems": 10
+          "widget": "array",
+          "title": "Keywords",
+          "items": { 
+            "type": "string",
+            "widget": "shortAnswer",
+            "pattern": "^.{0,50}$"
+          },
+          "maxItems": 10,
+          "minItems": 0
         }
       }
     },
     "createdAt": {
       "type": "string",
-      "format": "date-time"
+      "widget": "dateTime",
+      "title": "Created At",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
+      "displayFormat": "yyyy/MM/dd HH:mm:ss",
+      "formatDate": "date-time",
+      "disabled": true,
+      "field": "single",
+      "mode": "dateTime"
     },
     "updatedAt": {
       "type": "string",
-      "format": "date-time"
+      "widget": "dateTime",
+      "title": "Updated At",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
+      "displayFormat": "yyyy/MM/dd HH:mm:ss",
+      "formatDate": "date-time",
+      "disabled": true,
+      "field": "single",
+      "mode": "dateTime"
     }
   },
   "required": ["name", "slug"],
@@ -89,7 +181,12 @@
       "localField": "parentId",
       "foreignField": "_id",
       "alias": "parent",
-      "description": "Parent category"
+      "description": "Parent category",
+      "widget": "relation",
+      "typeRelation": {
+        "type": "n-1",
+        "entity": "categories"
+      }
     },
     "children": {
       "type": "hasMany",
@@ -111,27 +208,5 @@
       "alias": "products",
       "description": "Products in this category"
     }
-  },
-  "mongorest": {
-    "permissions": {
-      "read": ["user", "admin", "analyst", "dev"],
-      "create": ["admin", "dev"],
-      "update": ["admin", "dev"],
-      "delete": ["admin"]
-    },
-    "rateLimits": {
-      "read": { "requests": 200, "window": "1h" },
-      "write": { "requests": 100, "window": "1h" }
-    },
-    "hooks": {
-      "beforeCreate": ["generateSlug", "setTimestamps"],
-      "afterCreate": ["updateSearchIndex"],
-      "beforeUpdate": ["setUpdatedAt"],
-      "afterUpdate": ["updateSearchIndex"]
-    },
-    "searchFields": ["name", "description"],
-    "defaultSort": { "sortOrder": 1, "name": 1 },
-    "defaultLimit": 50,
-    "maxLimit": 500
   }
 }

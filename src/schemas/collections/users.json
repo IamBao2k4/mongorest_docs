@@ -13,84 +13,143 @@
   "properties": {
     "_id": {
       "type": "string",
+      "widget": "shortAnswer",
       "pattern": "^[0-9a-fA-F]{24}$",
-      "description": "MongoDB ObjectId"
+      "description": "MongoDB ObjectId",
+      "disabled": true
     },
     "email": {
       "type": "string",
+      "widget": "shortAnswer",
+      "title": "Email Address",
       "format": "email",
-      "description": "User email address"
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "description": "User email address",
+      "format-data": "email"
     },
     "name": {
       "type": "string",
+      "widget": "shortAnswer",
+      "title": "Full Name",
       "minLength": 2,
       "maxLength": 100,
-      "description": "Full name"
+      "pattern": "^.{2,100}$",
+      "description": "Full name",
+      "format-data": "none"
     },
     "profile": {
       "type": "object",
+      "title": "User Profile",
       "properties": {
         "age": {
           "type": "integer",
+          "widget": "numberInput",
+          "title": "Age",
           "minimum": 13,
-          "maximum": 120
+          "maximum": 120,
+          "pattern": "^\\d+$",
+          "format-data": "none"
         },
         "country": {
           "type": "string",
-          "enum": ["Vietnam", "Thailand", "Malaysia", "Singapore", "Indonesia", "Philippines"]
+          "widget": "select",
+          "title": "Country",
+          "enum": ["Vietnam", "Thailand", "Malaysia", "Singapore", "Indonesia", "Philippines"],
+          "choices": [
+            { "key": "Vietnam", "value": "Vietnam" },
+            { "key": "Thailand", "value": "Thailand" },
+            { "key": "Malaysia", "value": "Malaysia" },
+            { "key": "Singapore", "value": "Singapore" },
+            { "key": "Indonesia", "value": "Indonesia" },
+            { "key": "Philippines", "value": "Philippines" }
+          ],
+          "allowNull": false
         },
         "interests": {
           "type": "array",
-          "items": { "type": "string" },
-          "maxItems": 10
+          "widget": "checkbox",
+          "title": "Interests",
+          "items": { 
+            "type": "string",
+            "pattern": "^.{0,50}$"
+          },
+          "maxItems": 10,
+          "choices": [
+            { "key": "technology", "value": "Technology" },
+            { "key": "sports", "value": "Sports" },
+            { "key": "music", "value": "Music" },
+            { "key": "travel", "value": "Travel" },
+            { "key": "food", "value": "Food" },
+            { "key": "gaming", "value": "Gaming" },
+            { "key": "movies", "value": "Movies" },
+            { "key": "books", "value": "Books" },
+            { "key": "fitness", "value": "Fitness" },
+            { "key": "art", "value": "Art" }
+          ],
+          "layout": 0,
+          "toggleAll": true
         },
         "avatar": {
           "type": "string",
-          "format": "uri"
+          "widget": "file",
+          "title": "Avatar",
+          "format": "uri",
+          "pattern": "^(https?://|/).*\\.(jpg|jpeg|png|gif|webp|svg)$",
+          "meta": "Upload profile picture"
         }
       },
       "required": ["country"]
     },
     "status": {
       "type": "string",
+      "widget": "select",
+      "title": "Account Status",
       "enum": ["active", "inactive", "suspended"],
-      "default": "active"
+      "default": "active",
+      "choices": [
+        { "key": "active", "value": "Active" },
+        { "key": "inactive", "value": "Inactive" },
+        { "key": "suspended", "value": "Suspended" }
+      ],
+      "allowNull": false
     },
     "lastLogin": {
       "type": "string",
-      "format": "date-time"
+      "widget": "dateTime",
+      "title": "Last Login",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
+      "displayFormat": "yyyy/MM/dd HH:mm:ss",
+      "formatDate": "date-time",
+      "disabled": true,
+      "field": "single",
+      "mode": "dateTime"
     },
     "createdAt": {
       "type": "string",
-      "format": "date-time"
+      "widget": "dateTime",
+      "title": "Created At",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
+      "displayFormat": "yyyy/MM/dd HH:mm:ss",
+      "formatDate": "date-time",
+      "disabled": true,
+      "field": "single",
+      "mode": "dateTime"
     },
     "updatedAt": {
       "type": "string",
-      "format": "date-time"
+      "widget": "dateTime",
+      "title": "Updated At",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
+      "displayFormat": "yyyy/MM/dd HH:mm:ss",
+      "formatDate": "date-time",
+      "disabled": true,
+      "field": "single",
+      "mode": "dateTime"
     }
   },
   "required": ["email", "name", "profile"],
-  "additionalProperties": false,
-  "mongorest": {
-    "permissions": {
-      "read": ["user", "admin", "analyst", "dev"],
-      "create": ["admin", "dev"],
-      "update": ["admin", "dev"],
-      "delete": ["admin"]
-    },
-    "rateLimits": {
-      "read": { "requests": 100, "window": "1h" },
-      "write": { "requests": 50, "window": "1h" }
-    },
-    "hooks": {
-      "beforeCreate": ["validateEmail", "setTimestamps"],
-      "afterCreate": ["sendWelcomeEmail"],
-      "beforeUpdate": ["setUpdatedAt"],
-      "afterUpdate": ["sendNotification"]
-    },
-    "searchFields": ["name", "email"],
-    "defaultSort": { "createdAt": -1 },
-    "defaultLimit": 50,
-    "maxLimit": 1000
-  }
+  "additionalProperties": false
 }

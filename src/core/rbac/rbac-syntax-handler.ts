@@ -574,7 +574,6 @@ export class RBACPatternHandler {
                 const temp = {};
                 for (const pattern of includes) {
                     const resolvedPattern = this.resolveContext(pattern, context);
-                    console.log('resolvedPattern', resolvedPattern.segments);
                     this.includePatternInResult(data[i], resolvedPattern.segments, temp, [], operation, context);
                 }
                 result.push(temp);
@@ -606,6 +605,10 @@ export class RBACPatternHandler {
             return;
         }
         const segment = segments[0];
+
+        console.log('segments', segments);
+        console.log('segment', segment);
+
         const remainingSegments = segments.slice(1);
         const isLastSegment = remainingSegments.length === 0;
 

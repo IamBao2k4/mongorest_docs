@@ -14,82 +14,148 @@
   "properties": {
     "_id": {
       "type": "string",
+      "widget": "shortAnswer",
       "pattern": "^[0-9a-fA-F]{24}$",
-      "description": "MongoDB ObjectId"
+      "description": "MongoDB ObjectId",
+      "disabled": true
     },
     "sku": {
       "type": "string",
+      "widget": "shortAnswer",
+      "title": "SKU",
       "pattern": "^[A-Z0-9-]+$",
-      "description": "Stock Keeping Unit"
+      "description": "Stock Keeping Unit",
+      "format-data": "none"
     },
     "name": {
       "type": "string",
+      "widget": "shortAnswer",
+      "title": "Product Name",
       "minLength": 3,
       "maxLength": 200,
-      "description": "Product name"
+      "pattern": "^.{3,200}$",
+      "description": "Product name",
+      "format-data": "none"
     },
     "description": {
       "type": "string",
+      "widget": "textarea",
+      "title": "Description",
       "maxLength": 2000,
-      "description": "Product description"
+      "pattern": "^[\\s\\S]{0,2000}$",
+      "description": "Product description",
+      "customRole": "textarea"
     },
     "category": {
       "type": "string",
-      "enum": ["electronics", "clothing", "books", "home", "sports", "beauty", "toys", "automotive"]
+      "widget": "select",
+      "title": "Category",
+      "enum": ["electronics", "clothing", "books", "home", "sports", "beauty", "toys", "automotive"],
+      "choices": [
+        { "key": "electronics", "value": "Electronics" },
+        { "key": "clothing", "value": "Clothing" },
+        { "key": "books", "value": "Books" },
+        { "key": "home", "value": "Home & Garden" },
+        { "key": "sports", "value": "Sports & Outdoors" },
+        { "key": "beauty", "value": "Beauty & Personal Care" },
+        { "key": "toys", "value": "Toys & Games" },
+        { "key": "automotive", "value": "Automotive" }
+      ],
+      "allowNull": false
     },
     "subcategory": {
       "type": "string",
-      "maxLength": 100
+      "widget": "shortAnswer",
+      "title": "Subcategory",
+      "maxLength": 100,
+      "pattern": "^.{0,100}$",
+      "format-data": "none"
     },
     "price": {
       "type": "number",
+      "widget": "numberInput",
+      "title": "Price",
       "minimum": 0,
-      "maximum": 999999.99
+      "maximum": 999999.99,
+      "pattern": "^\\d+(\\.\\d{1,2})?$",
+      "format-data": "money"
     },
     "currency": {
       "type": "string",
+      "widget": "select",
+      "title": "Currency",
       "enum": ["USD", "VND", "EUR", "GBP"],
-      "default": "USD"
+      "default": "USD",
+      "choices": [
+        { "key": "USD", "value": "US Dollar" },
+        { "key": "VND", "value": "Vietnamese Dong" },
+        { "key": "EUR", "value": "Euro" },
+        { "key": "GBP", "value": "British Pound" }
+      ]
     },
     "inventory": {
       "type": "object",
+      "title": "Inventory",
       "properties": {
         "quantity": {
           "type": "integer",
-          "minimum": 0
+          "widget": "numberInput",
+          "title": "Quantity",
+          "minimum": 0,
+          "pattern": "^\\d+$",
+          "format-data": "none"
         },
         "reserved": {
           "type": "integer",
+          "widget": "numberInput",
+          "title": "Reserved",
           "minimum": 0,
-          "default": 0
+          "default": 0,
+          "pattern": "^\\d+$",
+          "format-data": "none"
         },
         "lowStockThreshold": {
           "type": "integer",
+          "widget": "numberInput",
+          "title": "Low Stock Threshold",
           "minimum": 0,
-          "default": 10
+          "default": 10,
+          "pattern": "^\\d+$",
+          "format-data": "none"
         }
       },
       "required": ["quantity"]
     },
     "images": {
       "type": "array",
+      "widget": "multipleFiles",
+      "title": "Product Images",
       "items": {
         "type": "string",
-        "format": "uri"
+        "format": "uri",
+        "pattern": "^(https?://|/).*\\.(jpg|jpeg|png|gif|webp|svg)$"
       },
-      "maxItems": 10
+      "maxItems": 10,
+      "meta": "Upload product images (max 10)",
+      "library_setting": "uploaded_to_post"
     },
     "tags": {
       "type": "array",
+      "widget": "array",
+      "title": "Tags",
       "items": {
         "type": "string",
-        "maxLength": 50
+        "widget": "shortAnswer",
+        "maxLength": 50,
+        "pattern": "^.{0,50}$"
       },
       "uniqueItems": true,
       "maxItems": 20
     },
     "specifications": {
       "type": "object",
+      "widget": "data",
+      "title": "Specifications",
       "additionalProperties": {
         "oneOf": [
           { "type": "string" },
@@ -100,30 +166,65 @@
     },
     "ratings": {
       "type": "object",
+      "title": "Ratings",
       "properties": {
         "average": {
           "type": "number",
+          "widget": "numberInput",
+          "title": "Average Rating",
           "minimum": 0,
-          "maximum": 5
+          "maximum": 5,
+          "pattern": "^[0-5](\\.\\d)?$",
+          "format-data": "none",
+          "disabled": true
         },
         "count": {
           "type": "integer",
-          "minimum": 0
+          "widget": "numberInput",
+          "title": "Review Count",
+          "minimum": 0,
+          "pattern": "^\\d+$",
+          "format-data": "none",
+          "disabled": true
         }
       }
     },
     "status": {
       "type": "string",
+      "widget": "select",
+      "title": "Status",
       "enum": ["active", "inactive", "discontinued", "draft"],
-      "default": "draft"
+      "default": "draft",
+      "choices": [
+        { "key": "active", "value": "Active" },
+        { "key": "inactive", "value": "Inactive" },
+        { "key": "discontinued", "value": "Discontinued" },
+        { "key": "draft", "value": "Draft" }
+      ]
     },
     "createdAt": {
       "type": "string",
-      "format": "date-time"
+      "widget": "dateTime",
+      "title": "Created At",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
+      "displayFormat": "yyyy/MM/dd HH:mm:ss",
+      "formatDate": "date-time",
+      "disabled": true,
+      "field": "single",
+      "mode": "dateTime"
     },
     "updatedAt": {
       "type": "string",
-      "format": "date-time"
+      "widget": "dateTime",
+      "title": "Updated At",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
+      "displayFormat": "yyyy/MM/dd HH:mm:ss",
+      "formatDate": "date-time",
+      "disabled": true,
+      "field": "single",
+      "mode": "dateTime"
     }
   },
   "required": ["sku", "name", "category", "price", "inventory"],
@@ -141,27 +242,5 @@
         { "$match": { "items.productId": "{{localValue}}" } }
       ]
     }
-  },
-  "mongorest": {
-    "permissions": {
-      "read": ["user", "admin", "analyst", "dev"],
-      "create": ["admin", "dev"],
-      "update": ["admin", "dev"],
-      "delete": ["admin"]
-    },
-    "rateLimits": {
-      "read": { "requests": 200, "window": "1h" },
-      "write": { "requests": 100, "window": "1h" }
-    },
-    "hooks": {
-      "beforeCreate": ["generateSKU", "setTimestamps"],
-      "afterCreate": ["updateSearchIndex"],
-      "beforeUpdate": ["setUpdatedAt"],
-      "afterUpdate": ["updateSearchIndex", "checkLowStock"]
-    },
-    "searchFields": ["name", "description", "tags"],
-    "defaultSort": { "createdAt": -1 },
-    "defaultLimit": 50,
-    "maxLimit": 500
   }
 }

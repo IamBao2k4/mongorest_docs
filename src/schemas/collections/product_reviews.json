@@ -14,71 +14,161 @@
   "properties": {
     "_id": {
       "type": "string",
+      "widget": "shortAnswer",
       "pattern": "^[0-9a-fA-F]{24}$",
-      "description": "MongoDB ObjectId"
+      "description": "MongoDB ObjectId",
+      "disabled": true
     },
     "productId": {
       "type": "string",
+      "widget": "relation",
+      "title": "Product",
       "pattern": "^[0-9a-fA-F]{24}$",
-      "description": "Reference to product _id"
+      "description": "Reference to product _id",
+      "typeRelation": {
+        "title": "Product",
+        "entity": "products",
+        "type": "n-1",
+        "filter": {
+          "combinator": "and",
+          "rules": [],
+          "id": "product-filter"
+        }
+      }
     },
     "userId": {
       "type": "string",
+      "widget": "relation",
+      "title": "User",
       "pattern": "^[0-9a-fA-F]{24}$",
-      "description": "Reference to user _id"
+      "description": "Reference to user _id",
+      "typeRelation": {
+        "title": "User",
+        "entity": "users",
+        "type": "n-1",
+        "filter": {
+          "combinator": "and",
+          "rules": [],
+          "id": "user-filter"
+        }
+      }
     },
     "rating": {
       "type": "integer",
+      "widget": "range",
+      "title": "Rating",
       "minimum": 1,
       "maximum": 5,
+      "pattern": "^[1-5]$",
       "description": "Review rating from 1 to 5 stars"
     },
     "title": {
       "type": "string",
+      "widget": "shortAnswer",
+      "title": "Review Title",
       "minLength": 5,
       "maxLength": 200,
-      "description": "Review title"
+      "pattern": "^.{5,200}$",
+      "description": "Review title",
+      "format-data": "none"
     },
     "content": {
       "type": "string",
+      "widget": "textarea",
+      "title": "Review Content",
       "minLength": 10,
       "maxLength": 2000,
-      "description": "Review content"
+      "pattern": "^[\\s\\S]{10,2000}$",
+      "description": "Review content",
+      "customRole": "textarea"
     },
     "verified": {
       "type": "boolean",
+      "widget": "boolean",
+      "title": "Verified Purchase",
       "default": false,
-      "description": "Whether this review is from a verified purchase"
+      "pattern": "^(true|false)$",
+      "description": "Whether this review is from a verified purchase",
+      "appearance": "checkbox"
     },
     "helpful": {
       "type": "object",
+      "title": "Helpful Votes",
       "properties": {
-        "yes": { "type": "integer", "minimum": 0, "default": 0 },
-        "no": { "type": "integer", "minimum": 0, "default": 0 }
+        "yes": { 
+          "type": "integer",
+          "widget": "numberInput",
+          "title": "Helpful",
+          "minimum": 0,
+          "default": 0,
+          "pattern": "^\\d+$",
+          "format-data": "none",
+          "disabled": true
+        },
+        "no": { 
+          "type": "integer",
+          "widget": "numberInput",
+          "title": "Not Helpful",
+          "minimum": 0,
+          "default": 0,
+          "pattern": "^\\d+$",
+          "format-data": "none",
+          "disabled": true
+        }
       },
       "description": "Helpful votes"
     },
     "status": {
       "type": "string",
+      "widget": "select",
+      "title": "Review Status",
       "enum": ["pending", "approved", "rejected", "spam"],
-      "default": "pending"
+      "default": "pending",
+      "choices": [
+        { "key": "pending", "value": "Pending" },
+        { "key": "approved", "value": "Approved" },
+        { "key": "rejected", "value": "Rejected" },
+        { "key": "spam", "value": "Spam" }
+      ],
+      "allowNull": false
     },
     "images": {
       "type": "array",
+      "widget": "multipleFiles",
+      "title": "Review Images",
       "items": {
         "type": "string",
-        "format": "uri"
+        "format": "uri",
+        "pattern": "^(https?://|/).*\\.(jpg|jpeg|png|gif|webp|svg)$"
       },
       "maxItems": 5,
-      "description": "Review images"
+      "description": "Review images",
+      "meta": "Upload review images (max 5)",
+      "library_setting": "uploaded_to_post"
     },
     "createdAt": {
       "type": "string",
-      "format": "date-time"
+      "widget": "dateTime",
+      "title": "Created At",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
+      "displayFormat": "yyyy/MM/dd HH:mm:ss",
+      "formatDate": "date-time",
+      "disabled": true,
+      "field": "single",
+      "mode": "dateTime"
     },
     "updatedAt": {
       "type": "string",
-      "format": "date-time"
+      "widget": "dateTime",
+      "title": "Updated At",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
+      "displayFormat": "yyyy/MM/dd HH:mm:ss",
+      "formatDate": "date-time",
+      "disabled": true,
+      "field": "single",
+      "mode": "dateTime"
     }
   },
   "required": ["productId", "userId", "rating", "title", "content"],
@@ -90,7 +180,12 @@
       "localField": "productId",
       "foreignField": "_id",
       "alias": "product",
-      "description": "Product being reviewed"
+      "description": "Product being reviewed",
+      "widget": "relation",
+      "typeRelation": {
+        "type": "n-1",
+        "entity": "products"
+      }
     },
     "user": {
       "type": "belongsTo",
@@ -98,29 +193,12 @@
       "localField": "userId",
       "foreignField": "_id",
       "alias": "user",
-      "description": "User who wrote the review"
+      "description": "User who wrote the review",
+      "widget": "relation",
+      "typeRelation": {
+        "type": "n-1",
+        "entity": "users"
+      }
     }
-  },
-  "mongorest": {
-    "permissions": {
-      "read": ["user", "admin", "analyst", "dev"],
-      "create": ["user", "admin", "dev"],
-      "update": ["admin", "dev"],
-      "delete": ["admin", "dev"]
-    },
-    "rateLimits": {
-      "read": { "requests": 200, "window": "1h" },
-      "write": { "requests": 20, "window": "1h" }
-    },
-    "hooks": {
-      "beforeCreate": ["checkVerifiedPurchase", "setTimestamps"],
-      "afterCreate": ["updateProductRating", "sendNotification"],
-      "beforeUpdate": ["setUpdatedAt"],
-      "afterUpdate": ["updateProductRating"]
-    },
-    "searchFields": ["title", "content"],
-    "defaultSort": { "createdAt": -1 },
-    "defaultLimit": 25,
-    "maxLimit": 100
   }
 }

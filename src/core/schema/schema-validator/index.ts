@@ -488,7 +488,7 @@ export class SchemaValidator {
         fields: {
           type: 'object',
           patternProperties: {
-            '^[a-zA-Z_][a-zA-Z0-9_]*$': {
+            '^[a-zA-Z_][a-zA-Z0-9_-]*$': {
               $ref: '#/$defs/fieldDefinition'
             }
           },
@@ -526,32 +526,59 @@ export class SchemaValidator {
         fieldDefinition: {
           type: 'object',
           properties: {
+            // Basic properties
             type: {
               type: 'string',
-              enum: ['string', 'number', 'boolean', 'date', 'objectId', 'array', 'object', 'mixed', 'buffer', 'decimal']
+              enum: ['string', 'number', 'boolean', 'date', 'objectId', 'array', 'object', 'mixed', 'buffer', 'decimal', 'integer']
             },
-            required: { type: ['boolean', 'null'] },
+            widget: {
+              type: ['string', 'null'],
+              enum: ['shortAnswer', 'password', 'textarea', 'UriKeyGen', 'numberInput', 'range', 
+                     'dateTime', 'date', 'time', 'radio', 'select', 'checkbox', 'boolean', 
+                     'relation', 'file', 'multipleFiles', 'multiImage', 'condition', 
+                     'dataWidget', 'href', 'icon', 'function', 'array', 'data', null]
+            },
+            title: { type: ['string', 'null'] },
+            description: { type: ['string', 'null'] },
             default: { type: ['string', 'number', 'boolean', 'object', 'array', 'null'] },
+            required: { type: ['boolean', 'null'] },
             unique: { type: ['boolean', 'null'] },
             index: { type: ['boolean', 'null'] },
+            disabled: { type: ['boolean', 'null'] },
+            
+            // String validation
             minLength: { type: ['integer', 'null'], minimum: 0 },
             maxLength: { type: ['integer', 'null'], minimum: 1 },
             pattern: { type: ['string', 'null'] },
-            enum: { type: ['array', 'null'], items: { type: 'string' } },
-            format: { type: ['string', 'null'], enum: ['email', 'url', 'uuid', 'phone'] },
+            enum: { 
+              oneOf: [
+                { type: 'array', items: { type: 'string' } },
+                { type: 'null' }
+              ]
+            },
+            format: { type: ['string', 'null'], enum: ['email', 'url', 'uuid', 'phone', 'uri', 'date', 'date-time', 'time', null] },
+            
+            // Number validation
             min: { type: ['number', 'null'] },
             max: { type: ['number', 'null'] },
+            minimum: { type: ['number', 'null'] },
+            maximum: { type: ['number', 'null'] },
             integer: { type: ['boolean', 'null'] },
             positive: { type: ['boolean', 'null'] },
+            
+            // Array validation
             minItems: { type: ['integer', 'null'], minimum: 0 },
             maxItems: { type: ['integer', 'null'], minimum: 1 },
             uniqueItems: { type: ['boolean', 'null'] },
             items: { 
               oneOf: [
                 { $ref: '#/$defs/fieldDefinition' },
+                { type: 'object' },
                 { type: 'null' }
               ]
             },
+            
+            // Object validation
             properties: { 
               type: ['object', 'null'],
               patternProperties: {
@@ -561,7 +588,78 @@ export class SchemaValidator {
               },
               additionalProperties: true
             },
-            description: { type: ['string', 'null'] },
+            
+            // Widget-specific properties from all-fields.json
+            'format-data': { 
+              type: ['string', 'null'],
+              enum: ['none', 'email', 'phone', 'money', null]
+            },
+            customRole: { type: ['string', 'null'] },
+            displayFormat: { type: ['string', 'null'] },
+            formatDate: { type: ['string', 'null'] },
+            field: { type: ['string', 'null'] },
+            mode: { type: ['string', 'null'] },
+            
+            // Choice-based fields
+            choices: {
+              oneOf: [
+                { type: 'string' },
+                {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      key: { type: 'string' },
+                      value: { type: 'string' }
+                    },
+                    required: ['key', 'value']
+                  }
+                },
+                { type: 'null' }
+              ]
+            },
+            allowNull: { type: ['boolean', 'null'] },
+            allowCustom: { type: ['boolean', 'null'] },
+            isMultiple: { type: ['boolean', 'null'] },
+            returnValue: { type: ['integer', 'null'] },
+            layout: { type: ['integer', 'null'] },
+            toggleAll: { type: ['boolean', 'null'] },
+            appearance: { type: ['string', 'null'] },
+            
+            // Relation field
+            typeRelation: {
+              type: ['object', 'null'],
+              properties: {
+                title: { type: 'string' },
+                entity: { type: 'string' },
+                type: { 
+                  type: 'string',
+                  enum: ['n-1', '1-n', 'n-n', '1-1']
+                },
+                filter: {
+                  type: 'object',
+                  properties: {
+                    combinator: { type: 'string', enum: ['and', 'or'] },
+                    rules: { type: 'array' },
+                    id: { type: 'string' }
+                  }
+                }
+              }
+            },
+            
+            // File fields
+            meta: { type: ['string', 'null'] },
+            library_setting: { type: ['string', 'null'] },
+            fields: {
+              type: ['array', 'null'],
+              items: { type: 'string' }
+            },
+            
+            // Other specific properties
+            typeUI: { type: ['string', 'null'] },
+            hiddenTitle: { type: ['boolean', 'null'] },
+            
+            // Additional validation
             example: { type: ['string', 'number', 'boolean', 'object', 'array', 'null'] }
           },
           required: ['type'],
@@ -577,7 +675,22 @@ export class SchemaValidator {
             collection: { type: 'string' },
             foreignField: { type: ['string', 'null'] },
             localField: { type: ['string', 'null'] },
-            through: { type: ['string', 'null'] }
+            through: { type: ['string', 'null'] },
+            widget: {
+              type: ['string', 'null'],
+              enum: ['relation', null]
+            },
+            typeRelation: {
+              type: ['object', 'null'],
+              properties: {
+                type: { 
+                  type: 'string',
+                  enum: ['n-1', '1-n', 'n-n', '1-1']
+                },
+                entity: { type: ['string', 'null'] },
+                filter: { type: ['object', 'null'] }
+              }
+            }
           },
           required: ['type', 'collection'],
           additionalProperties: true
@@ -721,10 +834,9 @@ export class SchemaValidator {
         break;
         
       case 'number':
-        schema.type = 'number';
-        if (fieldDef.min !== undefined) schema.minimum = fieldDef.min;
-        if (fieldDef.max !== undefined) schema.maximum = fieldDef.max;
-        if (fieldDef.integer) schema.type = 'integer';
+        schema.type = fieldDef.type;
+        schema.minimum = fieldDef.min;
+        schema.maximum = fieldDef.max;
         break;
         
       case 'boolean':
@@ -789,13 +901,15 @@ export class SchemaValidator {
       }
       
       // Check min/max value consistency for numbers
-      if (fieldDef.type === 'number' && fieldDef.min !== undefined && fieldDef.max !== undefined) {
-        if (fieldDef.min > fieldDef.max) {
+      if ((fieldDef.type === 'number')) {
+        const min = fieldDef.min;
+        const max = fieldDef.max;
+        if (min !== undefined && max !== undefined && min > max) {
           errors.push({
             name: "InvalidRangeError",
             field: fieldName,
             error: 'INVALID_RANGE',
-            message: `Field '${fieldName}': min must be less than or equal to max`,
+            message: `Field '${fieldName}': min/minimum must be less than or equal to max/maximum`,
             severity: 'error'
           });
         }
@@ -1013,7 +1127,7 @@ export class SchemaValidator {
     }
     
     if (errorTypes.includes('INVALID_FIELD_TYPE')) {
-      suggestions.push('Use supported field types: string, number, boolean, date, objectId, array, object, mixed, buffer, decimal');
+      suggestions.push('Use supported field types: string, number, boolean, date, objectId, array, object, mixed, buffer, decimal, integer');
     }
     
     if (errorTypes.includes('INVALID_LENGTH_RANGE')) {
