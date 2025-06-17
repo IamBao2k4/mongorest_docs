@@ -10,64 +10,140 @@
           {
             "user_role": "default",
             "patterns": [
-              {"sku": "field"},
-              "name",
-              "description",
-              "category",
-              "subcategory",
-              "price",
-              "currency",
-              "ratings",
-              "status"
+              {
+                "sku": "field"
+              },
+              {
+                "name": "field"
+              },
+              {
+                "description": "field"
+              },
+              {
+                "category": "field"
+              },
+              {
+                "subcategory": "field"
+              },
+              {
+                "price": "field"
+              },
+              {
+                "currency": "field"
+              },
+              {
+                "ratings": "field"
+              },
+              {
+                "status": "field"
+              }
             ]
           },
           {
             "user_role": "user",
             "patterns": [
-              "_id",
-              "sku",
-              "name",
-              "description",
-              "category",
-              "subcategory",
-              "price",
-              "currency",
-              "inventory.quantity",
-              "images",
-              "tags",
-              "specifications",
-              "ratings",
-              "status",
-              "createdAt"
+              {
+                "_id": "field"
+              },
+              {
+                "sku": "field"
+              },
+              {
+                "name": "field"
+              },
+              {
+                "description": "field"
+              },
+              {
+                "category": "field"
+              },
+              {
+                "subcategory": "field"
+              },
+              {
+                "price": "field"
+              },
+              {
+                "currency": "field"
+              },
+              {
+                "inventory.quantity": "field"
+              },
+              {
+                "images": "field"
+              },
+              {
+                "tags": "field"
+              },
+              {
+                "specifications": "field"
+              },
+              {
+                "ratings": "field"
+              },
+              {
+                "status": "field"
+              },
+              {
+                "createdAt": "field"
+              }
             ]
           },
           {
             "user_role": "analyst",
             "patterns": [
-              "_id",
-              "sku",
-              "name",
-              "category",
-              "subcategory",
-              "price",
-              "currency",
-              "inventory",
-              "ratings",
-              "status",
-              "createdAt",
-              "updatedAt"
+              {
+                "_id": "field"
+              },
+              {
+                "sku": "field"
+              },
+              {
+                "name": "field"
+              },
+              {
+                "category": "field"
+              },
+              {
+                "subcategory": "field"
+              },
+              {
+                "price": "field"
+              },
+              {
+                "currency": "field"
+              },
+              {
+                "inventory": "field"
+              },
+              {
+                "ratings": "field"
+              },
+              {
+                "status": "field"
+              },
+              {
+                "createdAt": "field"
+              },
+              {
+                "updatedAt": "field"
+              }
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ],
@@ -83,19 +159,25 @@
           {
             "user_role": "analyst",
             "patterns": [
-              "ratings"
+              {
+                "ratings": "field"
+              }
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ],
@@ -115,7 +197,9 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
@@ -132,46 +216,86 @@
           {
             "user_role": "default",
             "patterns": [
-              "_id",
-              "name",
-              "profile.avatar"
+              {
+                "_id": "field"
+              },
+              {
+                "name": "field"
+              },
+              {
+                "profile.avatar": "field"
+              }
             ]
           },
           {
             "user_role": "user",
             "patterns": [
-              "_id",
-              "email",
-              "name",
-              "profile",
-              "status"
+              {
+                "_id": "field"
+              },
+              {
+                "email": "field"
+              },
+              {
+                "name": "field"
+              },
+              {
+                "profile": "field"
+              },
+              {
+                "status": "field"
+              }
             ]
           },
           {
             "user_role": "analyst",
             "patterns": [
-              "_id",
-              "name",
-              "profile.age",
-              "profile.country",
-              "profile.interests",
-              "status",
-              "lastLogin",
-              "createdAt",
-              "email",
-              "profile.avatar"
+              {
+                "_id": "field"
+              },
+              {
+                "name": "field"
+              },
+              {
+                "profile.age": "field"
+              },
+              {
+                "profile.country": "field"
+              },
+              {
+                "profile.interests": "field"
+              },
+              {
+                "status": "field"
+              },
+              {
+                "lastLogin": "field"
+              },
+              {
+                "createdAt": "field"
+              },
+              {
+                "email": "field"
+              },
+              {
+                "profile.avatar": "field"
+              }
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ],
@@ -183,13 +307,27 @@
           {
             "user_role": "user",
             "patterns": [
-              "name",
-              "profile.age",
-              "profile.interests",
-              "profile.avatar",
-              "email",
-              "profile.country",
-              "status"
+              {
+                "name": "field"
+              },
+              {
+                "profile.age": "field"
+              },
+              {
+                "profile.interests": "field"
+              },
+              {
+                "profile.avatar": "field"
+              },
+              {
+                "email": "field"
+              },
+              {
+                "profile.country": "field"
+              },
+              {
+                "status": "field"
+              }
             ]
           },
           {
@@ -199,13 +337,17 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ],
@@ -225,7 +367,9 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
@@ -246,69 +390,165 @@
           {
             "user_role": "user",
             "patterns": [
-              "_id",
-              "orderNumber",
-              "customerId",
-              "items",
-              "shippingAddress",
-              "billingAddress",
-              "payment.method",
-              "payment.status",
-              "payment.amount",
-              "subtotal",
-              "tax",
-              "shipping",
-              "discount",
-              "totalAmount",
-              "currency",
-              "status",
-              "orderDate",
-              "shippedDate",
-              "deliveredDate",
-              "notes",
-              "customer",
-              "payment.transactionId"
+              {
+                "_id": "field"
+              },
+              {
+                "orderNumber": "field"
+              },
+              {
+                "customerId": "field"
+              },
+              {
+                "items": "field"
+              },
+              {
+                "shippingAddress": "field"
+              },
+              {
+                "billingAddress": "field"
+              },
+              {
+                "payment.method": "field"
+              },
+              {
+                "payment.status": "field"
+              },
+              {
+                "payment.amount": "field"
+              },
+              {
+                "subtotal": "field"
+              },
+              {
+                "tax": "field"
+              },
+              {
+                "shipping": "field"
+              },
+              {
+                "discount": "field"
+              },
+              {
+                "totalAmount": "field"
+              },
+              {
+                "currency": "field"
+              },
+              {
+                "status": "field"
+              },
+              {
+                "orderDate": "field"
+              },
+              {
+                "shippedDate": "field"
+              },
+              {
+                "deliveredDate": "field"
+              },
+              {
+                "notes": "field"
+              },
+              {
+                "customer": "field"
+              },
+              {
+                "payment.transactionId": "field"
+              }
             ]
           },
           {
             "user_role": "analyst",
             "patterns": [
-              "_id",
-              "orderNumber",
-              "customerId",
-              "items",
-              "payment.method",
-              "payment.status",
-              "payment.amount",
-              "subtotal",
-              "tax",
-              "shipping",
-              "discount",
-              "totalAmount",
-              "currency",
-              "status",
-              "orderDate",
-              "shippedDate",
-              "deliveredDate",
-              "customer._id",
-              "customer.name",
-              "customer.profile.country",
-              "shippingAddress",
-              "billingAddress",
-              "payment.transactionId",
-              "notes"
+              {
+                "_id": "field"
+              },
+              {
+                "orderNumber": "field"
+              },
+              {
+                "customerId": "field"
+              },
+              {
+                "items": "field"
+              },
+              {
+                "payment.method": "field"
+              },
+              {
+                "payment.status": "field"
+              },
+              {
+                "payment.amount": "field"
+              },
+              {
+                "subtotal": "field"
+              },
+              {
+                "tax": "field"
+              },
+              {
+                "shipping": "field"
+              },
+              {
+                "discount": "field"
+              },
+              {
+                "totalAmount": "field"
+              },
+              {
+                "currency": "field"
+              },
+              {
+                "status": "field"
+              },
+              {
+                "orderDate": "field"
+              },
+              {
+                "shippedDate": "field"
+              },
+              {
+                "deliveredDate": "field"
+              },
+              {
+                "customer._id": "field"
+              },
+              {
+                "customer.name": "field"
+              },
+              {
+                "customer.profile.country": "field"
+              },
+              {
+                "shippingAddress": "field"
+              },
+              {
+                "billingAddress": "field"
+              },
+              {
+                "payment.transactionId": "field"
+              },
+              {
+                "notes": "field"
+              }
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ],
@@ -320,9 +560,15 @@
           {
             "user_role": "user",
             "patterns": [
-              "shippingAddress",
-              "billingAddress",
-              "notes"
+              {
+                "shippingAddress": "field"
+              },
+              {
+                "billingAddress": "field"
+              },
+              {
+                "notes": "field"
+              }
             ]
           },
           {
@@ -332,13 +578,17 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ],
@@ -358,7 +608,9 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
@@ -375,56 +627,116 @@
           {
             "user_role": "default",
             "patterns": [
-              "_id",
-              "name",
-              "slug",
-              "description",
-              "parentId",
-              "image",
-              "sortOrder",
-              "featured",
-              "status",
-              "parent",
-              "children",
-              "products"
+              {
+                "_id": "field"
+              },
+              {
+                "name": "field"
+              },
+              {
+                "slug": "field"
+              },
+              {
+                "description": "field"
+              },
+              {
+                "parentId": "field"
+              },
+              {
+                "image": "field"
+              },
+              {
+                "sortOrder": "field"
+              },
+              {
+                "featured": "field"
+              },
+              {
+                "status": "field"
+              },
+              {
+                "parent": "field"
+              },
+              {
+                "children": "field"
+              },
+              {
+                "products": "field"
+              }
             ]
           },
           {
             "user_role": "user",
             "patterns": [
-              "_id",
-              "name",
-              "slug",
-              "description",
-              "parentId",
-              "image",
-              "sortOrder",
-              "featured",
-              "status",
-              "seo",
-              "createdAt",
-              "updatedAt",
-              "parent",
-              "children",
-              "products"
+              {
+                "_id": "field"
+              },
+              {
+                "name": "field"
+              },
+              {
+                "slug": "field"
+              },
+              {
+                "description": "field"
+              },
+              {
+                "parentId": "field"
+              },
+              {
+                "image": "field"
+              },
+              {
+                "sortOrder": "field"
+              },
+              {
+                "featured": "field"
+              },
+              {
+                "status": "field"
+              },
+              {
+                "seo": "field"
+              },
+              {
+                "createdAt": "field"
+              },
+              {
+                "updatedAt": "field"
+              },
+              {
+                "parent": "field"
+              },
+              {
+                "children": "field"
+              },
+              {
+                "products": "field"
+              }
             ]
           },
           {
             "user_role": "analyst",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ],
@@ -444,13 +756,17 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ],
@@ -470,7 +786,9 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
@@ -487,68 +805,152 @@
           {
             "user_role": "default",
             "patterns": [
-              "_id",
-              "productId",
-              "rating",
-              "content",
-              "helpful",
-              "images",
-              "createdAt",
-              "product.name",
-              "user.name",
-              "user.profile.avatar"
+              {
+                "_id": "field"
+              },
+              {
+                "productId": "field"
+              },
+              {
+                "rating": "field"
+              },
+              {
+                "content": "field"
+              },
+              {
+                "helpful": "field"
+              },
+              {
+                "images": "field"
+              },
+              {
+                "createdAt": "field"
+              },
+              {
+                "product.name": "field"
+              },
+              {
+                "user.name": "field"
+              },
+              {
+                "user.profile.avatar": "field"
+              }
             ]
           },
           {
             "user_role": "user",
             "patterns": [
-              "_id",
-              "productId",
-              "userId",
-              "rating",
-              "title",
-              "content",
-              "verified",
-              "helpful",
-              "status",
-              "images",
-              "createdAt",
-              "updatedAt",
-              "product",
-              "user"
+              {
+                "_id": "field"
+              },
+              {
+                "productId": "field"
+              },
+              {
+                "userId": "field"
+              },
+              {
+                "rating": "field"
+              },
+              {
+                "title": "field"
+              },
+              {
+                "content": "field"
+              },
+              {
+                "verified": "field"
+              },
+              {
+                "helpful": "field"
+              },
+              {
+                "status": "field"
+              },
+              {
+                "images": "field"
+              },
+              {
+                "createdAt": "field"
+              },
+              {
+                "updatedAt": "field"
+              },
+              {
+                "product": "field"
+              },
+              {
+                "user": "field"
+              }
             ]
           },
           {
             "user_role": "analyst",
             "patterns": [
-              "_id",
-              "productId",
-              "userId",
-              "rating",
-              "title",
-              "content",
-              "verified",
-              "helpful",
-              "status",
-              "createdAt",
-              "updatedAt",
-              "product._id",
-              "product.name",
-              "product.sku",
-              "user._id",
-              "user.name"
+              {
+                "_id": "field"
+              },
+              {
+                "productId": "field"
+              },
+              {
+                "userId": "field"
+              },
+              {
+                "rating": "field"
+              },
+              {
+                "title": "field"
+              },
+              {
+                "content": "field"
+              },
+              {
+                "verified": "field"
+              },
+              {
+                "helpful": "field"
+              },
+              {
+                "status": "field"
+              },
+              {
+                "createdAt": "field"
+              },
+              {
+                "updatedAt": "field"
+              },
+              {
+                "product._id": "field"
+              },
+              {
+                "product.name": "field"
+              },
+              {
+                "product.sku": "field"
+              },
+              {
+                "user._id": "field"
+              },
+              {
+                "user.name": "field"
+              }
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ],
@@ -560,34 +962,60 @@
           {
             "user_role": "user",
             "patterns": [
-              "productId",
-              "rating",
-              "title",
-              "content",
-              "images",
-              "userId",
-              "verified",
-              "helpful",
-              "status"
+              {
+                "productId": "field"
+              },
+              {
+                "rating": "field"
+              },
+              {
+                "title": "field"
+              },
+              {
+                "content": "field"
+              },
+              {
+                "images": "field"
+              },
+              {
+                "userId": "field"
+              },
+              {
+                "verified": "field"
+              },
+              {
+                "helpful": "field"
+              },
+              {
+                "status": "field"
+              }
             ]
           },
           {
             "user_role": "analyst",
             "patterns": [
-              "status",
-              "helpful"
+              {
+                "status": "field"
+              },
+              {
+                "helpful": "field"
+              }
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ],
@@ -599,7 +1027,9 @@
           {
             "user_role": "user",
             "patterns": [
-              "reviews"
+              {
+                "reviews": "field"
+              }
             ]
           },
           {
@@ -609,13 +1039,17 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ]
@@ -628,44 +1062,80 @@
           {
             "user_role": "default",
             "patterns": [
-              "_id",
-              "productId",
-              "categoryId",
-              "isPrimary",
-              "sortOrder",
-              "product",
-              "category"
+              {
+                "_id": "field"
+              },
+              {
+                "productId": "field"
+              },
+              {
+                "categoryId": "field"
+              },
+              {
+                "isPrimary": "field"
+              },
+              {
+                "sortOrder": "field"
+              },
+              {
+                "product": "field"
+              },
+              {
+                "category": "field"
+              }
             ]
           },
           {
             "user_role": "user",
             "patterns": [
-              "_id",
-              "productId",
-              "categoryId",
-              "isPrimary",
-              "sortOrder",
-              "createdAt",
-              "product",
-              "category"
+              {
+                "_id": "field"
+              },
+              {
+                "productId": "field"
+              },
+              {
+                "categoryId": "field"
+              },
+              {
+                "isPrimary": "field"
+              },
+              {
+                "sortOrder": "field"
+              },
+              {
+                "createdAt": "field"
+              },
+              {
+                "product": "field"
+              },
+              {
+                "category": "field"
+              }
             ]
           },
           {
             "user_role": "analyst",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ],
@@ -685,13 +1155,17 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ],
@@ -711,13 +1185,17 @@
           {
             "user_role": "admin",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           },
           {
             "user_role": "dev",
             "patterns": [
-              "*"
+              {
+                "*": "field"
+              }
             ]
           }
         ]
@@ -731,7 +1209,13 @@
     },
     "permission_inheritance": {
       "enabled": true,
-      "hierarchy": ["default", "user", "analyst", "admin", "dev"]
+      "hierarchy": [
+        "default",
+        "user",
+        "analyst",
+        "admin",
+        "dev"
+      ]
     },
     "dynamic_permissions": {
       "enabled": true,
