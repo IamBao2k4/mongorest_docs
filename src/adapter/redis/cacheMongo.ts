@@ -91,7 +91,7 @@ export class CachedMongoDBAdapter implements IDatabaseAdapter {
     }
   }
 
-  async find(collection: string, options: QueryOptions, jwt: string): Promise<QueryResult> {
+  async find(collection: string, options: QueryOptions): Promise<QueryResult> {
     // Try cache first if enabled
     if (this.isCacheEnabled()) {
       const cacheKey = {
@@ -111,7 +111,7 @@ export class CachedMongoDBAdapter implements IDatabaseAdapter {
     }
 
     // Get from MongoDB
-    const result = await this.mongoAdapter.find(collection, options, jwt);
+    const result = await this.mongoAdapter.find(collection, options);
 
     // Cache the result if enabled
     if (this.isCacheEnabled()) {
@@ -214,7 +214,7 @@ export class CachedMongoDBAdapter implements IDatabaseAdapter {
     
     const warmupPromises = commonQueries.map(async (query) => {
       try {
-        await this.find(collection, query, jwt);
+        await this.find(collection, query);
         console.log(`Warmed up cache for query:`, query.filter);
       } catch (error) {
         console.error(`Failed to warm up cache for query:`, query.filter, error);

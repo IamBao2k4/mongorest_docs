@@ -11,31 +11,31 @@
             "user_role": "default",
             "patterns": [
               {
-                "sku": "field"
+                "sku": { "type": "field" }
               },
               {
-                "name": "field"
+                "name": { "type": "field" }
               },
               {
-                "description": "field"
+                "description": { "type": "field" }
               },
               {
-                "category": "field"
+                "category": { "type": "field" }
               },
               {
-                "subcategory": "field"
+                "subcategory": { "type": "field" }
               },
               {
-                "price": "field"
+                "price": { "type": "field" }
               },
               {
-                "currency": "field"
+                "currency": { "type": "field" }
               },
               {
-                "ratings": "field"
+                "ratings": { "type": "field" }
               },
               {
-                "status": "field"
+                "status": { "type": "field" }
               }
             ]
           },
@@ -43,49 +43,49 @@
             "user_role": "user",
             "patterns": [
               {
-                "_id": "field"
+                "_id": { "type": "field" }
               },
               {
-                "sku": "field"
+                "sku": { "type": "field" }
               },
               {
-                "name": "field"
+                "name": { "type": "field" }
               },
               {
-                "description": "field"
+                "description": { "type": "field" }
               },
               {
-                "category": "field"
+                "category": { "type": "field" }
               },
               {
-                "subcategory": "field"
+                "subcategory": { "type": "field" }
               },
               {
-                "price": "field"
+                "price": { "type": "field" }
               },
               {
-                "currency": "field"
+                "currency": { "type": "field" }
               },
               {
-                "inventory.quantity": "field"
+                "inventory.quantity": { "type": "field" }
               },
               {
-                "images": "field"
+                "images": { "type": "field" }
               },
               {
-                "tags": "field"
+                "tags": { "type": "field" }
               },
               {
-                "specifications": "field"
+                "specifications": { "type": "field" }
               },
               {
-                "ratings": "field"
+                "ratings": { "type": "field" }
               },
               {
-                "status": "field"
+                "status": { "type": "field" }
               },
               {
-                "createdAt": "field"
+                "createdAt": { "type": "field" }
               }
             ]
           },
@@ -93,40 +93,40 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "_id": "field"
+                "_id": { "type": "field" }
               },
               {
-                "sku": "field"
+                "sku": { "type": "field" }
               },
               {
-                "name": "field"
+                "name": { "type": "field" }
               },
               {
-                "category": "field"
+                "category": { "type": "field" }
               },
               {
-                "subcategory": "field"
+                "subcategory": { "type": "field" }
               },
               {
-                "price": "field"
+                "price": { "type": "field" }
               },
               {
-                "currency": "field"
+                "currency": { "type": "field" }
               },
               {
-                "inventory": "field"
+                "inventory": { "type": "field" }
               },
               {
-                "ratings": "field"
+                "ratings": { "type": "field" }
               },
               {
-                "status": "field"
+                "status": { "type": "field" }
               },
               {
-                "createdAt": "field"
+                "createdAt": { "type": "field" }
               },
               {
-                "updatedAt": "field"
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -134,7 +134,52 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "sku": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "description": { "type": "field" }
+              },
+              {
+                "category": { "type": "field" }
+              },
+              {
+                "subcategory": { "type": "field" }
+              },
+              {
+                "price": { "type": "field" }
+              },
+              {
+                "currency": { "type": "field" }
+              },
+              {
+                "inventory": { "type": "field" }
+              },
+              {
+                "images": { "type": "field" }
+              },
+              {
+                "tags": { "type": "field" }
+              },
+              {
+                "specifications": { "type": "field" }
+              },
+              {
+                "ratings": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -142,7 +187,52 @@
             "user_role": "dev",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "sku": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "description": { "type": "field" }
+              },
+              {
+                "category": { "type": "field" }
+              },
+              {
+                "subcategory": { "type": "field" }
+              },
+              {
+                "price": { "type": "field" }
+              },
+              {
+                "currency": { "type": "field" }
+              },
+              {
+                "inventory": { "type": "field" }
+              },
+              {
+                "images": { "type": "field" }
+              },
+              {
+                "tags": { "type": "field" }
+              },
+              {
+                "specifications": { "type": "field" }
+              },
+              {
+                "ratings": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           }
@@ -160,7 +250,7 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "ratings": "field"
+                "ratings": { "type": "field" }
               }
             ]
           },
@@ -168,7 +258,52 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "sku": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "description": { "type": "field" }
+              },
+              {
+                "category": { "type": "field" }
+              },
+              {
+                "subcategory": { "type": "field" }
+              },
+              {
+                "price": { "type": "field" }
+              },
+              {
+                "currency": { "type": "field" }
+              },
+              {
+                "inventory": { "type": "field" }
+              },
+              {
+                "images": { "type": "field" }
+              },
+              {
+                "tags": { "type": "field" }
+              },
+              {
+                "specifications": { "type": "field" }
+              },
+              {
+                "ratings": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -176,7 +311,52 @@
             "user_role": "dev",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "sku": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "description": { "type": "field" }
+              },
+              {
+                "category": { "type": "field" }
+              },
+              {
+                "subcategory": { "type": "field" }
+              },
+              {
+                "price": { "type": "field" }
+              },
+              {
+                "currency": { "type": "field" }
+              },
+              {
+                "inventory": { "type": "field" }
+              },
+              {
+                "images": { "type": "field" }
+              },
+              {
+                "tags": { "type": "field" }
+              },
+              {
+                "specifications": { "type": "field" }
+              },
+              {
+                "ratings": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           }
@@ -198,7 +378,52 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "sku": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "description": { "type": "field" }
+              },
+              {
+                "category": { "type": "field" }
+              },
+              {
+                "subcategory": { "type": "field" }
+              },
+              {
+                "price": { "type": "field" }
+              },
+              {
+                "currency": { "type": "field" }
+              },
+              {
+                "inventory": { "type": "field" }
+              },
+              {
+                "images": { "type": "field" }
+              },
+              {
+                "tags": { "type": "field" }
+              },
+              {
+                "specifications": { "type": "field" }
+              },
+              {
+                "ratings": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -217,13 +442,13 @@
             "user_role": "default",
             "patterns": [
               {
-                "_id": "field"
+                "_id": { "type": "field" }
               },
               {
-                "name": "field"
+                "name": { "type": "field" }
               },
               {
-                "profile.avatar": "field"
+                "profile.avatar": { "type": "field" }
               }
             ]
           },
@@ -231,19 +456,19 @@
             "user_role": "user",
             "patterns": [
               {
-                "_id": "field"
+                "_id": { "type": "field" }
               },
               {
-                "email": "field"
+                "email": { "type": "field" }
               },
               {
-                "name": "field"
+                "name": { "type": "field" }
               },
               {
-                "profile": "field"
+                "profile": { "type": "field" }
               },
               {
-                "status": "field"
+                "status": { "type": "field" }
               }
             ]
           },
@@ -251,34 +476,34 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "_id": "field"
+                "_id": { "type": "field" }
               },
               {
-                "name": "field"
+                "name": { "type": "field" }
               },
               {
-                "profile.age": "field"
+                "profile.age": { "type": "field" }
               },
               {
-                "profile.country": "field"
+                "profile.country": { "type": "field" }
               },
               {
-                "profile.interests": "field"
+                "profile.interests": { "type": "field" }
               },
               {
-                "status": "field"
+                "status": { "type": "field" }
               },
               {
-                "lastLogin": "field"
+                "lastLogin": { "type": "field" }
               },
               {
-                "createdAt": "field"
+                "createdAt": { "type": "field" }
               },
               {
-                "email": "field"
+                "email": { "type": "field" }
               },
               {
-                "profile.avatar": "field"
+                "profile.avatar": { "type": "field" }
               }
             ]
           },
@@ -286,7 +511,28 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "email": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "profile": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "lastLogin": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -294,7 +540,28 @@
             "user_role": "dev",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "email": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "profile": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "lastLogin": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           }
@@ -308,25 +575,25 @@
             "user_role": "user",
             "patterns": [
               {
-                "name": "field"
+                "name": { "type": "field" }
               },
               {
-                "profile.age": "field"
+                "profile.age": { "type": "field" }
               },
               {
-                "profile.interests": "field"
+                "profile.interests": { "type": "field" }
               },
               {
-                "profile.avatar": "field"
+                "profile.avatar": { "type": "field" }
               },
               {
-                "email": "field"
+                "email": { "type": "field" }
               },
               {
-                "profile.country": "field"
+                "profile.country": { "type": "field" }
               },
               {
-                "status": "field"
+                "status": { "type": "field" }
               }
             ]
           },
@@ -338,7 +605,28 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "email": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "profile": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "lastLogin": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -346,7 +634,28 @@
             "user_role": "dev",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "email": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "profile": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "lastLogin": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           }
@@ -368,7 +677,28 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "email": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "profile": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "lastLogin": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -385,76 +715,62 @@
         "read": [
           {
             "user_role": "default",
-            "patterns": []
+            "patterns": [
+              {
+                "_id": { "type": "field" }
+              },
+              {
+                "orderNumber": { "type": "field" }
+              }
+            ]
           },
           {
             "user_role": "user",
             "patterns": [
               {
-                "_id": "field"
+                "customerId": { "type": "field" }
               },
               {
-                "orderNumber": "field"
+                "items": { "type": "field" }
               },
               {
-                "customerId": "field"
+                "shippingAddress": { "type": "field" }
               },
               {
-                "items": "field"
+                "billingAddress": { "type": "field" }
               },
               {
-                "shippingAddress": "field"
+                "payment.method": { "type": "field" }
               },
               {
-                "billingAddress": "field"
+                "payment.status": { "type": "field" }
               },
               {
-                "payment.method": "field"
+                "payment.amount": { "type": "field" }
               },
               {
-                "payment.status": "field"
+                "status": { "type": "field" }
               },
               {
-                "payment.amount": "field"
+                "orderDate": { "type": "field" }
               },
               {
-                "subtotal": "field"
+                "shippedDate": { "type": "field" }
               },
               {
-                "tax": "field"
+                "deliveredDate": { "type": "field" }
               },
               {
-                "shipping": "field"
+                "notes": { "type": "field" }
               },
               {
-                "discount": "field"
+                "customer": { 
+                  "type": "relation",
+                  "relate_collection": "users"
+                }
               },
               {
-                "totalAmount": "field"
-              },
-              {
-                "currency": "field"
-              },
-              {
-                "status": "field"
-              },
-              {
-                "orderDate": "field"
-              },
-              {
-                "shippedDate": "field"
-              },
-              {
-                "deliveredDate": "field"
-              },
-              {
-                "notes": "field"
-              },
-              {
-                "customer": "field"
-              },
-              {
-                "payment.transactionId": "field"
+                "payment.transactionId": { "type": "field" }
               }
             ]
           },
@@ -462,76 +778,76 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "_id": "field"
+                "_id": { "type": "field" }
               },
               {
-                "orderNumber": "field"
+                "orderNumber": { "type": "field" }
               },
               {
-                "customerId": "field"
+                "customerId": { "type": "field" }
               },
               {
-                "items": "field"
+                "items": { "type": "field" }
               },
               {
-                "payment.method": "field"
+                "payment.method": { "type": "field" }
               },
               {
-                "payment.status": "field"
+                "payment.status": { "type": "field" }
               },
               {
-                "payment.amount": "field"
+                "payment.amount": { "type": "field" }
               },
               {
-                "subtotal": "field"
+                "subtotal": { "type": "field" }
               },
               {
-                "tax": "field"
+                "tax": { "type": "field" }
               },
               {
-                "shipping": "field"
+                "shipping": { "type": "field" }
               },
               {
-                "discount": "field"
+                "discount": { "type": "field" }
               },
               {
-                "totalAmount": "field"
+                "totalAmount": { "type": "field" }
               },
               {
-                "currency": "field"
+                "currency": { "type": "field" }
               },
               {
-                "status": "field"
+                "status": { "type": "field" }
               },
               {
-                "orderDate": "field"
+                "orderDate": { "type": "field" }
               },
               {
-                "shippedDate": "field"
+                "shippedDate": { "type": "field" }
               },
               {
-                "deliveredDate": "field"
+                "deliveredDate": { "type": "field" }
               },
               {
-                "customer._id": "field"
+                "customer._id": { "type": "field" }
               },
               {
-                "customer.name": "field"
+                "customer.name": { "type": "field" }
               },
               {
-                "customer.profile.country": "field"
+                "customer.profile.country": { "type": "field" }
               },
               {
-                "shippingAddress": "field"
+                "shippingAddress": { "type": "field" }
               },
               {
-                "billingAddress": "field"
+                "billingAddress": { "type": "field" }
               },
               {
-                "payment.transactionId": "field"
+                "payment.transactionId": { "type": "field" }
               },
               {
-                "notes": "field"
+                "notes": { "type": "field" }
               }
             ]
           },
@@ -539,7 +855,64 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "orderNumber": { "type": "field" }
+              },
+              {
+                "customerId": { "type": "field" }
+              },
+              {
+                "items": { "type": "field" }
+              },
+              {
+                "shippingAddress": { "type": "field" }
+              },
+              {
+                "billingAddress": { "type": "field" }
+              },
+              {
+                "payment": { "type": "field" }
+              },
+              {
+                "subtotal": { "type": "field" }
+              },
+              {
+                "tax": { "type": "field" }
+              },
+              {
+                "shipping": { "type": "field" }
+              },
+              {
+                "discount": { "type": "field" }
+              },
+              {
+                "totalAmount": { "type": "field" }
+              },
+              {
+                "currency": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "orderDate": { "type": "field" }
+              },
+              {
+                "shippedDate": { "type": "field" }
+              },
+              {
+                "deliveredDate": { "type": "field" }
+              },
+              {
+                "notes": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -547,7 +920,64 @@
             "user_role": "dev",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "orderNumber": { "type": "field" }
+              },
+              {
+                "customerId": { "type": "field" }
+              },
+              {
+                "items": { "type": "field" }
+              },
+              {
+                "shippingAddress": { "type": "field" }
+              },
+              {
+                "billingAddress": { "type": "field" }
+              },
+              {
+                "payment": { "type": "field" }
+              },
+              {
+                "subtotal": { "type": "field" }
+              },
+              {
+                "tax": { "type": "field" }
+              },
+              {
+                "shipping": { "type": "field" }
+              },
+              {
+                "discount": { "type": "field" }
+              },
+              {
+                "totalAmount": { "type": "field" }
+              },
+              {
+                "currency": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "orderDate": { "type": "field" }
+              },
+              {
+                "shippedDate": { "type": "field" }
+              },
+              {
+                "deliveredDate": { "type": "field" }
+              },
+              {
+                "notes": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           }
@@ -561,13 +991,13 @@
             "user_role": "user",
             "patterns": [
               {
-                "shippingAddress": "field"
+                "shippingAddress": { "type": "field" }
               },
               {
-                "billingAddress": "field"
+                "billingAddress": { "type": "field" }
               },
               {
-                "notes": "field"
+                "notes": { "type": "field" }
               }
             ]
           },
@@ -579,7 +1009,64 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "orderNumber": { "type": "field" }
+              },
+              {
+                "customerId": { "type": "field" }
+              },
+              {
+                "items": { "type": "field" }
+              },
+              {
+                "shippingAddress": { "type": "field" }
+              },
+              {
+                "billingAddress": { "type": "field" }
+              },
+              {
+                "payment": { "type": "field" }
+              },
+              {
+                "subtotal": { "type": "field" }
+              },
+              {
+                "tax": { "type": "field" }
+              },
+              {
+                "shipping": { "type": "field" }
+              },
+              {
+                "discount": { "type": "field" }
+              },
+              {
+                "totalAmount": { "type": "field" }
+              },
+              {
+                "currency": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "orderDate": { "type": "field" }
+              },
+              {
+                "shippedDate": { "type": "field" }
+              },
+              {
+                "deliveredDate": { "type": "field" }
+              },
+              {
+                "notes": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -587,7 +1074,64 @@
             "user_role": "dev",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "orderNumber": { "type": "field" }
+              },
+              {
+                "customerId": { "type": "field" }
+              },
+              {
+                "items": { "type": "field" }
+              },
+              {
+                "shippingAddress": { "type": "field" }
+              },
+              {
+                "billingAddress": { "type": "field" }
+              },
+              {
+                "payment": { "type": "field" }
+              },
+              {
+                "subtotal": { "type": "field" }
+              },
+              {
+                "tax": { "type": "field" }
+              },
+              {
+                "shipping": { "type": "field" }
+              },
+              {
+                "discount": { "type": "field" }
+              },
+              {
+                "totalAmount": { "type": "field" }
+              },
+              {
+                "currency": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "orderDate": { "type": "field" }
+              },
+              {
+                "shippedDate": { "type": "field" }
+              },
+              {
+                "deliveredDate": { "type": "field" }
+              },
+              {
+                "notes": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           }
@@ -609,7 +1153,64 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "orderNumber": { "type": "field" }
+              },
+              {
+                "customerId": { "type": "field" }
+              },
+              {
+                "items": { "type": "field" }
+              },
+              {
+                "shippingAddress": { "type": "field" }
+              },
+              {
+                "billingAddress": { "type": "field" }
+              },
+              {
+                "payment": { "type": "field" }
+              },
+              {
+                "subtotal": { "type": "field" }
+              },
+              {
+                "tax": { "type": "field" }
+              },
+              {
+                "shipping": { "type": "field" }
+              },
+              {
+                "discount": { "type": "field" }
+              },
+              {
+                "totalAmount": { "type": "field" }
+              },
+              {
+                "currency": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "orderDate": { "type": "field" }
+              },
+              {
+                "shippedDate": { "type": "field" }
+              },
+              {
+                "deliveredDate": { "type": "field" }
+              },
+              {
+                "notes": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -628,40 +1229,49 @@
             "user_role": "default",
             "patterns": [
               {
-                "_id": "field"
+                "_id": { "type": "field" }
               },
               {
-                "name": "field"
+                "name": { "type": "field" }
               },
               {
-                "slug": "field"
+                "slug": { "type": "field" }
               },
               {
-                "description": "field"
+                "description": { "type": "field" }
               },
               {
-                "parentId": "field"
+                "parentId": { "type": "field" }
               },
               {
-                "image": "field"
+                "image": { "type": "field" }
               },
               {
-                "sortOrder": "field"
+                "sortOrder": { "type": "field" }
               },
               {
-                "featured": "field"
+                "featured": { "type": "field" }
               },
               {
-                "status": "field"
+                "status": { "type": "field" }
               },
               {
-                "parent": "field"
+                "parent": { 
+                  "type": "relation",
+                  "relate_collection": "categories"
+                }
               },
               {
-                "children": "field"
+                "children": { 
+                  "type": "relation",
+                  "relate_collection": "categories"
+                }
               },
               {
-                "products": "field"
+                "products": { 
+                  "type": "relation",
+                  "relate_collection": "products"
+                }
               }
             ]
           },
@@ -669,49 +1279,58 @@
             "user_role": "user",
             "patterns": [
               {
-                "_id": "field"
+                "_id": { "type": "field" }
               },
               {
-                "name": "field"
+                "name": { "type": "field" }
               },
               {
-                "slug": "field"
+                "slug": { "type": "field" }
               },
               {
-                "description": "field"
+                "description": { "type": "field" }
               },
               {
-                "parentId": "field"
+                "parentId": { "type": "field" }
               },
               {
-                "image": "field"
+                "image": { "type": "field" }
               },
               {
-                "sortOrder": "field"
+                "sortOrder": { "type": "field" }
               },
               {
-                "featured": "field"
+                "featured": { "type": "field" }
               },
               {
-                "status": "field"
+                "status": { "type": "field" }
               },
               {
-                "seo": "field"
+                "seo": { "type": "field" }
               },
               {
-                "createdAt": "field"
+                "createdAt": { "type": "field" }
               },
               {
-                "updatedAt": "field"
+                "updatedAt": { "type": "field" }
               },
               {
-                "parent": "field"
+                "parent": { 
+                  "type": "relation",
+                  "relate_collection": "categories"
+                }
               },
               {
-                "children": "field"
+                "children": { 
+                  "type": "relation",
+                  "relate_collection": "categories"
+                }
               },
               {
-                "products": "field"
+                "products": { 
+                  "type": "relation",
+                  "relate_collection": "products"
+                }
               }
             ]
           },
@@ -719,7 +1338,40 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "slug": { "type": "field" }
+              },
+              {
+                "description": { "type": "field" }
+              },
+              {
+                "parentId": { "type": "field" }
+              },
+              {
+                "image": { "type": "field" }
+              },
+              {
+                "sortOrder": { "type": "field" }
+              },
+              {
+                "featured": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "seo": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -727,7 +1379,40 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "slug": { "type": "field" }
+              },
+              {
+                "description": { "type": "field" }
+              },
+              {
+                "parentId": { "type": "field" }
+              },
+              {
+                "image": { "type": "field" }
+              },
+              {
+                "sortOrder": { "type": "field" }
+              },
+              {
+                "featured": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "seo": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -735,7 +1420,40 @@
             "user_role": "dev",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "slug": { "type": "field" }
+              },
+              {
+                "description": { "type": "field" }
+              },
+              {
+                "parentId": { "type": "field" }
+              },
+              {
+                "image": { "type": "field" }
+              },
+              {
+                "sortOrder": { "type": "field" }
+              },
+              {
+                "featured": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "seo": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           }
@@ -757,7 +1475,40 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "slug": { "type": "field" }
+              },
+              {
+                "description": { "type": "field" }
+              },
+              {
+                "parentId": { "type": "field" }
+              },
+              {
+                "image": { "type": "field" }
+              },
+              {
+                "sortOrder": { "type": "field" }
+              },
+              {
+                "featured": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "seo": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -765,7 +1516,40 @@
             "user_role": "dev",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "slug": { "type": "field" }
+              },
+              {
+                "description": { "type": "field" }
+              },
+              {
+                "parentId": { "type": "field" }
+              },
+              {
+                "image": { "type": "field" }
+              },
+              {
+                "sortOrder": { "type": "field" }
+              },
+              {
+                "featured": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "seo": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           }
@@ -787,7 +1571,40 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "slug": { "type": "field" }
+              },
+              {
+                "description": { "type": "field" }
+              },
+              {
+                "parentId": { "type": "field" }
+              },
+              {
+                "image": { "type": "field" }
+              },
+              {
+                "sortOrder": { "type": "field" }
+              },
+              {
+                "featured": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "seo": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -806,34 +1623,34 @@
             "user_role": "default",
             "patterns": [
               {
-                "_id": "field"
+                "_id": { "type": "field" }
               },
               {
-                "productId": "field"
+                "productId": { "type": "field" }
               },
               {
-                "rating": "field"
+                "rating": { "type": "field" }
               },
               {
-                "content": "field"
+                "content": { "type": "field" }
               },
               {
-                "helpful": "field"
+                "helpful": { "type": "field" }
               },
               {
-                "images": "field"
+                "images": { "type": "field" }
               },
               {
-                "createdAt": "field"
+                "createdAt": { "type": "field" }
               },
               {
-                "product.name": "field"
+                "product.name": { "type": "field" }
               },
               {
-                "user.name": "field"
+                "user.name": { "type": "field" }
               },
               {
-                "user.profile.avatar": "field"
+                "user.profile.avatar": { "type": "field" }
               }
             ]
           },
@@ -841,46 +1658,52 @@
             "user_role": "user",
             "patterns": [
               {
-                "_id": "field"
+                "_id": { "type": "field" }
               },
               {
-                "productId": "field"
+                "productId": { "type": "field" }
               },
               {
-                "userId": "field"
+                "userId": { "type": "field" }
               },
               {
-                "rating": "field"
+                "rating": { "type": "field" }
               },
               {
-                "title": "field"
+                "title": { "type": "field" }
               },
               {
-                "content": "field"
+                "content": { "type": "field" }
               },
               {
-                "verified": "field"
+                "verified": { "type": "field" }
               },
               {
-                "helpful": "field"
+                "helpful": { "type": "field" }
               },
               {
-                "status": "field"
+                "status": { "type": "field" }
               },
               {
-                "images": "field"
+                "images": { "type": "field" }
               },
               {
-                "createdAt": "field"
+                "createdAt": { "type": "field" }
               },
               {
-                "updatedAt": "field"
+                "updatedAt": { "type": "field" }
               },
               {
-                "product": "field"
+                "product": { 
+                  "type": "relation",
+                  "relate_collection": "products"
+                }
               },
               {
-                "user": "field"
+                "user": { 
+                  "type": "relation",
+                  "relate_collection": "users"
+                }
               }
             ]
           },
@@ -888,52 +1711,52 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "_id": "field"
+                "_id": { "type": "field" }
               },
               {
-                "productId": "field"
+                "productId": { "type": "field" }
               },
               {
-                "userId": "field"
+                "userId": { "type": "field" }
               },
               {
-                "rating": "field"
+                "rating": { "type": "field" }
               },
               {
-                "title": "field"
+                "title": { "type": "field" }
               },
               {
-                "content": "field"
+                "content": { "type": "field" }
               },
               {
-                "verified": "field"
+                "verified": { "type": "field" }
               },
               {
-                "helpful": "field"
+                "helpful": { "type": "field" }
               },
               {
-                "status": "field"
+                "status": { "type": "field" }
               },
               {
-                "createdAt": "field"
+                "createdAt": { "type": "field" }
               },
               {
-                "updatedAt": "field"
+                "updatedAt": { "type": "field" }
               },
               {
-                "product._id": "field"
+                "product._id": { "type": "field" }
               },
               {
-                "product.name": "field"
+                "product.name": { "type": "field" }
               },
               {
-                "product.sku": "field"
+                "product.sku": { "type": "field" }
               },
               {
-                "user._id": "field"
+                "user._id": { "type": "field" }
               },
               {
-                "user.name": "field"
+                "user.name": { "type": "field" }
               }
             ]
           },
@@ -941,7 +1764,40 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "productId": { "type": "field" }
+              },
+              {
+                "userId": { "type": "field" }
+              },
+              {
+                "rating": { "type": "field" }
+              },
+              {
+                "title": { "type": "field" }
+              },
+              {
+                "content": { "type": "field" }
+              },
+              {
+                "verified": { "type": "field" }
+              },
+              {
+                "helpful": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "images": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -949,7 +1805,40 @@
             "user_role": "dev",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "productId": { "type": "field" }
+              },
+              {
+                "userId": { "type": "field" }
+              },
+              {
+                "rating": { "type": "field" }
+              },
+              {
+                "title": { "type": "field" }
+              },
+              {
+                "content": { "type": "field" }
+              },
+              {
+                "verified": { "type": "field" }
+              },
+              {
+                "helpful": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "images": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           }
@@ -963,31 +1852,31 @@
             "user_role": "user",
             "patterns": [
               {
-                "productId": "field"
+                "productId": { "type": "field" }
               },
               {
-                "rating": "field"
+                "rating": { "type": "field" }
               },
               {
-                "title": "field"
+                "title": { "type": "field" }
               },
               {
-                "content": "field"
+                "content": { "type": "field" }
               },
               {
-                "images": "field"
+                "images": { "type": "field" }
               },
               {
-                "userId": "field"
+                "userId": { "type": "field" }
               },
               {
-                "verified": "field"
+                "verified": { "type": "field" }
               },
               {
-                "helpful": "field"
+                "helpful": { "type": "field" }
               },
               {
-                "status": "field"
+                "status": { "type": "field" }
               }
             ]
           },
@@ -995,10 +1884,10 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "status": "field"
+                "status": { "type": "field" }
               },
               {
-                "helpful": "field"
+                "helpful": { "type": "field" }
               }
             ]
           },
@@ -1006,7 +1895,40 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "productId": { "type": "field" }
+              },
+              {
+                "userId": { "type": "field" }
+              },
+              {
+                "rating": { "type": "field" }
+              },
+              {
+                "title": { "type": "field" }
+              },
+              {
+                "content": { "type": "field" }
+              },
+              {
+                "verified": { "type": "field" }
+              },
+              {
+                "helpful": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "images": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
@@ -1014,7 +1936,40 @@
             "user_role": "dev",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "productId": { "type": "field" }
+              },
+              {
+                "userId": { "type": "field" }
+              },
+              {
+                "rating": { "type": "field" }
+              },
+              {
+                "title": { "type": "field" }
+              },
+              {
+                "content": { "type": "field" }
+              },
+              {
+                "verified": { "type": "field" }
+              },
+              {
+                "helpful": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "images": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           }
@@ -1028,7 +1983,7 @@
             "user_role": "user",
             "patterns": [
               {
-                "reviews": "field"
+                "reviews": { "type": "field" }
               }
             ]
           },
@@ -1040,17 +1995,46 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "productId": { "type": "field" }
+              },
+              {
+                "userId": { "type": "field" }
+              },
+              {
+                "rating": { "type": "field" }
+              },
+              {
+                "title": { "type": "field" }
+              },
+              {
+                "content": { "type": "field" }
+              },
+              {
+                "verified": { "type": "field" }
+              },
+              {
+                "helpful": { "type": "field" }
+              },
+              {
+                "status": { "type": "field" }
+              },
+              {
+                "images": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
+              },
+              {
+                "updatedAt": { "type": "field" }
               }
             ]
           },
           {
             "user_role": "dev",
-            "patterns": [
-              {
-                "*": "field"
-              }
-            ]
+            "patterns": []
           }
         ]
       }
@@ -1063,25 +2047,31 @@
             "user_role": "default",
             "patterns": [
               {
-                "_id": "field"
+                "_id": { "type": "field" }
               },
               {
-                "productId": "field"
+                "productId": { "type": "field" }
               },
               {
-                "categoryId": "field"
+                "categoryId": { "type": "field" }
               },
               {
-                "isPrimary": "field"
+                "isPrimary": { "type": "field" }
               },
               {
-                "sortOrder": "field"
+                "sortOrder": { "type": "field" }
               },
               {
-                "product": "field"
+                "product": { 
+                  "type": "relation",
+                  "relate_collection": "products"
+                }
               },
               {
-                "category": "field"
+                "category": { 
+                  "type": "relation",
+                  "relate_collection": "categories"
+                }
               }
             ]
           },
@@ -1089,28 +2079,34 @@
             "user_role": "user",
             "patterns": [
               {
-                "_id": "field"
+                "_id": { "type": "field" }
               },
               {
-                "productId": "field"
+                "productId": { "type": "field" }
               },
               {
-                "categoryId": "field"
+                "categoryId": { "type": "field" }
               },
               {
-                "isPrimary": "field"
+                "isPrimary": { "type": "field" }
               },
               {
-                "sortOrder": "field"
+                "sortOrder": { "type": "field" }
               },
               {
-                "createdAt": "field"
+                "createdAt": { "type": "field" }
               },
               {
-                "product": "field"
+                "product": { 
+                  "type": "relation",
+                  "relate_collection": "products"
+                }
               },
               {
-                "category": "field"
+                "category": { 
+                  "type": "relation",
+                  "relate_collection": "categories"
+                }
               }
             ]
           },
@@ -1118,7 +2114,22 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "productId": { "type": "field" }
+              },
+              {
+                "categoryId": { "type": "field" }
+              },
+              {
+                "isPrimary": { "type": "field" }
+              },
+              {
+                "sortOrder": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
               }
             ]
           },
@@ -1126,7 +2137,22 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "productId": { "type": "field" }
+              },
+              {
+                "categoryId": { "type": "field" }
+              },
+              {
+                "isPrimary": { "type": "field" }
+              },
+              {
+                "sortOrder": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
               }
             ]
           },
@@ -1134,7 +2160,22 @@
             "user_role": "dev",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "productId": { "type": "field" }
+              },
+              {
+                "categoryId": { "type": "field" }
+              },
+              {
+                "isPrimary": { "type": "field" }
+              },
+              {
+                "sortOrder": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
               }
             ]
           }
@@ -1156,7 +2197,22 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "productId": { "type": "field" }
+              },
+              {
+                "categoryId": { "type": "field" }
+              },
+              {
+                "isPrimary": { "type": "field" }
+              },
+              {
+                "sortOrder": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
               }
             ]
           },
@@ -1164,7 +2220,22 @@
             "user_role": "dev",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "productId": { "type": "field" }
+              },
+              {
+                "categoryId": { "type": "field" }
+              },
+              {
+                "isPrimary": { "type": "field" }
+              },
+              {
+                "sortOrder": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
               }
             ]
           }
@@ -1186,41 +2257,31 @@
             "user_role": "admin",
             "patterns": [
               {
-                "*": "field"
+                "_id": { "type": "field" }
+              },
+              {
+                "productId": { "type": "field" }
+              },
+              {
+                "categoryId": { "type": "field" }
+              },
+              {
+                "isPrimary": { "type": "field" }
+              },
+              {
+                "sortOrder": { "type": "field" }
+              },
+              {
+                "createdAt": { "type": "field" }
               }
             ]
           },
           {
             "user_role": "dev",
-            "patterns": [
-              {
-                "*": "field"
-              }
-            ]
+            "patterns": []
           }
         ]
       }
     }
-  ],
-  "rbac_features": {
-    "pattern_syntax": {
-      "field": "field",
-      "all_fields": "*"
-    },
-    "permission_inheritance": {
-      "enabled": true,
-      "hierarchy": [
-        "default",
-        "user",
-        "analyst",
-        "admin",
-        "dev"
-      ]
-    },
-    "dynamic_permissions": {
-      "enabled": true,
-      "context_aware": true,
-      "runtime_evaluation": true
-    }
-  }
+  ]
 }

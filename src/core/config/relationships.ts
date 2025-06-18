@@ -12,8 +12,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   // ===== USER RELATIONSHIPS =====
   
   // Users -> Orders (1:many)
-  registry.registerFromDefinition('look_users', {
-    name: 'look_orders',
+  registry.registerFromDefinition('users', {
+    name: 'orders',
     targetTable: 'orders',
     localField: '_id',
     foreignField: 'customerId',
@@ -21,8 +21,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   });
 
   // Users -> Reviews (1:many)
-  registry.registerFromDefinition('look_users', {
-    name: 'look_product_reviews',
+  registry.registerFromDefinition('users', {
+    name: 'product_reviews',
     targetTable: 'product_reviews',
     localField: '_id',
     foreignField: 'userId',
@@ -32,7 +32,7 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   // ===== CATEGORY RELATIONSHIPS =====
   
   // Categories -> Parent Category (many:1) - Self-referencing
-  registry.registerFromDefinition('look_categories', {
+  registry.registerFromDefinition('categories', {
     name: 'parent',
     targetTable: 'categories',
     localField: 'parentId',
@@ -41,7 +41,7 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   });
 
   // Categories -> Child Categories (1:many) - Self-referencing
-  registry.registerFromDefinition('look_categories', {
+  registry.registerFromDefinition('categories', {
     name: 'children',
     targetTable: 'categories',
     localField: '_id',
@@ -50,8 +50,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   });
 
   // Categories -> Products (many:many) via junction table
-  registry.registerFromDefinition('look_categories', {
-    name: 'look_products',
+  registry.registerFromDefinition('categories', {
+    name: 'products',
     targetTable: 'products',
     localField: '_id',
     foreignField: '_id',
@@ -64,8 +64,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   });
 
   // Categories -> Primary Products (1:many) - Direct relationship
-  registry.registerFromDefinition('look_categories', {
-    name: 'look_products',
+  registry.registerFromDefinition('categories', {
+    name: 'products',
     targetTable: 'products',
     localField: '_id',
     foreignField: 'primaryCategoryId',
@@ -75,8 +75,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   // ===== PRODUCT RELATIONSHIPS =====
   
   // Products -> Primary Category (many:1)
-  registry.registerFromDefinition('look_products', {
-    name: 'look_category',
+  registry.registerFromDefinition('products', {
+    name: 'category',
     targetTable: 'categories',
     localField: 'primaryCategoryId',
     foreignField: '_id',
@@ -84,8 +84,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   });
 
   // Products -> Categories (many:many) via junction table
-  registry.registerFromDefinition('look_products', {
-    name: 'look_categories',
+  registry.registerFromDefinition('products', {
+    name: 'categories',
     targetTable: 'categories',
     localField: '_id',
     foreignField: '_id',
@@ -98,8 +98,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   });
 
   // Products -> Reviews (1:many)
-  registry.registerFromDefinition('look_products', {
-    name: 'look_product_reviews',
+  registry.registerFromDefinition('products', {
+    name: 'product_reviews',
     targetTable: 'product_reviews',
     localField: '_id',
     foreignField: 'productId',
@@ -109,8 +109,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   // ===== ORDER RELATIONSHIPS =====
   
   // Orders -> Customer/User (many:1)
-  registry.registerFromDefinition('look_orders', {
-    name: 'look_users',
+  registry.registerFromDefinition('orders', {
+    name: 'users',
     targetTable: 'users',
     localField: 'customerId',
     foreignField: '_id',
@@ -120,8 +120,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   // ===== REVIEW RELATIONSHIPS =====
   
   // Reviews -> Product (many:1)
-  registry.registerFromDefinition('look_product_reviews', {
-    name: 'look_products',
+  registry.registerFromDefinition('product_reviews', {
+    name: 'products',
     targetTable: 'products',
     localField: 'productId',
     foreignField: '_id',
@@ -129,8 +129,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   });
 
   // Reviews -> User (many:1)
-  registry.registerFromDefinition('look_product_reviews', {
-    name: 'look_users',
+  registry.registerFromDefinition('product_reviews', {
+    name: 'users',
     targetTable: 'users',
     localField: 'userId',
     foreignField: '_id',
@@ -140,8 +140,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   // ===== JUNCTION TABLE RELATIONSHIPS =====
   
   // Product_Categories -> Product (many:1)
-  registry.registerFromDefinition('look_categories', {
-    name: 'look_products',
+  registry.registerFromDefinition('categories', {
+    name: 'products',
     targetTable: 'products',
     localField: 'productId',
     foreignField: '_id',
@@ -149,8 +149,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   });
 
   // Product_Categories -> Category (many:1)
-  registry.registerFromDefinition('look_categories', {
-    name: 'look_categories',
+  registry.registerFromDefinition('categories', {
+    name: 'categories',
     targetTable: 'categories',
     localField: 'categoryId',
     foreignField: '_id',
@@ -168,7 +168,7 @@ export function setupBasicRelationships(): RelationshipRegistry {
   
   // Users -> Orders (1:many)
   registry.registerFromDefinition('users', {
-    name: 'look_orders',
+    name: 'orders',
     targetTable: 'orders',
     localField: '_id',
     foreignField: 'customerId',
@@ -177,7 +177,7 @@ export function setupBasicRelationships(): RelationshipRegistry {
 
   // Orders -> Customer (many:1)
   registry.registerFromDefinition('orders', {
-    name: 'look_users',
+    name: 'users',
     targetTable: 'users',
     localField: 'customerId',
     foreignField: '_id',
@@ -186,7 +186,7 @@ export function setupBasicRelationships(): RelationshipRegistry {
 
   // Products -> Reviews (1:many)
   registry.registerFromDefinition('products', {
-    name: 'look_product_reviews',
+    name: 'product_reviews',
     targetTable: 'product_reviews',
     localField: '_id',
     foreignField: 'productId',
@@ -195,7 +195,7 @@ export function setupBasicRelationships(): RelationshipRegistry {
 
   // Categories -> Products (many:many)
   registry.registerFromDefinition('categories', {
-    name: 'look_products',
+    name: 'products',
     targetTable: 'products',
     localField: '_id',
     foreignField: '_id',

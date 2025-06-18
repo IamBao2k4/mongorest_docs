@@ -54,7 +54,7 @@ export interface IDatabaseAdapter {
   isConnected(): boolean;
 
   // Query methods 
-  find(collection: string, options: QueryOptions, jwt: string): Promise<QueryResult>;
+  find(collection: string, options: QueryOptions): Promise<QueryResult>;
   
   // Insert methods
   insertOne(collection: string, document: any): Promise<SingleInsertResult>;

@@ -5,17 +5,20 @@ import { FilterParser } from "../parsers/filterParser";
 import { LogicalParser } from "../parsers/logicalParser";
 import { OrderParser } from "../parsers/orderParser";
 import { ModularSelectParser, RelationshipRegistry } from "../parsers/selectParser";
+import { RbacValidator } from "../rbac/rbac-validator";
+import { Core } from "./mainCore";
 
 /**
  * Fixed version of your converter - minimal changes
  */
-export class PostgRESTToMongoConverter {
+export class MongoRest extends Core {
   private filterParser: FilterParser;
   private logicalParser: LogicalParser;
   private selectParser: ModularSelectParser; // ✅ Fixed naming
   private orderParser: OrderParser;
 
-  constructor(registry?: RelationshipRegistry) { // ✅ Added registry parameter
+  constructor(registry?: RelationshipRegistry) {
+    super(); // ✅ Added registry parameter
     this.filterParser = new FilterParser();
     this.logicalParser = new LogicalParser();
     this.selectParser = new ModularSelectParser(registry || new RelationshipRegistry()); // ✅ Fixed constructor
@@ -25,9 +28,14 @@ export class PostgRESTToMongoConverter {
   /**
    * Convert PostgREST query parameters to MongoDB query
    */
-  convert(params: QueryParams, collection?: string): MongoQuery {
+  convert(params: QueryParams, collection: string, roles: string[]): MongoQuery {
+    if (!this.rbacValidator.hasAccess(collection, 'read', roles)) {
+      throw new Error(`User does not have access to read on collection ${collection}`);
+    }
+
     const result: MongoQuery = {
-      filter: {}
+      filter: {},
+      projection: {},
     };
 
     const filterConditions: Record<string, any>[] = [];
@@ -83,6 +91,18 @@ export class PostgRESTToMongoConverter {
     } else if (filterConditions.length > 1) {
       result.filter = { $and: filterConditions };
     }
+
+    console.log('collection', collection);
+
+    RbacValidator.getRbacFeatures(
+      collection,
+      'read',
+      roles,
+    ).forEach((f : string) => {
+      result.projection![f] = 1;
+    })
+    
+    console.log('result.projection', result.projection);
     return result;
   }
 

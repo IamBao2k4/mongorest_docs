@@ -3,7 +3,8 @@
 import fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { IDatabaseAdapter } from "../../adapter/mongodb/types";
 import { CachedMongoDBAdapter } from "../../adapter/redis/cacheMongo";
-import { PostgRESTToMongoConverter } from "../../core/main/mongorest";
+import { Core } from "../../core/main/mainCore";
+import { MongoRest } from "../../core/main/mongorest";
 import { CacheRoutes } from "./cache";
 import { SwaggerGenerator } from "./swagger";
 import setupEcommerceRelationships from "../../core/config/relationships";
@@ -29,7 +30,7 @@ interface BulkParams extends RouteParams {
 export class FastifyServer {
   private server: FastifyInstance;
   private dbAdapter: IDatabaseAdapter;
-  private converter: PostgRESTToMongoConverter;
+  private converter: Core;
   private config: FastifyServerConfig;
   private cacheRoutes: CacheRoutes | null = null;
   private swaggerGenerator: SwaggerGenerator;
@@ -45,7 +46,7 @@ export class FastifyServer {
 
     // Setup relationships and converter
     const registry = setupEcommerceRelationships();
-    this.converter = new PostgRESTToMongoConverter(registry);
+    this.converter = new MongoRest(registry);
 
     // Initialize Swagger generator
     this.swaggerGenerator = new SwaggerGenerator();
@@ -163,10 +164,11 @@ export class FastifyServer {
 
   private convertPostgrestQuery(
     queryParams: Record<string, string>,
-    collection: string
+    collection: string,
+    roles: string[] = []
   ) {
     try {
-      const mongoQuery = this.converter.convert(queryParams, collection);
+      const mongoQuery = this.converter.convert(queryParams, collection, roles);
       console.log("Converted query:", JSON.stringify(mongoQuery));
       return mongoQuery;
     } catch (error: any) {
@@ -198,9 +200,14 @@ export class FastifyServer {
         return reply.code(400).send({ error: "Collection not specified" });
       }
 
-      const mongoQuery = this.convertPostgrestQuery(queryParams, collection);
       const jwt = this.getJwtFromRequest(request);
-      const result = await this.dbAdapter.find(collection, mongoQuery, jwt);
+
+      const decodedJwt = JSON.parse(Buffer.from(jwt.split('.')[1], 'base64').toString());
+
+      const roles = decodedJwt.roles ? decodedJwt.roles.split(',') : [];
+
+      const mongoQuery = this.convertPostgrestQuery(queryParams, collection, roles);
+      const result = await this.dbAdapter.find(collection, mongoQuery);
 
       // Add cache status header if using cached adapter
       if (this.dbAdapter instanceof CachedMongoDBAdapter) {

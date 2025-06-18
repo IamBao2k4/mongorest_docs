@@ -36,7 +36,7 @@
       "description": "Reference to user _id",
       "typeRelation": {
         "title": "Customer",
-        "entity": "users",
+        "_id": "users",
         "type": "n-1",
         "filter": {
           "combinator": "and",
@@ -58,7 +58,7 @@
             "pattern": "^[0-9a-fA-F]{24}$",
             "typeRelation": {
               "title": "Product",
-              "entity": "products",
+              "_id": "products",
               "type": "n-1",
               "filter": {
                 "combinator": "and",
@@ -416,7 +416,7 @@
       "widget": "relation",
       "typeRelation": {
         "type": "n-1",
-        "entity": "users"
+        "_id": "users"
       }
     }
   }
