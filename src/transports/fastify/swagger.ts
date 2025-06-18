@@ -354,8 +354,8 @@ GET /api/users?select=*,orders(status=eq.completed)&or=(status=eq.active,status=
               name: 'select',
               in: 'query',
               schema: { type: 'string' },
-              description: 'Fields to select. Examples: *, name,email, *,look_product_reviews(or=(verified=neq.true,status=eq.approved))',
-              example: '*,look_product_reviews(or=(reviews.verified=neq.true,reviews.status=eq.approved),look_products(categories(children())))'
+              description: 'Fields to select. Examples: *, name,email, *,product_reviews(or=(verified=neq.true,status=eq.approved))',
+              example: '*,product_reviews(or=(reviews.verified=neq.true,reviews.status=eq.approved),products(categories(children())))'
             },
             {
               name: 'limit',

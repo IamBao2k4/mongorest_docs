@@ -449,6 +449,8 @@
               },
               {
                 "profile.avatar": { "type": "field" }
+              },{
+                "product_reviews": { "type": "relation", "relate_collection": "product_reviews" }
               }
             ]
           },
