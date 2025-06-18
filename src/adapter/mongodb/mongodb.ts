@@ -172,7 +172,9 @@ export class MongoDBAdapter extends DataBase implements IDatabaseAdapter {
 
     const totalPage = Math.ceil(totalRecord / limit);
 
-    const resultRBAC = this.RbacDatabase(results, "read", jwt, collection)
+    const resultRBAC = this.RbacDatabase(results,jwt, collection)
+
+    console.log("RBAC", resultRBAC)
 
     return {
       data: resultRBAC,
@@ -183,14 +185,14 @@ export class MongoDBAdapter extends DataBase implements IDatabaseAdapter {
     };
   }
 
-  async insertOne(collection: string, document: any, jwt: string): Promise<SingleInsertResult> {
+  async insertOne(collection: string, document: any): Promise<SingleInsertResult> {
     this.ensureConnection();
     
     const result = await this.db!.collection(collection).insertOne(document);
     return { insertedId: result.insertedId };
   }
 
-  async insertMany(collection: string, documents: any[], jwt: string): Promise<BulkInsertResult> {
+  async insertMany(collection: string, documents: any[]): Promise<BulkInsertResult> {
     this.ensureConnection();
 
     if (!Array.isArray(documents)) {
@@ -221,7 +223,7 @@ export class MongoDBAdapter extends DataBase implements IDatabaseAdapter {
     };
   }
 
-  async updateOne(collection: string, id: any, updateFields: any, jwt: string): Promise<SingleUpdateResult> {
+  async updateOne(collection: string, id: any, updateFields: any): Promise<SingleUpdateResult> {
     this.ensureConnection();
 
     const result = await this.db!.collection(collection).updateOne(
@@ -259,7 +261,7 @@ export class MongoDBAdapter extends DataBase implements IDatabaseAdapter {
     };
   }
 
-  async deleteOne(collection: string, id: any, jwt: string): Promise<SingleDeleteResult> {
+  async deleteOne(collection: string, id: any): Promise<SingleDeleteResult> {
     this.ensureConnection();
 
     const result = await this.db!.collection(collection).deleteOne({
@@ -269,7 +271,7 @@ export class MongoDBAdapter extends DataBase implements IDatabaseAdapter {
     return { deletedCount: result.deletedCount };
   }
 
-  async deleteMany(collection: string, filters: any[], jwt: string): Promise<BulkDeleteResult> {
+  async deleteMany(collection: string, filters: any[]): Promise<BulkDeleteResult> {
     this.ensureConnection();
 
     if (!Array.isArray(filters)) {

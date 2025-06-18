@@ -19,14 +19,14 @@ async function main() {
       }
     },
     // Redis configuration (optional - remove this section to run without cache)
-    // redis: {
-    //   host: 'localhost',
-    //   port: 6379,
-    //   // password: 'your-redis-password', // if Redis has password
-    //   database: 0,
-    //   keyPrefix: 'mongorest:',
-    //   ttl: 300 // 5 minutes default TTL
-    // },
+    redis: {
+      host: '192.168.1.109',
+      port: 6379,
+      // password: 'your-redis-password', // if Redis has password
+      database: 0,
+      keyPrefix: 'mongorest:',
+      ttl: 300 // 5 minutes default TTL
+    },
     cacheOptions: {
       enableReadCache: true,
       enableWriteThrough: true,
