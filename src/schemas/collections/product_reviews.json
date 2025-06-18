@@ -27,7 +27,7 @@
       "description": "Reference to product _id",
       "typeRelation": {
         "title": "Product",
-        "entity": "products",
+        "_id": "products",
         "type": "n-1",
         "filter": {
           "combinator": "and",
@@ -44,7 +44,7 @@
       "description": "Reference to user _id",
       "typeRelation": {
         "title": "User",
-        "entity": "users",
+        "_id": "users",
         "type": "n-1",
         "filter": {
           "combinator": "and",
@@ -184,7 +184,7 @@
       "widget": "relation",
       "typeRelation": {
         "type": "n-1",
-        "entity": "products"
+        "_id": "products"
       }
     },
     "user": {
@@ -197,7 +197,7 @@
       "widget": "relation",
       "typeRelation": {
         "type": "n-1",
-        "entity": "users"
+        "_id": "users"
       }
     }
   }

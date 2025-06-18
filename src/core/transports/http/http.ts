@@ -4,7 +4,8 @@ import * as http from "http";
 import * as url from "url";
 import { IDatabaseAdapter } from "../../adapter/mongodb/types";
 import { CachedMongoDBAdapter } from "../../adapter/redis/cacheMongo";
-import { PostgRESTToMongoConverter } from "../../main/mongorest";
+import { Core } from "../../main/mainCore";
+import { MongoRest } from "../../main/mongorest";
 import { CacheRoutes } from "./cache";
 import setupEcommerceRelationships from "../../config/relationships";
 
@@ -16,7 +17,7 @@ export interface HttpServerConfig {
 export class HttpServer {
   private server: http.Server;
   private dbAdapter: IDatabaseAdapter;
-  private converter: PostgRESTToMongoConverter;
+  private converter: Core;
   private config: HttpServerConfig;
   private cacheRoutes: CacheRoutes | null = null;
 
@@ -31,7 +32,7 @@ export class HttpServer {
 
     // Setup relationships and converter
     const registry = setupEcommerceRelationships();
-    this.converter = new PostgRESTToMongoConverter(registry);
+    this.converter = new MongoRest(registry);
 
     this.server = http.createServer(this.handleRequest.bind(this));
   }
@@ -141,10 +142,11 @@ export class HttpServer {
 
   private convertPostgrestQuery(
     queryParams: Record<string, string>,
-    collection: string
+    collection: string,
+    roles: string[]
   ) {
     try {
-      const mongoQuery = this.converter.convert(queryParams, collection);
+      const mongoQuery = this.converter.convert(queryParams, collection, roles);
       console.log("Converted query:", JSON.stringify(mongoQuery));
       return mongoQuery;
     } catch (error: any) {
@@ -159,12 +161,21 @@ export class HttpServer {
     queryParams: Record<string, string>
   ): Promise<void> {
     try {
-      const mongoQuery = this.convertPostgrestQuery(queryParams, collection);
+      
       let jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2RlZmF1bHRfMDAxIiwidXNlcklkIjoidXNlcl9kZWZhdWx0XzAwMSIsInVzZXJuYW1lIjoiZ3Vlc3RfdXNlciIsInJvbGVzIjoiZGVmYXVsdCIsImlzQWRtaW4iOmZhbHNlfQ.p21cymLG1Q-flME3vyB84TP1Whd1zqQOmhAbWA3bjPs"
       if (res.getHeader("Bearer Token")) {
-        jwt =
-          (res.getHeader("Bearer Token") as string).split(" ")[1]
+        jwt = (res.getHeader("Bearer Token") as string).split(" ")[1]
       }
+
+      const decodedJwt = JSON.parse(Buffer.from(jwt.split('.')[1], 'base64').toString());
+
+      console.log("Decoded JWT:", decodedJwt);
+
+      const roles = decodedJwt.roles ? decodedJwt.roles.split(',') : [];
+
+      console.log("User roles:", roles);
+
+      const mongoQuery = this.convertPostgrestQuery(queryParams, collection, ["default"]);
       const result = await this.dbAdapter.find(collection, mongoQuery, jwt);
 
       // Add cache status header if using cached adapter

@@ -13,7 +13,6 @@ import {
   SingleUpdateResult,
   SingleDeleteResult
 } from './types';
-import { DataBase } from '../database/database';
 
 export interface MongoDBConfig {
   connectionString: string;
@@ -27,13 +26,12 @@ export interface MongoDBConfig {
   };
 }
 
-export class MongoDBAdapter extends DataBase implements IDatabaseAdapter {
+export class MongoDBAdapter implements IDatabaseAdapter {
   private client: MongoClient | null = null;
   private db: Db | null = null;
   private config: MongoDBConfig;
 
   constructor(config: MongoDBConfig) {
-    super()
     this.config = config;
   }
 
@@ -171,11 +169,8 @@ export class MongoDBAdapter extends DataBase implements IDatabaseAdapter {
     ]);
 
     const totalPage = Math.ceil(totalRecord / limit);
-
-    const resultRBAC = this.RbacDatabase(results, "read", jwt, collection)
-
     return {
-      data: resultRBAC,
+      data: results,
       totalRecord,
       totalPage,
       limit,

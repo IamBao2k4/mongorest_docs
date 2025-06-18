@@ -55,7 +55,7 @@
       "description": "Parent category ID for hierarchical categories",
       "typeRelation": {
         "title": "Parent Category",
-        "entity": "categories",
+        "_id": "categories",
         "type": "n-1",
         "filter": {
           "combinator": "and",
@@ -185,7 +185,7 @@
       "widget": "relation",
       "typeRelation": {
         "type": "n-1",
-        "entity": "categories"
+        "_id": "categories"
       }
     },
     "children": {
