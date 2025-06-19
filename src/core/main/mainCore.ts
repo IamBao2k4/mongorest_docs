@@ -16,6 +16,10 @@ export class Core {
     this.registry = registry;
   }
 
+  public validate() {
+    
+  }
+
   public convert(
     params: QueryParams,
     collection: string,

@@ -29,6 +29,8 @@ export class MongoRest{
    */
   convert(params: QueryParams, collection: string, roles: string[]): MongoQuery {
     
+    console.log("params", JSON.stringify(params))
+
     const result: MongoQuery = {
       filter: {},
       projection: {},
@@ -88,8 +90,6 @@ export class MongoRest{
       result.filter = { $and: filterConditions };
     }
 
-    console.log('collection', collection);
-
     RbacValidator.getRbacFeatures(
       collection,
       'read',
@@ -97,9 +97,7 @@ export class MongoRest{
     ).forEach((f : string) => {
       result.projection![f] = 1;
     })
-    
-    console.log('result.projection', result.projection);
-    return result;
+        return result;
   }
 
 
