@@ -11,14 +11,13 @@ import { Core } from "./mainCore";
 /**
  * Fixed version of your converter - minimal changes
  */
-export class MongoRest extends Core {
+export class MongoRest{
   private filterParser: FilterParser;
   private logicalParser: LogicalParser;
   private selectParser: ModularSelectParser; // ✅ Fixed naming
   private orderParser: OrderParser;
 
   constructor(registry?: RelationshipRegistry) {
-    super(); // ✅ Added registry parameter
     this.filterParser = new FilterParser();
     this.logicalParser = new LogicalParser();
     this.selectParser = new ModularSelectParser(registry || new RelationshipRegistry()); // ✅ Fixed constructor
@@ -29,10 +28,7 @@ export class MongoRest extends Core {
    * Convert PostgREST query parameters to MongoDB query
    */
   convert(params: QueryParams, collection: string, roles: string[]): MongoQuery {
-    if (!this.rbacValidator.hasAccess(collection, 'read', roles)) {
-      throw new Error(`User does not have access to read on collection ${collection}`);
-    }
-
+    
     const result: MongoQuery = {
       filter: {},
       projection: {},

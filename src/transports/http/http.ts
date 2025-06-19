@@ -32,7 +32,7 @@ export class HttpServer {
 
     // Setup relationships and converter
     const registry = setupEcommerceRelationships();
-    this.converter = new MongoRest(registry);
+    this.converter = new Core(registry);
 
     this.server = http.createServer(this.handleRequest.bind(this));
   }
@@ -146,7 +146,7 @@ export class HttpServer {
     roles: string[]
   ) {
     try {
-      const mongoQuery = this.converter.convert(queryParams, collection, roles);
+      const mongoQuery = this.converter.convert(queryParams, collection, roles, "mongorest");
       console.log("Converted query:", JSON.stringify(mongoQuery));
       return mongoQuery;
     } catch (error: any) {

@@ -46,7 +46,7 @@ export class FastifyServer {
 
     // Setup relationships and converter
     const registry = setupEcommerceRelationships();
-    this.converter = new MongoRest(registry);
+    this.converter = new Core(registry);
 
     // Initialize Swagger generator
     this.swaggerGenerator = new SwaggerGenerator();
@@ -168,7 +168,7 @@ export class FastifyServer {
     roles: string[] = []
   ) {
     try {
-      const mongoQuery = this.converter.convert(queryParams, collection, roles);
+      const mongoQuery = this.converter.convert(queryParams, collection, roles, "mongorest");
       console.log("Converted query:", JSON.stringify(mongoQuery));
       return mongoQuery;
     } catch (error: any) {
