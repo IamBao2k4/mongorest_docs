@@ -10,6 +10,14 @@
     { "fields": { "productId": 1 } },
     { "fields": { "isPrimary": 1 } }
   ],
+  "plugins": [
+    {
+      "createdAt": true,
+      "updatedAt": true,
+      "timestamps": true,
+      "softDelete": false
+    }
+  ],
   "properties": {
     "_id": {
       "type": "string",

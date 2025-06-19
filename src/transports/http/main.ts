@@ -1,5 +1,3 @@
-// src/main.ts
-
 import { QueryOptions } from '../../adapter/mongodb/types';
 import { CachedMongoDBAdapter } from '../../adapter/redis/cacheMongo'; 
 import { HttpServer } from './http'; 
@@ -20,7 +18,7 @@ async function main() {
     },
     // Redis configuration (optional - remove this section to run without cache)
     redis: {
-      host: '192.168.1.109',
+      host: 'localhost',
       port: 6379,
       // password: 'your-redis-password', // if Redis has password
       database: 0,

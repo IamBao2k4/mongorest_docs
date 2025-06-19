@@ -14,10 +14,22 @@ export interface HttpServerConfig {
   host?: string;
 }
 
+function jwtDecode(res: http.ServerResponse): any {
+  let jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2RlZmF1bHRfMDAxIiwidXNlcklkIjoidXNlcl9kZWZhdWx0XzAwMSIsInVzZXJuYW1lIjoiZ3Vlc3RfdXNlciIsInJvbGVzIjoiZGVmYXVsdCIsImlzQWRtaW4iOmZhbHNlfQ.p21cymLG1Q-flME3vyB84TP1Whd1zqQOmhAbWA3bjPs"
+  if (res.getHeader("Bearer Token")) {
+    jwt = (res.getHeader("Bearer Token") as string).split(" ")[1]
+  }
+
+  const decodedJwt = JSON.parse(Buffer.from(jwt.split('.')[1], 'base64').toString());
+
+  return decodedJwt.roles ? decodedJwt.roles.split(',') : [];
+}
+
+
 export class HttpServer {
   private server: http.Server;
   private dbAdapter: IDatabaseAdapter;
-  private converter: Core;
+  private core: Core;
   private config: HttpServerConfig;
   private cacheRoutes: CacheRoutes | null = null;
 
@@ -30,9 +42,9 @@ export class HttpServer {
       this.cacheRoutes = new CacheRoutes(dbAdapter);
     }
 
-    // Setup relationships and converter
+    // Setup relationships and core
     const registry = setupEcommerceRelationships();
-    this.converter = new Core(registry);
+    this.core = new Core(registry);
 
     this.server = http.createServer(this.handleRequest.bind(this));
   }
@@ -146,7 +158,7 @@ export class HttpServer {
     roles: string[]
   ) {
     try {
-      const mongoQuery = this.converter.convert(queryParams, collection, roles, "mongorest");
+      const mongoQuery = this.core.convert(queryParams, collection, roles, "mongorest");
       console.log("Converted query:", JSON.stringify(mongoQuery));
       return mongoQuery;
     } catch (error: any) {
@@ -161,19 +173,8 @@ export class HttpServer {
     queryParams: Record<string, string>
   ): Promise<void> {
     try {
-      
-      let jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2RlZmF1bHRfMDAxIiwidXNlcklkIjoidXNlcl9kZWZhdWx0XzAwMSIsInVzZXJuYW1lIjoiZ3Vlc3RfdXNlciIsInJvbGVzIjoiZGVmYXVsdCIsImlzQWRtaW4iOmZhbHNlfQ.p21cymLG1Q-flME3vyB84TP1Whd1zqQOmhAbWA3bjPs"
-      if (res.getHeader("Bearer Token")) {
-        jwt = (res.getHeader("Bearer Token") as string).split(" ")[1]
-      }
 
-      const decodedJwt = JSON.parse(Buffer.from(jwt.split('.')[1], 'base64').toString());
-
-      console.log("Decoded JWT:", decodedJwt);
-
-      const roles = decodedJwt.roles ? decodedJwt.roles.split(',') : [];
-
-      console.log("User roles:", roles);
+      const roles = jwtDecode(res);
 
       const mongoQuery = this.convertPostgrestQuery(queryParams, collection, ["default"]);
       const result = await this.dbAdapter.find(collection, mongoQuery);
@@ -202,11 +203,20 @@ export class HttpServer {
     try {
       const body = await this.parseBody(req);
 
+      const roles = jwtDecode(res);
+
+      const new_body = this.core.validateBody(
+        collection,
+        "write",
+        ["default"],
+        body
+      );
+
       if (isBulk) {
-        const result = await this.dbAdapter.insertMany(collection, body);
+        const result = await this.dbAdapter.insertMany(collection, new_body);
         this.sendResponse(res, 201, result);
       } else {
-        const result = await this.dbAdapter.insertOne(collection, body);
+        const result = await this.dbAdapter.insertOne(collection, new_body);
         this.sendResponse(res, 201, result);
       }
     } catch (error: any) {
@@ -224,6 +234,15 @@ export class HttpServer {
   ): Promise<void> {
     try {
       const body = await this.parseBody(req);
+
+      const roles = jwtDecode(res);
+
+      const new_body = this.core.validateBody(
+        collection,
+        "write",
+        ["default"],
+        body
+      );
 
       if (isBulk) {
         const result = await this.dbAdapter.updateMany(collection, body);
@@ -248,6 +267,14 @@ export class HttpServer {
     isBulk: boolean
   ): Promise<void> {
     try {
+
+      const roles = jwtDecode(res);
+
+      if(!this.core.hasDeleteAccess(collection, ["default"])) {
+        this.sendError(res, 403, "Forbidden: You do not have permission to delete from this collection");
+        return;
+      }
+
       if (isBulk) {
         const body = await this.parseBody(req);
         const result = await this.dbAdapter.deleteMany(collection, body);
@@ -341,8 +368,7 @@ export class HttpServer {
             : "no cache layer";
 
         console.log(
-          `Server running on ${this.config.host || "localhost"}:${
-            this.config.port
+          `Server running on ${this.config.host || "localhost"}:${this.config.port
           } ${cacheStatus}`
         );
 

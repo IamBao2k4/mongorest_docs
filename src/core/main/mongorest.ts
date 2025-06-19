@@ -6,7 +6,6 @@ import { LogicalParser } from "../parsers/logicalParser";
 import { OrderParser } from "../parsers/orderParser";
 import { ModularSelectParser, RelationshipRegistry } from "../parsers/selectParser";
 import { RbacValidator } from "../rbac/rbac-validator";
-import { Core } from "./mainCore";
 
 /**
  * Fixed version of your converter - minimal changes
@@ -90,7 +89,9 @@ export class MongoRest{
 
     console.log('collection', collection);
 
-    RbacValidator.getRbacFeatures(
+    const rbacValidator = new RbacValidator();
+
+    rbacValidator.getRbacFeatures(
       collection,
       'read',
       roles,
@@ -101,7 +102,6 @@ export class MongoRest{
     console.log('result.projection', result.projection);
     return result;
   }
-
 
   // ✅ New helper method
   private handleSelect(selectValue: string, collection: string | undefined, result: MongoQuery): void {

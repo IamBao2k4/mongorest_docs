@@ -44,4 +44,16 @@ export class Core {
         break;
     }
   }
+
+  public validateBody(collection: string, action: string, roles: string[], data: any) : any {
+    if (!this.rbacValidator.hasAccess(collection, action, roles)) {
+      throw new Error(`User does not have access to ${action} on collection ${collection}`);
+    }
+
+    return this.rbacValidator.filterBodyData(collection, action, roles, data);
+  }
+
+  public hasDeleteAccess(collection: string, roles: string[]): boolean {
+    return this.rbacValidator.hasAccess(collection, "delete", roles);
+  }
 }

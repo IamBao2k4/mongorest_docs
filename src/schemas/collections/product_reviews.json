@@ -11,6 +11,14 @@
     { "fields": { "status": 1, "createdAt": -1 } },
     { "fields": { "productId": 1, "userId": 1 }, "unique": true }
   ],
+  "plugins": [
+    {
+      "createdAt": true,
+      "updatedAt": true,
+      "timestamps": true,
+      "softDelete": false
+    }
+  ],
   "properties": {
     "_id": {
       "type": "string",

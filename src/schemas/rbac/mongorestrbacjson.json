@@ -571,7 +571,17 @@
         "write": [
           {
             "user_role": "default",
-            "patterns": []
+            "patterns": [
+              {
+                "name": { "type": "field" }
+              },
+              {
+                "profile.avatar": { "type": "field" }
+              },
+              {
+                "profile.age": { "type": "field" }
+              }
+            ]
           },
           {
             "user_role": "user",
