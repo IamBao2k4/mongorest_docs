@@ -1,0 +1,286 @@
+
+> mongorest@1.0.0 demo:new
+> tsx src/demo/expressServer.ts
+
+🚀 Initializing core system...
+✅ MongoDB adapter registered
+✅ PostgreSQL adapter registered
+✅ Elasticsearch adapter registered
+✅ MySQL adapter registered
+✅ Core system initialized successfully
+📊 System status: [
+  {
+    key: 'mongodb@1.0.0',
+    name: 'mongodb',
+    type: 'mongodb',
+    version: '1.0.0',
+    capabilities: {
+      filterOperators: [Array],
+      joinTypes: [Array],
+      aggregations: [Array],
+      fullTextSearch: true,
+      transactions: true,
+      nestedQueries: true,
+      maxComplexity: 100,
+      maxResultSize: 1000000
+    }
+  },
+  {
+    key: 'postgresql@1.0.0',
+    name: 'postgresql',
+    type: 'postgresql',
+    version: '1.0.0',
+    capabilities: {
+      filterOperators: [Array],
+      joinTypes: [Array],
+      aggregations: [Array],
+      fullTextSearch: true,
+      transactions: true,
+      nestedQueries: true,
+      maxComplexity: 50,
+      maxResultSize: 100000
+    }
+  },
+  {
+    key: 'elasticsearch@1.0.0',
+    name: 'elasticsearch',
+    type: 'elasticsearch',
+    version: '1.0.0',
+    capabilities: {
+      filterOperators: [Array],
+      joinTypes: [Array],
+      aggregations: [Array],
+      fullTextSearch: true,
+      transactions: false,
+      nestedQueries: true,
+      maxComplexity: 200,
+      maxResultSize: 10000,
+      custom: [Object]
+    }
+  },
+  {
+    key: 'mysql@1.0.0',
+    name: 'mysql',
+    type: 'mysql',
+    version: '1.0.0',
+    capabilities: {
+      filterOperators: [Array],
+      joinTypes: [Array],
+      aggregations: [Array],
+      fullTextSearch: true,
+      transactions: true,
+      nestedQueries: true,
+      maxComplexity: 50,
+      maxResultSize: 100000
+    }
+  }
+]
+
+🚀 MongoREST New Architecture Demo Server
+📍 Server running at: http://localhost:3003
+📖 Examples: http://localhost:3003/examples
+🩺 Health: http://localhost:3003/health
+📊 Status: http://localhost:3003/status
+
+🎯 Test URLs:
+• Intermediate JSON: http://localhost:3003/api/test/intermediate/users?skip=0&limit=10&select=name,email&status=eq.active
+• MongoDB Query: http://localhost:3003/api/test/native/users?dbType=mongodb&skip=0&limit=10&select=name,email&status=eq.active
+• PostgreSQL Query: http://localhost:3003/api/test/native/users?dbType=postgresql&skip=0&limit=10&select=name,email&status=eq.active
+• Your Complex Example: http://localhost:3003/api/users?dryRun=true&skip=0&limit=100&select=*,look_product_reviews(or=(reviews.verified=neq.true,reviews.status=eq.approved))&and=(status=eq.active)
+    
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":true},{"status":"approved"}],"$or":[{"verified":true},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$match":{"$and":[{"status":"approved),products(categories(children())))"},{"status":"active"}]}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":true},{"status":"approved"}],"$or":[{"verified":true},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":true},{"status":"approved"}],"$or":[{"verified":true},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":true},{"status":"approved"}],"$or":[{"verified":true},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":true},{"status":"approved"}],"$or":[{"verified":true},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$project":{"_id":1,"email":1,"name":1,"profile":1,"status":1}}]
+Enhanced many-to-many relationship: categories with junction: {
+  table: 'product_categories',
+  localKey: 'productId',
+  foreignKey: 'categoryId'
+}
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}},{"$lookup":{"from":"products","let":{"local_value":"$productId"},"pipeline":[{"$match":{"$expr":{"$eq":["$_id","$$local_value"]}}},{"$lookup":{"from":"product_categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$productId","$$local_value"]}}}],"as":"_junction"}},{"$lookup":{"from":"categories","let":{"junction_ids":{"$map":{"input":"$_junction","as":"j","in":"$$j.categoryId"}}},"pipeline":[{"$match":{"$expr":{"$in":["$_id","$$junction_ids"]}}},{"$lookup":{"from":"categories","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$parentId","$$local_value"]}}}],"as":"children"}}],"as":"categories"}},{"$unset":"_junction"}],"as":"products"}},{"$unwind":{"path":"$products","preserveNullAndEmptyArrays":true}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}}],"as":"look_product_reviews"}},{"$match":{"status":"active"}},{"$project":{"look_product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$ne":true}},{"status":"approved"}],"$or":[{"verified":{"$ne":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":true},{"status":"approved"}],"$or":[{"verified":true},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$lte":true}},{"status":"approved"}],"$or":[{"verified":{"$lte":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$lte":true}},{"status":"approved"}],"$or":[{"verified":{"$lte":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$lte":true}},{"status":"approved"}],"$or":[{"verified":{"$lte":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$lte":true}},{"status":"approved"}],"$or":[{"verified":{"$lte":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$lte":true}},{"status":"approved"}],"$or":[{"verified":{"$lte":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$lte":true}},{"status":"approved"}],"$or":[{"verified":{"$lte":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$lte":true}},{"status":"approved"}],"$or":[{"verified":{"$lte":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$lte":true}},{"status":"approved"}],"$or":[{"verified":{"$lte":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$lte":true}},{"status":"approved"}],"$or":[{"verified":{"$lte":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$lte":true}},{"status":"approved"}],"$or":[{"verified":{"$lte":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$lte":true}},{"status":"approved"}],"$or":[{"verified":{"$lte":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]
+nativeQuery [{"$lookup":{"from":"product_reviews","let":{"local_value":"$_id"},"pipeline":[{"$match":{"$expr":{"$eq":["$userId","$$local_value"]}}},{"$match":{"$and":[{"verified":{"$lte":true}},{"status":"approved"}],"$or":[{"verified":{"$lte":true}},{"status":"approved"}]}}],"as":"product_reviews"}},{"$match":{"status":"active"}},{"$project":{"product_reviews.*":1}},{"$limit":100}]

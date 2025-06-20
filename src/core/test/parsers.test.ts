@@ -1,7 +1,8 @@
-import { FilterParser } from '../parsers/filterParser';
-import { LogicalParser } from '../parsers/logicalParser';
-import { OrderParser } from '../parsers/orderParser';
-import { ModularSelectParser, createRelationshipConfig, SAMPLE_RELATIONSHIPS } from '../parsers/selectParser';
+import { FilterParser } from "../base/mongodb/parsers/filterParser";
+import { LogicalParser } from "../base/mongodb/parsers/logicalParser";
+import { OrderParser } from "../base/mongodb/parsers/orderParser";
+import { createRelationshipConfig, ModularSelectParser, SAMPLE_RELATIONSHIPS } from "../base/mongodb/parsers/selectParser";
+
 
 describe('FilterParser', () => {
   let parser: FilterParser;

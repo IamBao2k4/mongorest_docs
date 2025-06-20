@@ -17,6 +17,10 @@ export class RbacValidator {
         RbacValidator.rbacJson = JSON.parse(raw);
     }
 
+    public updateConfig(config: RbacJson) {
+        RbacValidator.rbacJson = config;
+    }
+
     private static hasUserRole(role: RbacRolePattern[], userRoles: string): boolean {
         return role.some(r => r.user_role === userRoles);
     }
@@ -35,7 +39,7 @@ export class RbacValidator {
         );
     }
 
-    public static getRbacFeatures(collection: string, action: string, userRoles: string[], isRelate: boolean = false, layer: number = 1, pre_fieldName? : string): string[] {
+    public getRbacFeatures(collection: string, action: string, userRoles: string[], isRelate: boolean = false, layer: number = 1, pre_fieldName? : string): string[] {
 
         if(layer > 2) {
             return [];

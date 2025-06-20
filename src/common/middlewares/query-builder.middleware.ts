@@ -188,7 +188,7 @@ export function handleSearch(queryParams: any): ResultHandleSearch {
     addStageToPipeline(Object.keys(sortQuery).length > 0 ? { $sort: sortQuery } : null);
 
     // Thêm giai đoạn projection
-    addStageToPipeline(Object.keys(projection).length > 0 ? { $project: projection } : null);
+    // addStageToPipeline(Object.keys(projection).length > 0 ? { $project: projection } : null);
 
     // Thêm giai đoạn unwind nếu có
     addStageToPipeline(queryParams['unwind'] ? { $unwind: `$${queryParams['unwind']}` } : null);

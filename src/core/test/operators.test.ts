@@ -5,28 +5,28 @@ import {
   GreaterThanEqualOperator, 
   LessThanOperator, 
   LessThanEqualOperator 
-} from '../operators/comparisonOperators';
+} from '../base/mongodb/operators/comparisonOperators';
 
 import { 
   InOperator, 
   ContainsOperator, 
   ContainedInOperator, 
   OverlapOperator 
-} from '../operators/arrayOperator';
+} from '../base/mongodb/operators/arrayOperator';
 
 import { 
   IsOperator, 
   IsDistinctOperator 
-} from '../operators/nullOperators';
+} from '../base/mongodb/operators/nullOperators';
 
 import { 
   LikeOperator, 
   ILikeOperator, 
   MatchOperator, 
   IMatchOperator 
-} from '../operators/textOperators';
+} from '../base/mongodb/operators/textOperators';
 
-import { NotOperator } from '../operators/logicalOperators';
+import { NotOperator } from '../base/mongodb/operators/logicalOperators';
 
 describe('Comparison Operators', () => {
   describe('EqualOperator', () => {

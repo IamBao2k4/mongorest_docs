@@ -1,10 +1,10 @@
-import { RelationshipRegistry } from '../relationship/RelationshipRegistry';
-import { OneToOneRelationship } from '../relationship/oneToOneRelationship';
-import { OneToManyRelationship } from '../relationship/oneToManyRelationship';
-import { ManyToOneRelationship } from '../relationship/manyToOneRelationship';
-import { ManyToManyRelationship } from '../relationship/manyToManyRelationship';
-import { JoinParser } from '../relationship/JoinParser';
-import { EmbedRequest, RelationshipDefinition } from '../relationship/types';
+import { RelationshipRegistry } from '../adapters/base/relationship/RelationshipRegistry';
+import { OneToOneRelationship } from '../adapters/base/relationship/oneToOneRelationship';
+import { OneToManyRelationship } from '../adapters/base/relationship/oneToManyRelationship';
+import { ManyToOneRelationship } from '../adapters/base/relationship/manyToOneRelationship';
+import { ManyToManyRelationship } from '../adapters/base/relationship/manyToManyRelationship';
+import { JoinParser } from '../adapters/base/relationship/JoinParser';
+import { EmbedRequest, RelationshipDefinition } from '../adapters/base/relationship/types';
 
 describe('RelationshipRegistry', () => {
   let registry: RelationshipRegistry;
