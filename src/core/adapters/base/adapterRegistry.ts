@@ -323,7 +323,7 @@ export class AdapterPluginSystem {
   }
 
   private isValidAdapter(obj: any): obj is DatabaseAdapter {
-    return obj &&
+    return !!(obj &&
            typeof obj.name === 'string' &&
            typeof obj.type === 'string' &&
            typeof obj.version === 'string' &&
@@ -333,7 +333,7 @@ export class AdapterPluginSystem {
            typeof obj.getCapabilities === 'function' &&
            typeof obj.initialize === 'function' &&
            typeof obj.dispose === 'function' &&
-           typeof obj.testConnection === 'function';
+           typeof obj.testConnection === 'function');
   }
 }
 

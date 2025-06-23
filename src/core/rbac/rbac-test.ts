@@ -11,7 +11,7 @@ rbacValidator.loadConfig(); // Ensure the RBAC configuration is loaded
 
 if (rbacValidator.hasAccess(collection_name, action, userRoles)) {
     if( features.length === 0 ) {
-        console.log(RbacValidator.getRbacFeatures(collection_name, action, userRoles));
+        console.log(rbacValidator.getRbacFeatures(collection_name, action, userRoles));
     }
     else {
         console.log(RbacValidator.filterRbacFeatures(collection_name, action, userRoles, features));

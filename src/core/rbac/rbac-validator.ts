@@ -71,15 +71,15 @@ export class RbacValidator {
                         features.add(isRelate ? (pre_fieldName + "." + fieldName) : fieldName); ;
                     } else {
                         const relate_collection = pattern[fieldName].relate_collection;
-                        const rbacFeatures = RbacValidator.getRbacFeatures(
+                        const rbacFeatures = this.getRbacFeatures(
                             relate_collection, 
                             action, 
                             userRoles, 
                             true, 
-                            layer + (collection === relate_collection ? 1 : 0), 
+                            layer + 1, 
                             pre_fieldName ? (pre_fieldName + "." + fieldName) : fieldName
                         );
-                        rbacFeatures.length > 0 ? rbacFeatures.forEach(feature => {
+                        rbacFeatures.length > 0 ? rbacFeatures.forEach((feature: string) => {
                             features.add(feature);
                         }) : {};
                     }

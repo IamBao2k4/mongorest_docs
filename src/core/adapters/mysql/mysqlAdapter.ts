@@ -135,7 +135,8 @@ export class MySQLAdapter extends BaseDatabaseAdapter {
       // Initialize MySQL connection pool
       const mysql = await import('mysql2/promise');
       
-      this.pool = mysql.createPool({
+      // Prepare pool config and handle ssl property
+      const poolConfig: any = {
         host: config.connection.host || 'localhost',
         port: config.connection.port || 3306,
         database: config.connection.database,
@@ -143,9 +144,12 @@ export class MySQLAdapter extends BaseDatabaseAdapter {
         password: config.connection.password,
         waitForConnections: true,
         connectionLimit: config.connection.pool?.max || 10,
-        queueLimit: 0,
-        ssl: config.connection.ssl
-      });
+        queueLimit: 0
+      };
+      if (config.connection.ssl !== false && config.connection.ssl !== undefined) {
+        poolConfig.ssl = config.connection.ssl;
+      }
+      this.pool = mysql.createPool(poolConfig);
     }
   }
 
