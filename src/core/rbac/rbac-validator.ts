@@ -83,7 +83,7 @@ export class RbacValidator {
                             layer + (collection === relate_collection ? 1 : 0),
                             pre_fieldName ? (pre_fieldName + "." + fieldName) : fieldName
                         );
-                        rbacFeatures.length > 0 ? rbacFeatures.forEach(feature => {
+                        rbacFeatures.length > 0 ? rbacFeatures.forEach((feature: string) => {
                             features.add(feature);
                         }) : {};
                     }

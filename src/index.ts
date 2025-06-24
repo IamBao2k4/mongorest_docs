@@ -2,7 +2,6 @@ import Fastify from 'fastify';
 import { IndexRoute } from './routes/_index';
 import { registerGlobalErrorHandler } from './common/exceptions/global.exception';
 import { responseInterceptor } from './common/interceptors/response.interceptor';
-import { SchemaLoader } from './core/schema/loader';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -47,38 +46,41 @@ const loadSchemasFromSubfolders = async (schemasPath: string) => {
     const collectionsPath = path.join(schemasPath, 'collections');
     if (fs.existsSync(collectionsPath)) {
         console.log(`Loading collections from: ${collectionsPath}`);
-        const collectionSchemas = await SchemaLoader.loadAllSchemas(collectionsPath, "collections");
-        console.log(`Found ${collectionSchemas.size} collection schemas:`, Array.from(collectionSchemas.keys()));
-        
-        // Merge into allSchemas
-        for (const [key, value] of collectionSchemas) {
-            allSchemas.set(key, value);
-        }
+        // TODO: Restore schema loading when SchemaLoader is reimplemented
+        // const collectionSchemas = await SchemaLoader.loadAllSchemas(collectionsPath, "collections");
+        // console.log(`Found ${collectionSchemas.size} collection schemas:`, Array.from(collectionSchemas.keys()));
+        // 
+        // // Merge into allSchemas
+        // for (const [key, value] of collectionSchemas) {
+        //     allSchemas.set(key, value);
+        // }
     }
     
     // Load from functions folder  
     const functionsPath = path.join(schemasPath, 'functions');
     if (fs.existsSync(functionsPath)) {
         console.log(`Loading functions from: ${functionsPath}`);
-        const functionSchemas = await SchemaLoader.loadAllSchemas(functionsPath, "functions");
-        console.log(`Found ${functionSchemas.size} function schemas:`, Array.from(functionSchemas.keys()));
-        
-        // Merge into allSchemas
-        for (const [key, value] of functionSchemas) {
-            allSchemas.set(key, value);
-        }
+        // TODO: Restore schema loading when SchemaLoader is reimplemented
+        // const functionSchemas = await SchemaLoader.loadAllSchemas(functionsPath, "functions");
+        // console.log(`Found ${functionSchemas.size} function schemas:`, Array.from(functionSchemas.keys()));
+        // 
+        // // Merge into allSchemas
+        // for (const [key, value] of functionSchemas) {
+        //     allSchemas.set(key, value);
+        // }
     }
 
     const rbacPath = path.join(schemasPath, 'rbac');
     if (fs.existsSync(rbacPath)) {
         console.log(`Loading RBAC schemas from: ${rbacPath}`);
-        const rbacSchemas = await SchemaLoader.loadAllSchemas(rbacPath, "rbac");
-        console.log(`Found ${rbacSchemas.size} RBAC schemas:`, Array.from(rbacSchemas.keys()));
-        
-        // Merge into allSchemas
-        for (const [key, value] of rbacSchemas) {
-            allSchemas.set(key, value);
-        }
+        // TODO: Restore schema loading when SchemaLoader is reimplemented
+        // const rbacSchemas = await SchemaLoader.loadAllSchemas(rbacPath, "rbac");
+        // console.log(`Found ${rbacSchemas.size} RBAC schemas:`, Array.from(rbacSchemas.keys()));
+        // 
+        // // Merge into allSchemas
+        // for (const [key, value] of rbacSchemas) {
+        //     allSchemas.set(key, value);
+        // }
     }
     
     return allSchemas;

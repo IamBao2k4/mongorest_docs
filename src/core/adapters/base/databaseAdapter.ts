@@ -54,7 +54,7 @@ export interface DatabaseAdapter {
 
 export type DatabaseType = 
   | 'mongodb' | 'postgresql' | 'mysql' | 'elasticsearch' 
-  | 'redis' | 'sqlite' | 'oracle' | 'custom';
+  | 'redis' | 'sqlite' | 'oracle' | 'custom' | 'mock';
 
 export interface ExecutionOptions {
   /** Request timeout in milliseconds */

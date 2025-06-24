@@ -1,9 +1,9 @@
 export interface RbacJson {
-  name: string;
-  version: string;
-  description: string;
+  name?: string;
+  version?: string;
+  description?: string;
   collections: RbacCollection[];
-  rbac_features: RbacFeatures;
+  rbac_features?: RbacFeatures;
 }
 
 export interface RbacCollection {
