@@ -1,5 +1,5 @@
+import { isObject } from 'class-validator';
 import { Schema, FieldDefinition, ValidationResult, ValidationError, ValidationOptions } from '../types';
-import { Types } from 'mongoose';
 
 /**
  * Data Validator - Validate data according to schema
@@ -239,11 +239,17 @@ export class DataValidator {
     return { valid: true };
   }
   
+
+  private static isObjectId(value: any): boolean {
+    return typeof value === 'string' && /^[a-f\d]{24}$/i.test(value);
+  
+  }
+
   /**
    * Validate ObjectId type
    */
   private static validateObjectIdType(value: any, fieldDef: FieldDefinition, fieldName: string): ValidationResult {
-    if (!Types.ObjectId.isValid(value)) {
+    if (!this.isObjectId(value)) {
       return {
         valid: false,
         errors: [{
