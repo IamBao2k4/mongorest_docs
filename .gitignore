@@ -6,3 +6,4 @@ generator/
 **/dist/
 **/logs/
 **/.next/
+.note_docs

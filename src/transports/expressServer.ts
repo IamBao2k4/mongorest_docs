@@ -295,7 +295,7 @@ app.get('/api/:collection', async (req, res) => {
   try {
     const { collection } = req.params;
     const dbType = (req.query.dbType as DatabaseType) || 'mongodb';
-    const roles = req.headers['x-user-roles']?.toString().split(',') || ['nice'];
+    const roles = req.headers['x-user-roles']?.toString().split(',') || ['default'];
     const dryRun = req.query.dryRun === 'true';
     
     // Remove internal params

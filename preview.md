@@ -101,134 +101,97 @@ API trả về:
 
 ### Tính năng chính:
 
-#### Danh sách collections khả dụng:
-```http
-GET /collections
-```
+## 1. Query linh hoạt dựa trên param
+**Mô tả:** Người dùng chỉ cần viết param dựa trên syntax mà thư viện định nghĩa, không cần viết query hay luồng phức tạp.
 
-Trả về:
+### Cơ chế query
+**Param:** Người dùng viết api bao gồm param định nghĩa câu query cần thực hiện.
+**RBAC Validator:** RBAC nằm trong MongoREST sẽ tạo ra các projection hoặc lọc các field có trong body dựa trên user role thông qua JWT.
+**MongoREST Parser:** MongoREST sẽ chuyển param thành câu lệnh query.
+**Database:** Thực hiện câu query và trả dữ liệu cho người dùng.
+
+### Ví dụ minh họa
+
 ```json
-[
-  { "name": "users", "count": 12034, "description": "User accounts" },
-  { "name": "orders", "count": 9581, "description": "E-commerce orders" }
-]
+GET /api/users?dbType=mongodb&skip=0&limit=200&select=product_reviews(verified=neq.true,status=eq.approved,products(categories()))&and=(status=eq.active)
 ```
 
-#### Chi tiết schema của collection:
-```http
-GET /collections/users
-```
-
-Trả về:
+#### Với user role là: user, RBAC config:
 ```json
 {
-  "collection": "users",
-  "fields": [
-    { "name": "_id", "type": "ObjectId", "indexed": true, "description": "Primary key" },
-    { "name": "name", "type": "string", "indexed": false },
-    { "name": "email", "type": "string", "indexed": true, "unique": true }
-  ]
+"collection_name": "users",
+    "rbac_config": {
+        "read": [
+            {
+            "user_role": "default",
+            "patterns": [
+                {
+                    "_id": { "type": "field" }
+                },
+                {
+                    "name": { "type": "field" }
+                },
+                {
+                    "profile.avatar": { "type": "field" }
+                },
+                {
+                    "product_reviews": { 
+                        "type": "relation", "relate_collection": "product_reviews" 
+                    }
+                }
+            ]
+            },
+        ]
+    }
 }
 ```
 
-#### Tài liệu hóa API:
-Tự động sinh file đặc tả OpenAPI mô tả toàn bộ các endpoint, có thể truy cập qua:
-- `GET /documentation` - trang Swagger UI
-- `GET /openapi.json` - JSON mô tả API
-
-## 5. Hỗ trợ truy vấn Aggregation Pipeline (Truy vấn tổng hợp nâng cao)
-
-**Mô tả:** Tận dũng aggregation framework của MongoDB để cho phép người dùng API thực hiện các truy vấn tổng hợp phức tạp mà các endpoint CRUD cơ bản không làm được.
-
-### Endpoint aggregation chung:
-```http
-POST /<collection>/aggregate
-```
-
-Client gửi lên một mảng JSON mô tả pipeline và nhận kết quả tương ứng.
-
-### Hạn chế & bảo mật:
-Giới hạn một số stage nhạy cảm như `$out` hoặc `$merge` để tránh client ghi dữ liệu tùy tiện.
-
-### Ví dụ minh họa:
-Tính tổng doanh thu theo từng khách hàng:
-
-```http
-POST /orders/aggregate
-Content-Type: application/json
-
-[
-  { "$group": { "_id": "$customerId", "totalAmount": { "$sum": "$amount" } } },
-  { "$sort": { "totalAmount": -1 } }
-]
-```
-
-Kết quả:
+#### Kết quả trả về
 ```json
-[
-  { "_id": "C123", "totalAmount": 1500000 },
-  { "_id": "C200", "totalAmount": 1200000 }
+"data":[
+    {
+        "_id":"objId",
+        "name":"username",
+        "profile":
+        {
+            "avatar":"image link"
+        },
+        "product_reviews":[
+            {
+                "_id":"objId",
+                "productId":"objId",
+                "rating":1,
+                "content":"content",
+                "helpful":{
+                    "yes":48,
+                    "no":8
+                },
+                "images":[
+                    "image link 1",
+                    "image link 2",
+                    "image link 3"
+                ],
+                "createdAt":"datetime"
+            }
+        ]
+    }
 ]
 ```
 
-## 6. Tìm kiếm văn bản và truy vấn theo chỉ mục đặc biệt (Full-text Search & Index Queries)
 
-**Mô tả:** Khai thác các chỉ mục đặc biệt của MongoDB như chỉ mục toàn văn (text index) và chỉ mục không gian địa lý để cung cấp các tính năng truy vấn nâng cao.
+**Giải thích**
+- **dbType=mongodb:** Chỉ định loại database là MongoDB.
+- **skip=0:** Bỏ qua 0 bản ghi đầu tiên (bắt đầu từ đầu, dùng cho phân trang).
+- **limit=200:** Lấy tối đa 200 bản ghi (giới hạn số lượng kết quả trả về).
+- **select=product_reviews(verified=neq.true,status=eq.approved,products(categories())):**
+    - Join và bảng product_reviews.
+    - Trong product_reviews, chỉ lấy các review mà:
+        - verified khác true (neq.true)
+        - status bằng approved (eq.approved)
+    - Và trong mỗi review, join vào bảng products, sau đó join tiếp vào categories với mỗi product.
+- **and=(status=eq.active):** Chỉ lấy các user có status bằng active.
 
-### Tính năng chính:
-
-#### Tìm kiếm văn bản:
-```http
-GET /articles?text=fastify+MongoDB
-```
-
-Tìm các tài liệu chứa từ khóa "fastify" và "MongoDB" ở các trường văn bản đã được lập chỉ mục.
-
-#### Truy vấn theo không gian địa lý:
-```http
-GET /stores?near=10.776,106.700&maxDistance=5000
-```
-
-Trả về các cửa hàng trong vòng 5km quanh tọa độ đã cho.
-
-### Sử dụng thông tin chỉ mục:
-Module hoạt động phối hợp với module Metadata để biết collection nào có index loại gì.
-
-## 7. Cập nhật thời gian thực qua Change Streams (Real-time Updates)
-
-**Mô tả:** Tích hợp MongoDB Change Streams để cung cấp tính năng "live query" cho MongoRest, cho phép client nhận thông báo thời gian thực khi có dữ liệu thay đổi.
-
-### Cơ chế hoạt động:
-- **WebSocket API:** Endpoint như `GET /<collection>/live` upgrade lên WebSocket
-- **Server-Sent Events (SSE):** Client kết nối tới `GET /<collection>/events`
-- **Long-polling fallback:** `GET /<collection>?since=<lastUpdate>`
-
-### Phạm vi theo dõi:
-Change Stream có thể mở ở mức collection với khả năng filter sự kiện.
-
-### Ví dụ minh họa:
-Ứng dụng chat:
-```javascript
-// Client kết nối WebSocket
-ws://server/messages/live?room=abc
-
-// Server đẩy sự kiện khi có tin nhắn mới
-{
-  "operation": "insert",
-  "fullDocument": {
-    "_id": "...",
-    "room": "abc",
-    "text": "Hello!"
-  }
-}
-```
-
-### Yêu cầu kỹ thuật:
-- MongoDB phải chạy replica set (dù 1 node)
-- Sử dụng MongoDB Change Streams qua driver Node.js
-- Kết hợp với thư viện WebSocket
-
-## 8. Xác thực và Phân quyền (Authentication & Authorization)
+## 2. Xác thực và Phân quyền (Authentication & Authorization)
 
 **Mô tả:** Thêm lớp xác thực người dùng và phân quyền truy cập cho MongoRest, đảm bảo bảo mật API.
 
