@@ -119,12 +119,12 @@ async function initializeCore() {
         adapters: {
           mongodb: {
             connection: {
-              connectionString: process.env.MONGODB_URL || 'mongodb://thaily:Th%40i2004@localhost:27017/mongorest?authSource=admin'
+              connectionString: process.env.MONGODB_URL || 'mongodb://thaily:Th%40i2004@192.168.1.109:27017/mongorest?authSource=admin'
             }
           },
           postgresql: {
             connection: {
-              host: process.env.POSTGRES_HOST || 'localhost',
+              host: process.env.POSTGRES_HOST || '192.168.1.109',
               port: parseInt(process.env.POSTGRES_PORT || '5432'),
               database: process.env.POSTGRES_DB || 'testdb',
               username: process.env.POSTGRES_USER || 'user',
@@ -133,13 +133,13 @@ async function initializeCore() {
           },
           elasticsearch: {
             connection: {
-              host: process.env.ELASTICSEARCH_HOST || 'localhost',
+              host: process.env.ELASTICSEARCH_HOST || '192.168.1.109',
               port: parseInt(process.env.ELASTICSEARCH_PORT || '9200')
             }
           },
           mysql: {
             connection: {
-              host: process.env.MYSQL_HOST || 'localhost',
+              host: process.env.MYSQL_HOST || '192.168.1.109',
               port: parseInt(process.env.MYSQL_PORT || '3306'),
               database: process.env.MYSQL_DB || 'testdb',
               username: process.env.MYSQL_USER || 'user',
@@ -255,7 +255,7 @@ app.get('/api/:collection', async (req, res) => {
   try {
     const { collection } = req.params;
     const dbType = (req.query.dbType as DatabaseType) || 'mongodb';
-    const roles = req.headers['x-user-roles']?.toString().split(',') || ['user'];
+    const roles = req.headers['x-user-roles']?.toString().split(',') || ['nice'];
     const dryRun = req.query.dryRun === 'true';
     
     // Remove internal params
@@ -305,7 +305,7 @@ app.get('/api/:collection', async (req, res) => {
 app.get('/examples', (req, res) => {
   res.json({
     title: 'MongoREST New Architecture - API Examples',
-    baseUrl: `http://localhost:${port}`,
+    baseUrl: `http://192.168.1.109:${port}`,
     examples: {
       'Health Check': '/health',
       'System Status': '/status',
@@ -341,16 +341,16 @@ async function startServer() {
   app.listen(port, () => {
     console.log(`
 🚀 MongoREST New Architecture Demo Server
-📍 Server running at: http://localhost:${port}
-📖 Examples: http://localhost:${port}/examples
-🩺 Health: http://localhost:${port}/health
-📊 Status: http://localhost:${port}/status
+📍 Server running at: http://192.168.1.109:${port}
+📖 Examples: http://192.168.1.109:${port}/examples
+🩺 Health: http://192.168.1.109:${port}/health
+📊 Status: http://192.168.1.109:${port}/status
 
 🎯 Test URLs:
-• Intermediate JSON: http://localhost:${port}/api/test/intermediate/users?skip=0&limit=10&select=name,email&status=eq.active
-• MongoDB Query: http://localhost:${port}/api/test/native/users?dbType=mongodb&skip=0&limit=10&select=name,email&status=eq.active
-• PostgreSQL Query: http://localhost:${port}/api/test/native/users?dbType=postgresql&skip=0&limit=10&select=name,email&status=eq.active
-• Your Complex Example: http://localhost:${port}/api/users?dryRun=true&skip=0&limit=100&select=*,look_product_reviews(or=(reviews.verified=neq.true,reviews.status=eq.approved))&and=(status=eq.active)
+• Intermediate JSON: http://192.168.1.109:${port}/api/test/intermediate/users?skip=0&limit=10&select=name,email&status=eq.active
+• MongoDB Query: http://192.168.1.109:${port}/api/test/native/users?dbType=mongodb&skip=0&limit=10&select=name,email&status=eq.active
+• PostgreSQL Query: http://192.168.1.109:${port}/api/test/native/users?dbType=postgresql&skip=0&limit=10&select=name,email&status=eq.active
+• Your Complex Example: http://192.168.1.109:${port}/api/users?dryRun=true&skip=0&limit=100&select=*,look_product_reviews(or=(reviews.verified=neq.true,reviews.status=eq.approved))&and=(status=eq.active)
     `);
   });
 }

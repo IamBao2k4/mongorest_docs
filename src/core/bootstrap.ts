@@ -5,7 +5,8 @@ import { PostgreSQLAdapter } from './adapters/postgresql/postgresqlAdapter';
 import { ElasticsearchAdapter } from './adapters/elasticsearch/elasticsearchAdapter';
 import { MySQLAdapter } from './adapters/mysql/mysqlAdapter';
 import { RelationshipRegistry } from './adapters/base/relationship/RelationshipRegistry';
-import { ConfigurationError, ConnectionError, wrapError } from './errors';
+import { BootstrapErrors } from './errors/errorFactories';
+import { wrapError, ErrorCodes } from './errors';
 
 /**
  * Bootstrap the new core system with all database adapters
@@ -38,7 +39,7 @@ export class CoreBootstrap {
 
       return this.core;
     } catch (error) {
-      throw wrapError(error, 'Failed to initialize with built-in adapters');
+      throw BootstrapErrors.initBuiltinFailed(error);
     }
   }
 
@@ -47,7 +48,7 @@ export class CoreBootstrap {
    */
   async initializeWithConfig(config: BootstrapConfig): Promise<NewCore> {
     if (!config) {
-      throw new ConfigurationError("Configuration is required");
+      throw BootstrapErrors.configRequired();
     }
     
     try {
@@ -79,7 +80,7 @@ export class CoreBootstrap {
 
       return this.core;
     } catch (error) {
-      throw wrapError(error, 'Failed to initialize with config');
+      throw BootstrapErrors.initConfigFailed(error);
     }
   }
 
@@ -88,7 +89,7 @@ export class CoreBootstrap {
    */
   getCore(): NewCore {
     if (!this.core) {
-      throw new ConfigurationError('Core is not initialized. Call initialize() first.');
+      throw BootstrapErrors.coreNotInitialized();
     }
     return this.core;
   }
@@ -120,7 +121,7 @@ export class CoreBootstrap {
 
     } catch (error) {
       console.error('❌ Failed to register built-in adapters:', error);
-      throw error;
+      throw wrapError(error, ErrorCodes.BST_INIT_BUILTIN_FAILED);
     }
   }
 
@@ -139,7 +140,7 @@ export class CoreBootstrap {
         }
       } catch (error) {
         if (adapterConfig.required) {
-          throw error;
+          throw wrapError(error, ErrorCodes.ADP_LOAD_FAILED);
         }
         console.warn(`⚠️ Optional custom adapter failed to load:`, error);
       }
@@ -177,7 +178,7 @@ export class CoreBootstrap {
       const adapters = adapterRegistry.listAdapters();
       
       if (!Array.isArray(adapters)) {
-        throw new ConnectionError("Failed to get adapter list");
+        throw BootstrapErrors.adapterListFailed();
       }
       
       const results: ConnectionTestResult[] = [];
@@ -213,7 +214,7 @@ export class CoreBootstrap {
 
       return results;
     } catch (error) {
-      throw wrapError(error, 'Failed to test connections');
+      throw BootstrapErrors.testConnectionFailed(error);
     }
   }
 

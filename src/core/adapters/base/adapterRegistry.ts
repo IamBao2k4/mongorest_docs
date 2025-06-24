@@ -1,4 +1,5 @@
 import { DatabaseAdapter, DatabaseType } from './databaseAdapter';
+import { AdapterErrors } from '../../errors/errorFactories';
 
 /**
  * Registry for managing database adapters
@@ -262,18 +263,18 @@ export class AdapterPluginSystem {
       const AdapterClass = module.default || module;
       
       if (typeof AdapterClass !== 'function') {
-        throw new Error(`Invalid adapter module: ${modulePath}`);
+        throw AdapterErrors.moduleInvalid(modulePath);
       }
 
       const adapter = new AdapterClass();
       
       if (!this.isValidAdapter(adapter)) {
-        throw new Error(`Invalid adapter implementation: ${modulePath}`);
+        throw AdapterErrors.implementationInvalid(modulePath);
       }
 
       this.registry.register(adapter);
     } catch (error) {
-      throw new Error(`Failed to load adapter from ${modulePath}: ${(error as Error).message}`);
+      throw AdapterErrors.loadFailed(modulePath, (error as Error).message);
     }
   }
 

@@ -14,7 +14,7 @@ import {
 } from "../adapters/base/adapterRegistry";
 import { RbacValidator } from "../rbac/rbac-validator";
 import { RelationshipRegistry } from "../adapters/base/relationship/RelationshipRegistry";
-import { AuthorizationError, QueryError, NotFoundError, RelationshipError, wrapError } from "../errors";
+import { CoreErrors } from "../errors/errorFactories";
 
 /**
  * New core architecture with clean separation of concerns
@@ -50,9 +50,7 @@ export class NewCore {
   ): Promise<IntermediateQueryResult<T>> {
     // 1. Validate RBAC access
     if (!this.rbacValidator.hasAccess(collection, "read", roles)) {
-      throw new AuthorizationError(
-        `User does not have access to read on collection ${collection}`
-      );
+      throw CoreErrors.accessDeniedRead(collection, roles);
     }
 
     // 2. Convert URL params to intermediate JSON format
@@ -74,12 +72,7 @@ export class NewCore {
     // 6. Validate query against adapter capabilities
     const validation = adapter.validateQuery(intermediateQuery);
     if (!validation.valid) {
-      throw new QueryError(
-        `Query validation failed: ${validation.errors
-          .map((e) => e.message)
-          .join(", ")}`,
-        { errors: validation.errors }
-      );
+      throw CoreErrors.queryValidationFailed(validation.errors);
     }
 
     // 7. Convert to native database query
@@ -90,7 +83,7 @@ export class NewCore {
       try {
         (adapter as any).setCurrentContext(intermediateQuery);
       } catch (error) {
-        throw wrapError(error, 'Failed to set adapter context');
+        throw CoreErrors.adapterContextFailed(error);
       }
     }
 
@@ -107,10 +100,10 @@ export class NewCore {
             }
           });
         } else {
-          throw new AuthorizationError("RBAC features must be an array");
+          throw CoreErrors.rbacFeaturesInvalid();
         }
       } catch (error) {
-        throw wrapError(error, 'Failed to get RBAC features');
+        throw CoreErrors.rbacFeaturesFailed(error);
       }
 
       if (Object.keys(projection).length > 0 && Array.isArray(nativeQuery)) {
@@ -192,11 +185,7 @@ export class NewCore {
     );
 
     if (!adapter) {
-      throw new NotFoundError(
-        `No adapter found for database type: ${databaseType}${
-          adapterName ? ` with name: ${adapterName}` : ""
-        }`
-      );
+      throw CoreErrors.adapterNotFound(databaseType, adapterName);
     }
 
     return adapter;
@@ -219,11 +208,11 @@ export class NewCore {
     sourceCollection: string
   ): void {
     if (!this.relationshipRegistry) {
-      throw new RelationshipError("Relationship registry is not initialized");
+      throw CoreErrors.relationshipNotInitialized();
     }
 
     if (!Array.isArray(joins)) {
-      throw new QueryError("Joins must be an array");
+      throw CoreErrors.joinsInvalidType();
     }
 
     joins.forEach((join) => {
@@ -233,7 +222,7 @@ export class NewCore {
           this.relationshipRegistry!.getRelationships(sourceCollection);
         
         if (!Array.isArray(relationships)) {
-          throw new RelationshipError(`Failed to get relationships for collection: ${sourceCollection}`);
+          throw CoreErrors.relationshipNotFound(sourceCollection);
         }
         
         const relationship = relationships.find(
@@ -282,15 +271,15 @@ export class NewCore {
     roles: string[]
   ): void {
     if (!query) {
-      throw new QueryError("Query object is required");
+      throw CoreErrors.queryObjectRequired();
     }
     
     if (!collection || typeof collection !== 'string') {
-      throw new QueryError("Valid collection name is required");
+      throw CoreErrors.collectionNameInvalid();
     }
     
     if (!Array.isArray(roles)) {
-      throw new AuthorizationError("Roles must be an array");
+      throw CoreErrors.rolesInvalidType();
     }
     
     const rbacValidator = new RbacValidator();
@@ -303,7 +292,7 @@ export class NewCore {
         roles
       );
     } catch (error) {
-      throw wrapError(error, 'Failed to apply RBAC restrictions');
+      throw CoreErrors.rbacRestrictionFailed(error);
     }
 
     if (allowedFields.length > 0) {

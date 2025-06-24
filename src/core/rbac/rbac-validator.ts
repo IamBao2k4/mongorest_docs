@@ -6,6 +6,7 @@ import {
 } from './rbac-interface'
 import * as fs from 'fs';
 import * as path from 'path';
+import { RbacErrors } from '../errors/errorFactories';
 
 
 export class RbacValidator {
@@ -52,7 +53,7 @@ export class RbacValidator {
         const rbacCollection: RbacCollection = this.rbacJson.collections.find((col: RbacCollection) => col.collection_name === collection)!;
 
         if (!rbacCollection) {
-            throw new Error(`Collection ${collection} not found in RBAC configuration.`);
+            throw RbacErrors.collectionNotFound(collection);
         }
 
         const collectionAction: RbacRolePattern[] = action === 'read' ? rbacCollection.rbac_config.read : action === 'write' ? rbacCollection.rbac_config.write : rbacCollection.rbac_config.delete;
@@ -118,7 +119,7 @@ export class RbacValidator {
         const rbacCollection: RbacCollection = this.rbacJson.collections.find((col: RbacCollection) => col.collection_name === collection)!;
 
         if (!rbacCollection) {
-            throw new Error(`Collection ${collection} not found in RBAC configuration.`);
+            throw RbacErrors.collectionNotFound(collection);
         }
 
         const collectionAction: RbacRolePattern[] = action === 'read' ? rbacCollection.rbac_config.read : action === 'write' ? rbacCollection.rbac_config.write : rbacCollection.rbac_config.delete;
@@ -182,7 +183,7 @@ export class RbacValidator {
 
     public filterBodyData(collection: string, action: string, roles: string[], data: any): any {
         if (!this.hasAccess(collection, action, roles)) {
-            throw new Error(`User does not have access to ${action} on collection ${collection}`);
+            throw RbacErrors.accessDenied(action, collection, roles);
         }
 
         const rbacFeatures = this.objectize(this.getRbacFeatures(collection, action, roles));

@@ -2,6 +2,7 @@ import {
   IntermediateQuery, 
   IntermediateQueryResult 
 } from '../../types/intermediateQuery';
+import { AdapterErrors } from '../../errors/errorFactories';
 
 /**
  * Base interface for all database adapters
@@ -301,7 +302,7 @@ export abstract class BaseDatabaseAdapter implements DatabaseAdapter {
 
   protected ensureInitialized(): void {
     if (!this.isInitialized) {
-      throw new Error(`Adapter ${this.name} is not initialized`);
+      throw AdapterErrors.notInitialized(this.name);
     }
   }
 

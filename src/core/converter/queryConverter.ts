@@ -11,7 +11,7 @@ import {
   JoinType,
   RelationshipMeta
 } from '../types/intermediateQuery';
-import { QueryError } from '../errors';
+import { QueryErrors } from '../errors/errorFactories';
 
 /**
  * Converts URL query parameters to intermediate JSON format
@@ -118,7 +118,7 @@ export class QueryConverter {
             }
             this.currentQuery.joins.push(joinClause);
           } else {
-            throw new QueryError("Current query is not initialized");
+            throw QueryErrors.currentQueryNotInitialized();
           }
           
           // Add field for projection
