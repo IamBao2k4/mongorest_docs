@@ -4,11 +4,27 @@
  */
 
 export interface IntermediateQuery {
+  /** Query type */
+  type?: 'read' | 'insert' | 'update' | 'delete';
+  
   /** Main collection/table being queried */
   collection: string;
   
+  /** Target collection (for joins) */
+  target?: string;
+  
   /** Filter conditions */
   filter?: FilterCondition;
+  
+  /** Simple filter array (alternative to filter) */
+  filters?: Array<{
+    field: string;
+    operator: string;
+    value: any;
+  }>;
+  
+  /** Data for insert/update operations */
+  data?: any;
   
   /** Fields to select/project */
   select?: SelectClause;
@@ -19,11 +35,23 @@ export interface IntermediateQuery {
   /** Pagination settings */
   pagination?: PaginationClause;
   
+  /** Simple limit (alternative to pagination) */
+  limit?: number;
+  
+  /** Simple skip (alternative to pagination) */
+  skip?: number;
+  
   /** Join/relationship configurations */
   joins?: JoinClause[];
   
   /** Aggregation operations */
   aggregations?: AggregationClause[];
+  
+  /** Additional query options */
+  options?: {
+    partial?: boolean;
+    [key: string]: any;
+  };
   
   /** Additional metadata */
   metadata?: QueryMetadata;
@@ -197,6 +225,14 @@ export interface QueryMetadata {
   
   /** Performance hints */
   hints?: Record<string, any>;
+  
+  /** Database type */
+  database?: string;
+  
+  /** User information */
+  user?: {
+    roles: string[];
+  };
 }
 
 /**
@@ -222,6 +258,18 @@ export interface IntermediateQueryResult<T = any> {
     
     /** Generated native query */
     nativeQuery?: any;
+    
+    /** Number of documents inserted */
+    insertedCount?: number;
+    
+    /** Number of documents modified */
+    modifiedCount?: number;
+    
+    /** Number of documents deleted */
+    deletedCount?: number;
+    
+    /** Number of documents matched */
+    matchedCount?: number;
   };
   
   /** Pagination info */

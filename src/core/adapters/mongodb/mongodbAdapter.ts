@@ -14,6 +14,7 @@ import {
   SortClause
 } from '../../types/intermediateQuery';
 import { RelationshipRegistry } from '../base/relationship/RelationshipRegistry';
+import { ObjectId } from 'mongodb';
 
 /**
  * MongoDB adapter for converting intermediate queries to MongoDB aggregation pipelines
@@ -32,9 +33,27 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
   }
 
   /**
-   * Convert intermediate query to MongoDB aggregation pipeline
+   * Convert intermediate query to MongoDB query
    */
-  convertQuery(query: IntermediateQuery): any[] {
+  convertQuery(query: IntermediateQuery): any {
+    // Handle different query types
+    switch (query.type) {
+      case 'insert':
+        return this.convertInsertQuery(query);
+      case 'update':
+        return this.convertUpdateQuery(query);
+      case 'delete':
+        return this.convertDeleteQuery(query);
+      case 'read':
+      default:
+        return this.convertReadQuery(query);
+    }
+  }
+
+  /**
+   * Convert read query to MongoDB aggregation pipeline
+   */
+  private convertReadQuery(query: IntermediateQuery): any[] {
     const pipeline: any[] = [];
 
     // 1. Add lookup stages for joins first
@@ -47,6 +66,11 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     if (query.filter) {
       const matchStage = this.convertFilter(query.filter);
       console.log("matchStage", matchStage)
+      if (Object.keys(matchStage).length > 0) {
+        pipeline.push({ $match: matchStage });
+      }
+    } else if (query.filters && query.filters.length > 0) {
+      const matchStage = this.convertSimpleFilters(query.filters);
       if (Object.keys(matchStage).length > 0) {
         pipeline.push({ $match: matchStage });
       }
@@ -74,16 +98,124 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
       if (query.pagination.limit && query.pagination.limit > 0) {
         pipeline.push({ $limit: query.pagination.limit });
       }
+    } else {
+      if (query.skip && query.skip > 0) {
+        pipeline.push({ $skip: query.skip });
+      }
+      if (query.limit && query.limit > 0) {
+        pipeline.push({ $limit: query.limit });
+      }
     }
 
     return pipeline;
   }
 
   /**
-   * Execute MongoDB aggregation pipeline
+   * Convert insert query
+   */
+  private convertInsertQuery(query: IntermediateQuery): any {
+    return {
+      operation: 'insertOne',
+      document: query.data
+    };
+  }
+
+  /**
+   * Convert update query
+   */
+  private convertUpdateQuery(query: IntermediateQuery): any {
+    const filter = query.filters ? this.convertSimpleFilters(query.filters) : {};
+    
+    return {
+      operation: query.options?.partial ? 'updateOne' : 'replaceOne',
+      filter,
+      update: query.options?.partial ? { $set: query.data } : query.data
+    };
+  }
+
+  /**
+   * Convert delete query
+   */
+  private convertDeleteQuery(query: IntermediateQuery): any {
+    const filter = query.filters ? this.convertSimpleFilters(query.filters) : {};
+    
+    return {
+      operation: 'deleteOne',
+      filter
+    };
+  }
+
+  /**
+   * Convert simple filters array to MongoDB filter
+   */
+  private convertSimpleFilters(filters: Array<{field: string; operator: string; value: any}>): any {
+    const mongoFilter: any = {};
+    
+    filters.forEach(filter => {
+      const { field, operator, value } = filter;
+      
+      // Convert string to ObjectId for _id field
+      let processedValue = value;
+      if (field === '_id' && typeof value === 'string') {
+        try {
+          processedValue = new ObjectId(value);
+        } catch (error) {
+          // If conversion fails, keep original value
+          processedValue = value;
+        }
+      }
+      
+      switch (operator) {
+        case 'eq':
+          mongoFilter[field] = processedValue;
+          break;
+        case 'neq':
+          mongoFilter[field] = { $ne: processedValue };
+          break;
+        case 'gt':
+          mongoFilter[field] = { $gt: processedValue };
+          break;
+        case 'gte':
+          mongoFilter[field] = { $gte: processedValue };
+          break;
+        case 'lt':
+          mongoFilter[field] = { $lt: processedValue };
+          break;
+        case 'lte':
+          mongoFilter[field] = { $lte: processedValue };
+          break;
+        case 'in':
+          mongoFilter[field] = { $in: processedValue };
+          break;
+        case 'nin':
+          mongoFilter[field] = { $nin: processedValue };
+          break;
+        case 'like':
+        case 'contains':
+          mongoFilter[field] = { $regex: processedValue, $options: 'i' };
+          break;
+        case 'exists':
+          mongoFilter[field] = { $exists: processedValue };
+          break;
+        case 'null':
+          mongoFilter[field] = null;
+          break;
+        case 'notnull':
+          mongoFilter[field] = { $ne: null };
+          break;
+        default:
+          mongoFilter[field] = processedValue;
+      }
+    });
+    
+    return mongoFilter;
+  }
+
+  /**
+   * Execute MongoDB query
    */
   async executeQuery<T = any>(
-    nativeQuery: any[], 
+    nativeQuery: any, 
     options?: ExecutionOptions
   ): Promise<IntermediateQueryResult<T>> {
     this.ensureInitialized();
@@ -95,18 +227,68 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     const startTime = Date.now();
     
     try {
-      // Execute the aggregation pipeline
       const collection = this.db.collection(this.getCurrentCollection());
-      const cursor = collection.aggregate(nativeQuery, {
-        maxTimeMS: options?.timeout || 30000,
-        allowDiskUse: true,
-        ...options?.driverOptions
-      });
+      let result: any;
+      let data: T[] = [];
+      
+      // Handle different operation types
+      if (Array.isArray(nativeQuery)) {
+        // Read operation (aggregation pipeline)
+        const cursor = collection.aggregate(nativeQuery, {
+          maxTimeMS: options?.timeout || 30000,
+          allowDiskUse: true,
+          ...options?.driverOptions
+        });
+        data = await cursor.toArray();
+      } else if (nativeQuery.operation) {
+        // CRUD operations
+        switch (nativeQuery.operation) {
+          case 'insertOne':
+            result = await collection.insertOne(nativeQuery.document);
+            data = [{ ...nativeQuery.document, _id: result.insertedId }] as T[];
+            break;
+            
+          case 'updateOne':
+            result = await collection.updateOne(nativeQuery.filter, nativeQuery.update);
+            if (result.modifiedCount > 0) {
+              const updated = await collection.findOne(nativeQuery.filter);
+              data = updated ? [updated] : [];
+            }
+            break;
+            
+          case 'replaceOne':
+            result = await collection.replaceOne(nativeQuery.filter, nativeQuery.update);
+            if (result.modifiedCount > 0) {
+              const replaced = await collection.findOne(nativeQuery.filter);
+              data = replaced ? [replaced] : [];
+            }
+            break;
+            
+          case 'deleteOne':
+            result = await collection.deleteOne(nativeQuery.filter);
+            data = [];
+            break;
+            
+          default:
+            throw new Error(`Unsupported operation: ${nativeQuery.operation}`);
+        }
+      }
 
-      const data = await cursor.toArray();
       const executionTime = Date.now() - startTime;
-
-      return this.createResult(data, this.getCurrentQuery(), nativeQuery, executionTime);
+      const queryResult = this.createResult(data, this.getCurrentQuery(), nativeQuery, executionTime);
+      
+      // Add operation metadata for CRUD operations
+      if (result) {
+        queryResult.metadata = {
+          ...queryResult.metadata,
+          insertedCount: result.insertedCount || 0,
+          modifiedCount: result.modifiedCount || 0,
+          deletedCount: result.deletedCount || 0,
+          matchedCount: result.matchedCount || 0
+        };
+      }
+      
+      return queryResult;
     } catch (error) {
       throw new Error(`MongoDB query execution failed: ${(error as Error).message}`);
     }
@@ -150,13 +332,23 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     } else if (config.connection) {
       // Initialize MongoDB connection if not provided
       const { MongoClient } = await import('mongodb');
-      const client = new MongoClient(
-        config.connection.connectionString || 
-        this.buildConnectionString(config.connection)
-      );
+      const connectionString = config.connection.connectionString || 
+        this.buildConnectionString(config.connection);
       
+      const client = new MongoClient(connectionString);
       await client.connect();
-      this.db = client.db(config.connection.database);
+      
+      // Extract database name from connection string or use provided database
+      let dbName = config.connection.database;
+      if (!dbName && config.connection.connectionString) {
+        // Extract database name from connection string
+        const match = config.connection.connectionString.match(/\/([^/?]+)(\?|$)/);
+        if (match) {
+          dbName = match[1];
+        }
+      }
+      
+      this.db = client.db(dbName);
     }
   }
 

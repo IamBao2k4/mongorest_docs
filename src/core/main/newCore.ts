@@ -351,6 +351,274 @@ export class NewCore {
     const adapter = this.getAdapter(databaseType, adapterName);
     return adapter.convertQuery(intermediateQuery);
   }
+
+  /**
+   * Create a new resource
+   */
+  async create<T = any>(
+    collection: string,
+    data: any,
+    roles: string[],
+    databaseType: DatabaseType = "mongodb",
+    adapterName?: string
+  ): Promise<T> {
+    // Validate RBAC access
+    if (!this.rbacValidator.hasAccess(collection, "create", roles)) {
+      throw new AuthorizationError(
+        `User does not have access to create on collection ${collection}`
+      );
+    }
+
+    // Get appropriate database adapter
+    const adapter = this.getAdapter(databaseType, adapterName);
+
+    // Create intermediate query for insert operation
+    const intermediateQuery: IntermediateQuery = {
+      type: "insert",
+      collection,
+      data,
+      target: collection,
+      filters: [],
+      metadata: {
+        database: databaseType,
+        timestamp: new Date(),
+        user: {
+          roles
+        }
+      }
+    };
+
+    // Apply RBAC field restrictions
+    this.applyRbacRestrictions(intermediateQuery, collection, roles);
+
+    // Execute the insert
+    const result = await adapter.executeQuery<T>(
+      adapter.convertQuery(intermediateQuery)
+    );
+
+    return result.data[0];
+  }
+
+  /**
+   * Update a resource by ID
+   */
+  async update<T = any>(
+    collection: string,
+    id: string,
+    data: any,
+    roles: string[],
+    databaseType: DatabaseType = "mongodb",
+    adapterName?: string
+  ): Promise<T> {
+    // Validate RBAC access
+    if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
+      throw new AuthorizationError(
+        `User does not have access to update on collection ${collection}`
+      );
+    }
+
+    // Get appropriate database adapter
+    const adapter = this.getAdapter(databaseType, adapterName);
+
+    // Create intermediate query for update operation
+    const intermediateQuery: IntermediateQuery = {
+      type: "update",
+      collection,
+      data,
+      target: collection,
+      filters: [
+        {
+          field: "_id",
+          operator: "eq",
+          value: id
+        }
+      ],
+      metadata: {
+        database: databaseType,
+        timestamp: new Date(),
+        user: {
+          roles
+        }
+      }
+    };
+
+    // Apply RBAC field restrictions
+    this.applyRbacRestrictions(intermediateQuery, collection, roles);
+
+    // Execute the update
+    const result = await adapter.executeQuery<T>(
+      adapter.convertQuery(intermediateQuery)
+    );
+
+    if (!result.data || result.data.length === 0) {
+      throw new NotFoundError(`Resource with id ${id} not found in collection ${collection}`);
+    }
+
+    return result.data[0];
+  }
+
+  /**
+   * Partial update a resource by ID
+   */
+  async partialUpdate<T = any>(
+    collection: string,
+    id: string,
+    data: any,
+    roles: string[],
+    databaseType: DatabaseType = "mongodb",
+    adapterName?: string
+  ): Promise<T> {
+    // Validate RBAC access
+    if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
+      throw new AuthorizationError(
+        `User does not have access to update on collection ${collection}`
+      );
+    }
+
+    // Get appropriate database adapter
+    const adapter = this.getAdapter(databaseType, adapterName);
+
+    // Create intermediate query for partial update operation
+    const intermediateQuery: IntermediateQuery = {
+      type: "update",
+      collection,
+      data,
+      target: collection,
+      filters: [
+        {
+          field: "_id",
+          operator: "eq",
+          value: id
+        }
+      ],
+      options: {
+        partial: true
+      },
+      metadata: {
+        database: databaseType,
+        timestamp: new Date(),
+        user: {
+          roles
+        }
+      }
+    };
+
+    // Apply RBAC field restrictions
+    this.applyRbacRestrictions(intermediateQuery, collection, roles);
+
+    // Execute the partial update
+    const result = await adapter.executeQuery<T>(
+      adapter.convertQuery(intermediateQuery)
+    );
+
+    if (!result.data || result.data.length === 0) {
+      throw new NotFoundError(`Resource with id ${id} not found in collection ${collection}`);
+    }
+
+    return result.data[0];
+  }
+
+  /**
+   * Delete a resource by ID
+   */
+  async delete(
+    collection: string,
+    id: string,
+    roles: string[],
+    databaseType: DatabaseType = "mongodb",
+    adapterName?: string
+  ): Promise<boolean> {
+    // Validate RBAC access
+    if (!this.rbacValidator.hasAccess(collection, "delete", roles)) {
+      throw new AuthorizationError(
+        `User does not have access to delete on collection ${collection}`
+      );
+    }
+
+    // Get appropriate database adapter
+    const adapter = this.getAdapter(databaseType, adapterName);
+
+    // Create intermediate query for delete operation
+    const intermediateQuery: IntermediateQuery = {
+      type: "delete",
+      collection,
+      target: collection,
+      filters: [
+        {
+          field: "_id",
+          operator: "eq",
+          value: id
+        }
+      ],
+      metadata: {
+        database: databaseType,
+        timestamp: new Date(),
+        user: {
+          roles
+        }
+      }
+    };
+
+    // Execute the delete
+    const result = await adapter.executeQuery(
+      adapter.convertQuery(intermediateQuery)
+    );
+
+    return (result.metadata?.deletedCount ?? 0) > 0;
+  }
+
+  /**
+   * Find a resource by ID
+   */
+  async findById<T = any>(
+    collection: string,
+    id: string,
+    roles: string[],
+    databaseType: DatabaseType = "mongodb",
+    adapterName?: string
+  ): Promise<T | null> {
+    // Validate RBAC access
+    if (!this.rbacValidator.hasAccess(collection, "read", roles)) {
+      throw new AuthorizationError(
+        `User does not have access to read on collection ${collection}`
+      );
+    }
+
+    // Get appropriate database adapter
+    const adapter = this.getAdapter(databaseType, adapterName);
+
+    // Create intermediate query for finding by ID
+    const intermediateQuery: IntermediateQuery = {
+      type: "read",
+      collection,
+      target: collection,
+      filters: [
+        {
+          field: "_id",
+          operator: "eq",
+          value: id
+        }
+      ],
+      limit: 1,
+      metadata: {
+        database: databaseType,
+        timestamp: new Date(),
+        user: {
+          roles
+        }
+      }
+    };
+
+    // Apply RBAC field restrictions
+    this.applyRbacRestrictions(intermediateQuery, collection, roles);
+
+    // Execute the query
+    const result = await adapter.executeQuery<T>(
+      adapter.convertQuery(intermediateQuery)
+    );
+
+    return result.data && result.data.length > 0 ? result.data[0] : null;
+  }
 }
 
 /**

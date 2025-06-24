@@ -250,6 +250,46 @@ app.get('/api/test/native/:collection', async (req, res) => {
   }
 });
 
+// Get single resource by ID (GET) - must be before the general GET route
+app.get('/api/:collection/:id', async (req: any, res: any) => {
+  try {
+    const { collection, id } = req.params;
+    const dbType = (req.query.dbType as DatabaseType) || 'mongodb';
+    const roles = req.headers['x-user-roles']?.toString().split(',') || ['user'];
+    
+    // Execute find by ID operation
+    const result = await core.findById(collection, id, roles, dbType);
+    
+    if (!result) {
+      return res.status(404).json({
+        error: 'Resource not found',
+        collection,
+        id,
+        databaseType: dbType,
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: result,
+      collection,
+      id,
+      databaseType: dbType,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: 'Get operation failed',
+      message: (error as Error).message,
+      collection: req.params.collection,
+      id: req.params.id,
+      databaseType: req.query.dbType || 'mongodb',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Main API endpoint with multiple database support
 app.get('/api/:collection', async (req, res) => {
   try {
@@ -301,6 +341,136 @@ app.get('/api/:collection', async (req, res) => {
   }
 });
 
+// Create new resource (POST)
+app.post('/api/:collection', async (req, res) => {
+  try {
+    const { collection } = req.params;
+    const dbType = (req.body.dbType as DatabaseType) || 'mongodb';
+    const roles = req.headers['x-user-roles']?.toString().split(',') || ['user'];
+    
+    // Remove internal params from body
+    const data = { ...req.body };
+    delete data.dbType;
+    
+    // Execute create operation
+    const result = await core.create(collection, data, roles, dbType);
+    
+    res.status(201).json({
+      success: true,
+      data: result,
+      collection,
+      databaseType: dbType,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: 'Create operation failed',
+      message: (error as Error).message,
+      collection: req.params.collection,
+      databaseType: req.body.dbType || 'mongodb',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Update resource (PUT)
+app.put('/api/:collection/:id', async (req, res) => {
+  try {
+    const { collection, id } = req.params;
+    const dbType = (req.body.dbType as DatabaseType) || 'mongodb';
+    const roles = req.headers['x-user-roles']?.toString().split(',') || ['user'];
+    
+    // Remove internal params from body
+    const data = { ...req.body };
+    delete data.dbType;
+    
+    // Execute update operation
+    const result = await core.update(collection, id, data, roles, dbType);
+    
+    res.json({
+      success: true,
+      data: result,
+      collection,
+      id,
+      databaseType: dbType,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: 'Update operation failed',
+      message: (error as Error).message,
+      collection: req.params.collection,
+      id: req.params.id,
+      databaseType: req.body.dbType || 'mongodb',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Partial update resource (PATCH)
+app.patch('/api/:collection/:id', async (req, res) => {
+  try {
+    const { collection, id } = req.params;
+    const dbType = (req.body.dbType as DatabaseType) || 'mongodb';
+    const roles = req.headers['x-user-roles']?.toString().split(',') || ['user'];
+    
+    // Remove internal params from body
+    const data = { ...req.body };
+    delete data.dbType;
+    
+    // Execute partial update operation
+    const result = await core.partialUpdate(collection, id, data, roles, dbType);
+    
+    res.json({
+      success: true,
+      data: result,
+      collection,
+      id,
+      databaseType: dbType,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: 'Partial update operation failed',
+      message: (error as Error).message,
+      collection: req.params.collection,
+      id: req.params.id,
+      databaseType: req.body.dbType || 'mongodb',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Delete resource (DELETE)
+app.delete('/api/:collection/:id', async (req, res) => {
+  try {
+    const { collection, id } = req.params;
+    const dbType = (req.query.dbType as DatabaseType) || 'mongodb';
+    const roles = req.headers['x-user-roles']?.toString().split(',') || ['user'];
+    
+    // Execute delete operation
+    const result = await core.delete(collection, id, roles, dbType);
+    
+    res.json({
+      success: true,
+      message: 'Resource deleted successfully',
+      collection,
+      id,
+      databaseType: dbType,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: 'Delete operation failed',
+      message: (error as Error).message,
+      collection: req.params.collection,
+      id: req.params.id,
+      databaseType: req.query.dbType || 'mongodb',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Example queries endpoint
 app.get('/examples', (req, res) => {
   res.json({
@@ -316,7 +486,15 @@ app.get('/examples', (req, res) => {
       'Test MySQL Native': '/api/test/native/users?dbType=mysql&skip=0&limit=10&select=name,email&status=eq.active',
       'Dry Run Query (MongoDB)': '/api/users?dryRun=true&skip=0&limit=100&select=*,look_product_reviews(or=(reviews.verified=neq.true,reviews.status=eq.approved))&and=(status=eq.active)',
       'Dry Run Query (PostgreSQL)': '/api/users?dbType=postgresql&dryRun=true&skip=0&limit=10&select=name,email&status=eq.active',
-      'Complex Query Example': '/api/users?skip=0&limit=100&select=*,look_product_reviews(or=(reviews.verified=neq.true,reviews.status=eq.approved),look_products(categories(children())))&and=(status=eq.active)'
+      'Complex Query Example': '/api/users?skip=0&limit=100&select=*,look_product_reviews(or=(reviews.verified=neq.true,reviews.status=eq.approved),look_products(categories(children())))&and=(status=eq.active)',
+      'CRUD Operations': {
+        'Get All': 'GET /api/users',
+        'Get By ID': 'GET /api/users/123',
+        'Create': 'POST /api/users (with JSON body)',
+        'Update': 'PUT /api/users/123 (with JSON body)',
+        'Partial Update': 'PATCH /api/users/123 (with JSON body)',
+        'Delete': 'DELETE /api/users/123'
+      }
     },
     headers: {
       'Set User Roles': 'X-User-Rules: admin,user'
