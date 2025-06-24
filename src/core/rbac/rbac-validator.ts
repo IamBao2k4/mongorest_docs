@@ -72,8 +72,8 @@ export class RbacValidator {
 
                     const typeValue = pattern[fieldName].type;
 
-                    if (typeValue === 'field') {
-                        features.add(isRelate ? (pre_fieldName + "." + fieldName) : fieldName);;
+                    if (typeValue !== 'relation') {
+                        features.add(isRelate ? (pre_fieldName + "." + fieldName) : fieldName);
                     } else {
                         const relate_collection = pattern[fieldName].relate_collection;
                         const rbacFeatures = this.getRbacFeatures(
@@ -165,12 +165,12 @@ export class RbacValidator {
                 const projValue = projection[key];
 
                 if (projValue === 1) {
-                    // Field đơn giản
+                    // basic field
                     if (key in data) {
                         result[key] = data[key];
                     }
                 } else if (typeof projValue === 'object' && projValue !== null) {
-                    // Field lồng nhau
+                    // nested field
                     if (key in data && typeof data[key] === 'object' && data[key] !== null) {
                         result[key] = this.filterDataByProjection(data[key], projValue);
                     }
@@ -179,6 +179,10 @@ export class RbacValidator {
         }
 
         return result;
+    }
+
+    private RBACStrictData(data: any, projection: any ): any {
+        
     }
 
     public filterBodyData(collection: string, action: string, roles: string[], data: any): any {
