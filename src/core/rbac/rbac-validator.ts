@@ -71,7 +71,7 @@ export class RbacValidator {
                         features.add(isRelate ? (pre_fieldName + "." + fieldName) : fieldName); ;
                     } else {
                         const relate_collection = pattern[fieldName].relate_collection;
-                        const rbacFeatures = RbacValidator.getRbacFeatures(
+                        const rbacFeatures = this.getRbacFeatures(
                             relate_collection, 
                             action, 
                             userRoles, 

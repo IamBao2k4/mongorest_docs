@@ -14,6 +14,7 @@ import {
 } from "../adapters/base/adapterRegistry";
 import { RbacValidator } from "../rbac/rbac-validator";
 import { RelationshipRegistry } from "../adapters/base/relationship/RelationshipRegistry";
+import { AuthorizationError, QueryError, NotFoundError, RelationshipError, wrapError } from "../errors";
 
 /**
  * New core architecture with clean separation of concerns
@@ -49,7 +50,7 @@ export class NewCore {
   ): Promise<IntermediateQueryResult<T>> {
     // 1. Validate RBAC access
     if (!this.rbacValidator.hasAccess(collection, "read", roles)) {
-      throw new Error(
+      throw new AuthorizationError(
         `User does not have access to read on collection ${collection}`
       );
     }
@@ -73,10 +74,11 @@ export class NewCore {
     // 6. Validate query against adapter capabilities
     const validation = adapter.validateQuery(intermediateQuery);
     if (!validation.valid) {
-      throw new Error(
+      throw new QueryError(
         `Query validation failed: ${validation.errors
           .map((e) => e.message)
-          .join(", ")}`
+          .join(", ")}`,
+        { errors: validation.errors }
       );
     }
 
@@ -84,23 +86,38 @@ export class NewCore {
     const nativeQuery = adapter.convertQuery(intermediateQuery);
 
     // 8. Set adapter context and execute query
-    if ("setCurrentContext" in adapter) {
-      (adapter as any).setCurrentContext(intermediateQuery);
+    if ("setCurrentContext" in adapter && typeof (adapter as any).setCurrentContext === 'function') {
+      try {
+        (adapter as any).setCurrentContext(intermediateQuery);
+      } catch (error) {
+        throw wrapError(error, 'Failed to set adapter context');
+      }
     }
 
     console.log("nativeQuery", JSON.stringify(nativeQuery));
 
     if (databaseType === "mongodb") {
       const projection: Record<string, number> = {};
-      this.rbacValidator
-        .getRbacFeatures(collection, "read", roles)
-        .forEach((f: string) => {
-          projection[f] = 1;
-        });
+      try {
+        const features = this.rbacValidator.getRbacFeatures(collection, "read", roles);
+        if (Array.isArray(features)) {
+          features.forEach((f: string) => {
+            if (typeof f === 'string') {
+              projection[f] = 1;
+            }
+          });
+        } else {
+          throw new AuthorizationError("RBAC features must be an array");
+        }
+      } catch (error) {
+        throw wrapError(error, 'Failed to get RBAC features');
+      }
 
-      nativeQuery.push({
-        $project: projection,
-      });
+      if (Object.keys(projection).length > 0 && Array.isArray(nativeQuery)) {
+        nativeQuery.push({
+          $project: projection,
+        });
+      }
     }
 
     return adapter.executeQuery<T>(nativeQuery);
@@ -175,7 +192,7 @@ export class NewCore {
     );
 
     if (!adapter) {
-      throw new Error(
+      throw new NotFoundError(
         `No adapter found for database type: ${databaseType}${
           adapterName ? ` with name: ${adapterName}` : ""
         }`
@@ -201,13 +218,24 @@ export class NewCore {
     joins: any[],
     sourceCollection: string
   ): void {
-    if (!this.relationshipRegistry) return;
+    if (!this.relationshipRegistry) {
+      throw new RelationshipError("Relationship registry is not initialized");
+    }
+
+    if (!Array.isArray(joins)) {
+      throw new QueryError("Joins must be an array");
+    }
 
     joins.forEach((join) => {
       if (join.relationship && !join.on.length) {
         // Populate join conditions from relationship registry
         const relationships =
           this.relationshipRegistry!.getRelationships(sourceCollection);
+        
+        if (!Array.isArray(relationships)) {
+          throw new RelationshipError(`Failed to get relationships for collection: ${sourceCollection}`);
+        }
+        
         const relationship = relationships.find(
           (rel) => rel.name === join.relationship!.name
         );
@@ -253,12 +281,30 @@ export class NewCore {
     collection: string,
     roles: string[]
   ): void {
+    if (!query) {
+      throw new QueryError("Query object is required");
+    }
+    
+    if (!collection || typeof collection !== 'string') {
+      throw new QueryError("Valid collection name is required");
+    }
+    
+    if (!Array.isArray(roles)) {
+      throw new AuthorizationError("Roles must be an array");
+    }
+    
     const rbacValidator = new RbacValidator();
-    const allowedFields = rbacValidator.getRbacFeatures(
-      collection,
-      "read",
-      roles
-    );
+    
+    let allowedFields: string[];
+    try {
+      allowedFields = rbacValidator.getRbacFeatures(
+        collection,
+        "read",
+        roles
+      );
+    } catch (error) {
+      throw wrapError(error, 'Failed to apply RBAC restrictions');
+    }
 
     if (allowedFields.length > 0) {
       if (!query.select) {

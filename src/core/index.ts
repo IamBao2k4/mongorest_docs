@@ -2,12 +2,6 @@ export interface QueryParams {
   [key: string]: string | string[];
 }
 
-export interface MongoQuery {
-  filter: Record<string, any>;
-  projection?: Record<string, 1 | 0>;
-  sort?: Record<string, 1 | -1>;
-}
-
 export interface ParsedFilter {
   field: string;
   operator: string;
@@ -19,13 +13,12 @@ export interface MongoQuery {
   filter: Record<string, any>;
   projection?: Record<string, 1 | 0>;
   sort?: Record<string, 1 | -1>;
-  // New properties for enhanced functionality
   pipeline?: any[];
   hasEmbeds?: boolean;
   embeddedTables?: string[];
-  limit?: number;       // ✅ new
-  skip?: number;        // ✅ new
-  count?: boolean;      // ✅ new
+  limit?: number;
+  skip?: number;
+  count?: boolean;
 }
 
 export interface ConvertOptions {

@@ -11,12 +11,14 @@ import {
   JoinType,
   RelationshipMeta
 } from '../types/intermediateQuery';
+import { QueryError } from '../errors';
 
 /**
  * Converts URL query parameters to intermediate JSON format
  */
 export class QueryConverter {
   private relationshipRegistry?: any;
+  private currentQuery: IntermediateQuery | null = null;
 
   constructor(relationshipRegistry?: any) {
     this.relationshipRegistry = relationshipRegistry;
@@ -110,10 +112,14 @@ export class QueryConverter {
         
         if (joinClause) {
           // Add to query joins
-          if (!this.currentQuery.joins) {
-            this.currentQuery.joins = [];
+          if (this.currentQuery) {
+            if (!this.currentQuery.joins) {
+              this.currentQuery.joins = [];
+            }
+            this.currentQuery.joins.push(joinClause);
+          } else {
+            throw new QueryError("Current query is not initialized");
           }
-          this.currentQuery.joins.push(joinClause);
           
           // Add field for projection
           if (!result.fields) result.fields = [];
@@ -136,8 +142,7 @@ export class QueryConverter {
     return result;
   }
 
-  // Add property to track current query during processing
-  private currentQuery!: IntermediateQuery;
+  // Property is already declared at the top of the class
 
   private parseSort(orderClause: string): SortClause[] {
     const sorts: SortClause[] = [];

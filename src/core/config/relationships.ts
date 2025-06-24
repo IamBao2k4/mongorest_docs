@@ -51,7 +51,7 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
 
   // Categories -> Products (many:many) via junction table
   registry.registerFromDefinition('categories', {
-    name: 'products',
+    name: 'products_many_to_many',
     targetTable: 'products',
     localField: '_id',
     foreignField: '_id',
@@ -65,7 +65,7 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
 
   // Categories -> Primary Products (1:many) - Direct relationship
   registry.registerFromDefinition('categories', {
-    name: 'products',
+    name: 'primary_products',
     targetTable: 'products',
     localField: '_id',
     foreignField: 'primaryCategoryId',
@@ -140,8 +140,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   // ===== JUNCTION TABLE RELATIONSHIPS =====
   
   // Product_Categories -> Product (many:1)
-  registry.registerFromDefinition('categories', {
-    name: 'products',
+  registry.registerFromDefinition('product_categories', {
+    name: 'product',
     targetTable: 'products',
     localField: 'productId',
     foreignField: '_id',
@@ -149,8 +149,8 @@ export function setupEcommerceRelationships(): RelationshipRegistry {
   });
 
   // Product_Categories -> Category (many:1)
-  registry.registerFromDefinition('categories', {
-    name: 'categories',
+  registry.registerFromDefinition('product_categories', {
+    name: 'category',
     targetTable: 'categories',
     localField: 'categoryId',
     foreignField: '_id',

@@ -5,7 +5,7 @@ import { PostgreSQLAdapter } from './adapters/postgresql/postgresqlAdapter';
 import { ElasticsearchAdapter } from './adapters/elasticsearch/elasticsearchAdapter';
 import { MySQLAdapter } from './adapters/mysql/mysqlAdapter';
 import { RelationshipRegistry } from './adapters/base/relationship/RelationshipRegistry';
-import { error } from 'console';
+import { ConfigurationError, ConnectionError, wrapError } from './errors';
 
 /**
  * Bootstrap the new core system with all database adapters
@@ -24,50 +24,63 @@ export class CoreBootstrap {
    * Initialize the core system with built-in adapters
    */
   async initializeWithBuiltinAdapters(config?: CoreConfig): Promise<NewCore> {
-    // Register built-in adapters
-    await this.registerBuiltinAdapters();
+    try {
+      // Register built-in adapters
+      await this.registerBuiltinAdapters();
 
-    // Create core instance
-    this.core = new NewCore(this.relationshipRegistry, adapterRegistry);
+      // Create core instance
+      this.core = new NewCore(this.relationshipRegistry, adapterRegistry);
 
-    // Initialize with configuration
-    if (config) {
-      await this.core.initialize(config);
+      // Initialize with configuration
+      if (config) {
+        await this.core.initialize(config);
+      }
+
+      return this.core;
+    } catch (error) {
+      throw wrapError(error, 'Failed to initialize with built-in adapters');
     }
-
-    return this.core;
   }
 
   /**
    * Initialize the core system with custom configuration
    */
   async initializeWithConfig(config: BootstrapConfig): Promise<NewCore> {
-    // Register built-in adapters if requested
-    if (config.includeBuiltinAdapters !== false) {
-      await this.registerBuiltinAdapters();
+    if (!config) {
+      throw new ConfigurationError("Configuration is required");
     }
+    
+    try {
+      // Register built-in adapters if requested
+      if (config.includeBuiltinAdapters !== false) {
+        await this.registerBuiltinAdapters();
+      }
 
-    // Load custom adapters
-    if (config.customAdapters) {
-      await this.loadCustomAdapters(config.customAdapters);
+      // Load custom adapters
+      if (config.customAdapters) {
+        await this.loadCustomAdapters(config.customAdapters);
+      }
+
+      // Setup relationships
+      if (config.relationships) {
+        this.relationshipRegistry.registerBulk(config.relationships);
+      } else if (config.includeBuiltinAdapters !== false) {
+        // Only throw if we're expecting relationships
+        console.warn("No relationships defined in configuration");
+      }
+
+      // Create core instance
+      this.core = new NewCore(this.relationshipRegistry, adapterRegistry);
+
+      // Initialize with core configuration
+      if (config.core) {
+        await this.core.initialize(config.core);
+      }
+
+      return this.core;
+    } catch (error) {
+      throw wrapError(error, 'Failed to initialize with config');
     }
-
-    // Setup relationships
-    if (config.relationships) {
-      this.relationshipRegistry.registerBulk(config.relationships);
-    } else {
-      throw error("not relationship")
-    }
-
-    // Create core instance
-    this.core = new NewCore(this.relationshipRegistry, adapterRegistry);
-
-    // Initialize with core configuration
-    if (config.core) {
-      await this.core.initialize(config.core);
-    }
-
-    return this.core;
   }
 
   /**
@@ -75,7 +88,7 @@ export class CoreBootstrap {
    */
   getCore(): NewCore {
     if (!this.core) {
-      throw new Error('Core is not initialized. Call initialize() first.');
+      throw new ConfigurationError('Core is not initialized. Call initialize() first.');
     }
     return this.core;
   }
@@ -160,32 +173,48 @@ export class CoreBootstrap {
    * Test all adapter connections
    */
   async testConnections(): Promise<ConnectionTestResult[]> {
-    const adapters = adapterRegistry.listAdapters();
-    const results: ConnectionTestResult[] = [];
+    try {
+      const adapters = adapterRegistry.listAdapters();
+      
+      if (!Array.isArray(adapters)) {
+        throw new ConnectionError("Failed to get adapter list");
+      }
+      
+      const results: ConnectionTestResult[] = [];
 
-    for (const adapterInfo of adapters) {
-      const adapter = adapterRegistry.getAdapter(adapterInfo.name, adapterInfo.version);
-      if (adapter) {
+      for (const adapterInfo of adapters) {
         try {
-          const connected = await adapter.testConnection();
-          results.push({
-            adapter: adapterInfo.name,
-            type: adapterInfo.type,
-            connected,
-            error: connected ? undefined : 'Connection test failed'
-          });
+          const adapter = adapterRegistry.getAdapter(adapterInfo.name, adapterInfo.version);
+          if (adapter) {
+            const connected = await adapter.testConnection();
+            results.push({
+              adapter: adapterInfo.name,
+              type: adapterInfo.type,
+              connected,
+              error: connected ? undefined : 'Connection test failed'
+            });
+          } else {
+            results.push({
+              adapter: adapterInfo.name,
+              type: adapterInfo.type,
+              connected: false,
+              error: 'Adapter not found'
+            });
+          }
         } catch (error) {
           results.push({
             adapter: adapterInfo.name,
             type: adapterInfo.type,
             connected: false,
-            error: (error as Error).message
+            error: error instanceof Error ? error.message : 'Unknown error'
           });
         }
       }
-    }
 
-    return results;
+      return results;
+    } catch (error) {
+      throw wrapError(error, 'Failed to test connections');
+    }
   }
 
   /**
