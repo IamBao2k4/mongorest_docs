@@ -11,6 +11,14 @@
     { "fields": { "price": 1 } },
     { "fields": { "createdAt": -1 } }
   ],
+  "plugins": [
+    {
+      "createdAt": true,
+      "updatedAt": true,
+      "timestamps": true,
+      "softDelete": false
+    }
+  ],
   "properties": {
     "_id": {
       "type": "string",

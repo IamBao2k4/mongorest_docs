@@ -10,6 +10,14 @@
     { "fields": { "profile.country": 1, "status": 1 } },
     { "fields": { "name": "text", "email": "text" } }
   ],
+  "plugins": [
+    {
+      "createdAt": true,
+      "updatedAt": true,
+      "timestamps": true,
+      "softDelete": false
+    }
+  ],
   "properties": {
     "_id": {
       "type": "string",

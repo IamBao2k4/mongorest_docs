@@ -10,6 +10,14 @@
     { "fields": { "parentId": 1 } },
     { "fields": { "status": 1, "sortOrder": 1 } }
   ],
+  "plugins": [
+    {
+      "createdAt": true,
+      "updatedAt": true,
+      "timestamps": true,
+      "softDelete": false
+    }
+  ],
   "properties": {
     "_id": {
       "type": "string",
