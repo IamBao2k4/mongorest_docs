@@ -47,6 +47,18 @@ export const CoreErrors = {
   accessDeniedRead: (collection: string, roles: string[]) => 
     new AuthorizationError(ErrorCodes.COR_ACCESS_DENIED_READ, { collection, roles }),
     
+  accessDeniedCreate: (collection: string, roles: string[]) => 
+    new AuthorizationError(ErrorCodes.COR_ACCESS_DENIED_CREATE, { collection, roles }),
+    
+  accessDeniedUpdate: (collection: string, roles: string[]) => 
+    new AuthorizationError(ErrorCodes.COR_ACCESS_DENIED_UPDATE, { collection, roles }),
+    
+  accessDeniedDelete: (collection: string, roles: string[]) => 
+    new AuthorizationError(ErrorCodes.COR_ACCESS_DENIED_DELETE, { collection, roles }),
+    
+  resourceNotFound: (collection: string, id: string) => 
+    new NotFoundError(ErrorCodes.COR_RESOURCE_NOT_FOUND, { collection, id }),
+    
   queryValidationFailed: (errors: any[]) => 
     new QueryError(ErrorCodes.COR_QUERY_VALIDATION_FAILED, { errors }),
     

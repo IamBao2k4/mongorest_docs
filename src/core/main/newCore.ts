@@ -364,9 +364,7 @@ export class NewCore {
   ): Promise<T> {
     // Validate RBAC access
     if (!this.rbacValidator.hasAccess(collection, "create", roles)) {
-      throw new AuthorizationError(
-        `User does not have access to create on collection ${collection}`
-      );
+      throw CoreErrors.accessDeniedCreate(collection, roles);
     }
 
     // Get appropriate database adapter
@@ -412,9 +410,7 @@ export class NewCore {
   ): Promise<T> {
     // Validate RBAC access
     if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
-      throw new AuthorizationError(
-        `User does not have access to update on collection ${collection}`
-      );
+      throw CoreErrors.accessDeniedUpdate(collection, roles);
     }
 
     // Get appropriate database adapter
@@ -451,7 +447,7 @@ export class NewCore {
     );
 
     if (!result.data || result.data.length === 0) {
-      throw new NotFoundError(`Resource with id ${id} not found in collection ${collection}`);
+      throw CoreErrors.resourceNotFound(collection, id);
     }
 
     return result.data[0];
@@ -470,9 +466,7 @@ export class NewCore {
   ): Promise<T> {
     // Validate RBAC access
     if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
-      throw new AuthorizationError(
-        `User does not have access to update on collection ${collection}`
-      );
+      throw CoreErrors.accessDeniedUpdate(collection, roles);
     }
 
     // Get appropriate database adapter
@@ -512,7 +506,7 @@ export class NewCore {
     );
 
     if (!result.data || result.data.length === 0) {
-      throw new NotFoundError(`Resource with id ${id} not found in collection ${collection}`);
+      throw CoreErrors.resourceNotFound(collection, id);
     }
 
     return result.data[0];
@@ -530,9 +524,7 @@ export class NewCore {
   ): Promise<boolean> {
     // Validate RBAC access
     if (!this.rbacValidator.hasAccess(collection, "delete", roles)) {
-      throw new AuthorizationError(
-        `User does not have access to delete on collection ${collection}`
-      );
+      throw CoreErrors.accessDeniedDelete(collection, roles);
     }
 
     // Get appropriate database adapter
@@ -579,9 +571,7 @@ export class NewCore {
   ): Promise<T | null> {
     // Validate RBAC access
     if (!this.rbacValidator.hasAccess(collection, "read", roles)) {
-      throw new AuthorizationError(
-        `User does not have access to read on collection ${collection}`
-      );
+      throw CoreErrors.accessDeniedRead(collection, roles);
     }
 
     // Get appropriate database adapter

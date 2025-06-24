@@ -14,6 +14,10 @@ export const ErrorCodes = {
 
   // Core/NewCore Errors (COR) - Mixed
   COR_ACCESS_DENIED_READ: 'COR_ACCESS_DENIED_READ',
+  COR_ACCESS_DENIED_CREATE: 'COR_ACCESS_DENIED_CREATE',
+  COR_ACCESS_DENIED_UPDATE: 'COR_ACCESS_DENIED_UPDATE',
+  COR_ACCESS_DENIED_DELETE: 'COR_ACCESS_DENIED_DELETE',
+  COR_RESOURCE_NOT_FOUND: 'COR_RESOURCE_NOT_FOUND',
   COR_QUERY_VALIDATION_FAILED: 'COR_QUERY_VALIDATION_FAILED',
   COR_ADAPTER_CONTEXT_FAILED: 'COR_ADAPTER_CONTEXT_FAILED',
   COR_RBAC_FEATURES_INVALID: 'COR_RBAC_FEATURES_INVALID',
@@ -61,6 +65,10 @@ export const ErrorStatusCodes: Record<ErrorCode, number> = {
 
   // Core Errors - Mixed
   [ErrorCodes.COR_ACCESS_DENIED_READ]: 403,
+  [ErrorCodes.COR_ACCESS_DENIED_CREATE]: 403,
+  [ErrorCodes.COR_ACCESS_DENIED_UPDATE]: 403,
+  [ErrorCodes.COR_ACCESS_DENIED_DELETE]: 403,
+  [ErrorCodes.COR_RESOURCE_NOT_FOUND]: 404,
   [ErrorCodes.COR_QUERY_VALIDATION_FAILED]: 400,
   [ErrorCodes.COR_ADAPTER_CONTEXT_FAILED]: 500,
   [ErrorCodes.COR_RBAC_FEATURES_INVALID]: 403,
@@ -106,6 +114,10 @@ export const ErrorDescriptions: Record<ErrorCode, string> = {
 
   // Core
   [ErrorCodes.COR_ACCESS_DENIED_READ]: 'User does not have read access to the requested collection',
+  [ErrorCodes.COR_ACCESS_DENIED_CREATE]: 'User does not have create access to the requested collection',
+  [ErrorCodes.COR_ACCESS_DENIED_UPDATE]: 'User does not have update access to the requested collection',
+  [ErrorCodes.COR_ACCESS_DENIED_DELETE]: 'User does not have delete access to the requested collection',
+  [ErrorCodes.COR_RESOURCE_NOT_FOUND]: 'The requested resource was not found',
   [ErrorCodes.COR_QUERY_VALIDATION_FAILED]: 'Query validation failed against adapter capabilities',
   [ErrorCodes.COR_ADAPTER_CONTEXT_FAILED]: 'Failed to set adapter context for query execution',
   [ErrorCodes.COR_RBAC_FEATURES_INVALID]: 'RBAC features must be returned as an array',
