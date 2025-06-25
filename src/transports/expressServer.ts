@@ -119,7 +119,7 @@ async function initializeCore() {
         adapters: {
           mongodb: {
             connection: {
-              connectionString: process.env.MONGODB_URL || 'mongodb://thaily:Th%40i2004@192.168.1.109:27017/mongorest?authSource=admin'
+              connectionString: process.env.MONGODB_URL || 'mongodb://localhost:27017/mongorest?authSource=admin'
             }
           },
           postgresql: {

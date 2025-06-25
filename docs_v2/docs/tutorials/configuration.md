@@ -133,34 +133,6 @@ db: {
     minPoolSize: 10,
     maxIdleTimeMS: 10000,
     waitQueueTimeoutMS: 5000,
-    
-    // Server selection
-    serverSelectionTimeoutMS: 30000,
-    heartbeatFrequencyMS: 10000,
-    
-    // Socket options
-    socketTimeoutMS: 360000,
-    family: 4, // IPv4
-    
-    // Authentication
-    authSource: 'admin',
-    authMechanism: 'SCRAM-SHA-256',
-    
-    // SSL/TLS
-    ssl: true,
-    sslValidate: true,
-    sslCA: fs.readFileSync('./ca.pem'),
-    sslCert: fs.readFileSync('./cert.pem'),
-    sslKey: fs.readFileSync('./key.pem'),
-    
-    // Replica set
-    replicaSet: 'rs0',
-    readPreference: 'secondaryPreferred',
-    readConcern: { level: 'majority' },
-    writeConcern: { w: 'majority', j: true },
-    
-    // Compression
-    compressors: ['zlib', 'snappy']
   }
 }
 ```
@@ -214,51 +186,6 @@ server: {
   basePath: '/api/v1',
   staticPath: './public',
   uploadsPath: './uploads',
-  
-  // Performance
-  compression: {
-    enabled: true,
-    threshold: 1024, // bytes
-    level: 6 // 0-9
-  },
-  
-  // Request handling
-  bodyLimit: '10mb',
-  parameterLimit: 10000,
-  timeout: 30000, // 30 seconds
-  keepAliveTimeout: 65000,
-  
-  // Behind proxy
-  trustProxy: true,
-  proxyOptions: {
-    index: 0,
-    trust: ['loopback', 'linklocal', 'uniquelocal']
-  }
-}
-```
-
-### HTTPS configuration
-
-```javascript
-server: {
-  https: {
-    enabled: true,
-    port: 443,
-    key: fs.readFileSync('./server.key'),
-    cert: fs.readFileSync('./server.cert'),
-    ca: fs.readFileSync('./ca.cert'),
-    
-    // HTTP/2
-    allowHTTP1: true,
-    
-    // Security
-    honorCipherOrder: true,
-    secureOptions: constants.SSL_OP_NO_TLSv1,
-    ciphers: 'ECDHE-RSA-AES128-GCM-SHA256:!RC4:!MD5'
-  },
-  
-  // Redirect HTTP to HTTPS
-  httpRedirect: true
 }
 ```
 
@@ -290,9 +217,6 @@ cors: {
 auth: {
   jwt: {
     secret: process.env.JWT_SECRET,
-    publicKey: fs.readFileSync('./public.key'),
-    privateKey: fs.readFileSync('./private.key'),
-    algorithm: 'RS256', // HS256, RS256, ES256
     
     expiresIn: '24h',
     notBefore: '0s',
@@ -318,54 +242,12 @@ auth: {
 }
 ```
 
-### OAuth providers
-
-```javascript
-auth: {
-  oauth: {
-    // Google
-    google: {
-      enabled: true,
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: '/auth/google/callback',
-      scope: ['profile', 'email'],
-      hostedDomain: 'example.com',
-      prompt: 'select_account'
-    },
-    
-    // GitHub
-    github: {
-      enabled: true,
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: '/auth/github/callback',
-      scope: ['user:email', 'read:org']
-    },
-    
-    // Custom OAuth2
-    custom: {
-      enabled: true,
-      authorizationURL: 'https://provider.com/oauth/authorize',
-      tokenURL: 'https://provider.com/oauth/token',
-      clientId: process.env.OAUTH_CLIENT_ID,
-      clientSecret: process.env.OAUTH_CLIENT_SECRET,
-      callbackURL: '/auth/custom/callback',
-      scope: ['read', 'write']
-    }
-  }
-}
-```
-
 ## Schema Configuration
 
 ### Schema validation
 
 ```javascript
 schemas: {
-  // Validation mode
-  mode: 'strict', // strict, loose, none
-  
   // Default options
   defaults: {
     required: false,
@@ -383,45 +265,12 @@ schemas: {
   },
   
   // Validation library
-  validator: 'ajv', // ajv, joi, yup
+  validator: 'ajv',
   
   // Custom validators
   customFormats: {
     'phone': /^\+?[1-9]\d{1,14}$/,
     'slug': /^[a-z0-9]+(?:-[a-z0-9]+)*$/
-  }
-}
-```
-
-### Index configuration
-
-```javascript
-indexes: {
-  // Auto-create indexes
-  autoCreate: true,
-  
-  // Index options
-  options: {
-    background: true,
-    unique: false,
-    sparse: false,
-    expireAfterSeconds: null
-  },
-  
-  // Collection indexes
-  collections: {
-    users: [
-      { fields: { email: 1 }, unique: true },
-      { fields: { username: 1 }, unique: true, sparse: true },
-      { fields: { createdAt: -1 } },
-      { fields: { 'location.coordinates': '2dsphere' } }
-    ],
-    posts: [
-      { fields: { title: 'text', content: 'text' } },
-      { fields: { authorId: 1, createdAt: -1 } },
-      { fields: { tags: 1 } },
-      { fields: { deletedAt: 1 }, partialFilterExpression: { deletedAt: { $exists: true } } }
-    ]
   }
 }
 ```
@@ -465,199 +314,6 @@ cache: {
     posts: { ttl: 300 },
     static: { ttl: 3600 }
   },
-  
-  // Cache invalidation
-  invalidation: {
-    onWrite: true,
-    onUpdate: true,
-    onDelete: true,
-    patterns: ['related:*', 'list:*']
-  }
-}
-```
-
-### Memory cache
-
-```javascript
-cache: {
-  enabled: true,
-  type: 'memory',
-  
-  memory: {
-    max: 500,
-    ttl: 300,
-    updateAgeOnGet: true,
-    stale: true,
-    
-    // Size calculation
-    sizeCalculation: (value, key) => {
-      return JSON.stringify(value).length;
-    },
-    maxSize: 50 * 1024 * 1024 // 50MB
-  }
-}
-```
-
-## Logging Configuration
-
-### Logging setup
-
-```javascript
-logging: {
-  // Log level
-  level: process.env.LOG_LEVEL || 'info',
-  
-  // Formatters
-  format: 'json', // json, simple, detailed
-  
-  // Transports
-  transports: {
-    console: {
-      enabled: true,
-      level: 'info',
-      colorize: true,
-      timestamp: true
-    },
-    
-    file: {
-      enabled: true,
-      level: 'error',
-      filename: 'logs/error.log',
-      maxSize: '10m',
-      maxFiles: 5,
-      compress: true
-    },
-    
-    daily: {
-      enabled: true,
-      level: 'info',
-      dirname: 'logs',
-      filename: 'app-%DATE%.log',
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d'
-    },
-    
-    syslog: {
-      enabled: false,
-      host: 'localhost',
-      port: 514,
-      protocol: 'udp4',
-      facility: 'local0'
-    }
-  },
-  
-  // Request logging
-  requests: {
-    enabled: true,
-    excludePaths: ['/health', '/metrics'],
-    includeBody: false,
-    includeQuery: true,
-    includeHeaders: ['user-agent', 'referer']
-  },
-  
-  // Error logging
-  errors: {
-    includeStack: process.env.NODE_ENV !== 'production',
-    includeRequest: true,
-    includeUser: true
-  }
-}
-```
-
-## Security Configuration
-
-### Security headers
-
-```javascript
-security: {
-  helmet: {
-    enabled: true,
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", 'data:', 'https:'],
-        connectSrc: ["'self'"],
-        fontSrc: ["'self'"],
-        objectSrc: ["'none'"],
-        mediaSrc: ["'self'"],
-        frameSrc: ["'none'"]
-      }
-    },
-    hsts: {
-      maxAge: 31536000,
-      includeSubDomains: true,
-      preload: true
-    }
-  },
-  
-  // Rate limiting
-  rateLimit: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100,
-    message: 'Too many requests',
-    standardHeaders: true,
-    legacyHeaders: false,
-    
-    // Different limits per endpoint
-    endpoints: {
-      '/auth/login': { max: 5, windowMs: 15 * 60 * 1000 },
-      '/auth/register': { max: 3, windowMs: 60 * 60 * 1000 },
-      '/api/*': { max: 1000, windowMs: 15 * 60 * 1000 }
-    }
-  }
-}
-```
-
-## File Upload Configuration
-
-```javascript
-uploads: {
-  enabled: true,
-  
-  // Storage
-  storage: 'local', // local, s3, gridfs
-  
-  local: {
-    destination: './uploads',
-    createPath: true,
-    permissions: '0755'
-  },
-  
-  s3: {
-    bucket: process.env.S3_BUCKET,
-    region: process.env.S3_REGION,
-    accessKeyId: process.env.S3_ACCESS_KEY,
-    secretAccessKey: process.env.S3_SECRET_KEY,
-    endpoint: process.env.S3_ENDPOINT, // For S3-compatible services
-    signatureVersion: 'v4',
-    acl: 'private'
-  },
-  
-  // Limits
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB
-    files: 5,
-    fields: 10,
-    fieldSize: 1 * 1024 * 1024 // 1MB
-  },
-  
-  // Allowed types
-  allowedTypes: [
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    'application/pdf',
-    'text/plain'
-  ],
-  
-  // File naming
-  filename: (req, file) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    return file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname);
-  }
 }
 ```
 
@@ -716,47 +372,35 @@ ENABLE_METRICS=true
 
 ## Loading Configuration
 
-### Priority order
-
-```javascript
-// 1. Command line arguments (highest priority)
-mongorest start --port 4000
-
-// 2. Environment variables
-PORT=4000 mongorest start
-
-// 3. Configuration file
-module.exports = { server: { port: 4000 } };
-
-// 4. Default values (lowest priority)
-```
-
 ### Configuration validation
 
 ```javascript
 // mongorest.config.js
-const Joi = require('joi');
+const Ajv = require('ajv');
 
-const schema = Joi.object({
-  db: Joi.object({
-    uri: Joi.string().required(),
-    options: Joi.object()
-  }).required(),
+// validate by ajv
+const configSchema = {/** load your config here **/};
+
+const ajv = new Ajv();
+const validate = ajv.compile(configSchema);
+
+// Your configuration object
+const config = {
+  // ... your config here
+};
+
+// Validate configuration
+if (!validate(config)) {
+  const errors = validate.errors
+    .map(err => `${err.instancePath}: ${err.message}`)
+    .join('\n');
   
-  server: Joi.object({
-    port: Joi.number().port().default(3000),
-    host: Joi.string().hostname().default('0.0.0.0')
-  })
-});
-
-const config = { /* your config */ };
-
-const { error, value } = schema.validate(config);
-if (error) {
-  throw new Error(`Config validation error: ${error.message}`);
+  throw new Error(`Configuration validation failed:\n${errors}`);
 }
 
-module.exports = value;
+console.log('Configuration validated successfully');
+
+module.exports = config;
 ```
 
 ## Bước tiếp theo

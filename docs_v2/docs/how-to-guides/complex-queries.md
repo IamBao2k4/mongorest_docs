@@ -9,16 +9,15 @@ Hướng dẫn sử dụng các queries phức tạp và tối ưu trong MongoRE
 ## Overview
 
 Document này bao gồm:
-- Aggregation pipelines
-- Full-text search
+- Function pipelines
 - Geospatial queries
 - Time-series queries
 - Bulk operations
 - Query optimization
 
-## Aggregation Pipeline
+## Function Pipeline
 
-### Basic Aggregation
+### Basic Function
 
 ```bash
 POST /users/aggregate
@@ -38,13 +37,13 @@ Content-Type: application/json
 ]
 ```
 
-### Complex Aggregation Examples
+### Complex Function Examples
 
 #### Sales Analytics
 
 ```javascript
 // Total sales by month with year-over-year comparison
-POST /orders/aggregate
+POST /orders/function
 [
   // Match orders from last 2 years
   { "$match": {
@@ -104,7 +103,7 @@ POST /orders/aggregate
 #### User Activity Analysis
 
 ```javascript
-POST /activities/aggregate
+POST /activities/function
 [
   // Match last 30 days
   { "$match": {
@@ -170,7 +169,7 @@ POST /activities/aggregate
 ### Faceted Search
 
 ```javascript
-POST /products/aggregate
+POST /products/function
 [
   // Initial match
   { "$match": { "status": "active" } },
@@ -237,7 +236,7 @@ POST /products/aggregate
 
 ```javascript
 // Find all subordinates in org chart
-POST /employees/aggregate
+POST /employees/function
 [
   { "$match": { "_id": "manager-id" } },
   
@@ -267,59 +266,25 @@ POST /employees/aggregate
 
 ## Full-Text Search
 
-### Setup Text Indexes
-
-```javascript
-// Schema configuration
-schemas: {
-  posts: {
-    indexes: [
-      // Single field text index
-      { fields: { title: 'text' } },
-      
-      // Compound text index
-      { fields: { 
-        title: 'text', 
-        content: 'text',
-        tags: 'text'
-      }, weights: {
-        title: 10,
-        tags: 5,
-        content: 1
-      }},
-      
-      // Language-specific
-      { 
-        fields: { content: 'text' },
-        default_language: 'english',
-        language_override: 'lang'
-      }
-    ]
-  }
-}
-```
 
 ### Basic Text Search
 
 ```bash
 # Simple search
-GET /posts?$text=mongodb
+GET /posts?field=eq.mongodb
 
 # Phrase search
-GET /posts?$text="mongodb atlas"
-
-# Exclude terms
-GET /posts?$text=mongodb -sql -mysql
+GET /posts?field=eq."mongodb atlas"
 
 # With text score
-GET /posts?$text=mongodb&select=title,content,$score&order=$score.desc
+GET /posts?field=eq.mongodb&select=title,content,score&order=-score
 ```
 
 ### Advanced Text Search
 
 ```javascript
 // Search with aggregation
-POST /posts/aggregate
+POST /posts/function
 [
   { "$match": {
     "$text": { "$search": "mongodb nodejs" }
@@ -364,173 +329,9 @@ POST /posts/aggregate
 ### Autocomplete Search
 
 ```javascript
-// Using regex for autocomplete
-GET /users?name=regex.^john.*&limit=10
-
-// Using text search with partial matching
-POST /products/aggregate
-[
-  { "$search": {
-    "index": "autocomplete",
-    "autocomplete": {
-      "query": "samsu",
-      "path": "name",
-      "fuzzy": {
-        "maxEdits": 2,
-        "prefixLength": 3
-      }
-    }
-  }},
-  { "$limit": 10 },
-  { "$project": {
-    "_id": 1,
-    "name": 1,
-    "category": 1,
-    "score": { "$meta": "searchScore" }
-  }}
-]
+// Using like for autocomplete
+GET /users?name=like.john&limit=10
 ```
-
-## Geospatial Queries
-
-### Setup Geospatial Indexes
-
-```javascript
-schemas: {
-  stores: {
-    schema: {
-      location: {
-        type: 'object',
-        properties: {
-          type: { type: 'string', enum: ['Point'] },
-          coordinates: {
-            type: 'array',
-            items: { type: 'number' },
-            minItems: 2,
-            maxItems: 2
-          }
-        }
-      }
-    },
-    indexes: [
-      { fields: { location: '2dsphere' } }
-    ]
-  }
-}
-```
-
-### Near Queries
-
-```bash
-# Find stores within 5km
-GET /stores?location=near.{
-  "lng": -73.97,
-  "lat": 40.77,
-  "maxDistance": 5000,
-  "minDistance": 100
-}
-
-# With additional filters
-GET /stores?location=near.{
-  "lng": -73.97,
-  "lat": 40.77,
-  "maxDistance": 5000
-}&status=open&type=restaurant
-```
-
-### GeoWithin Queries
-
-```javascript
-// Within bounding box
-POST /stores/query
-{
-  "location": {
-    "$geoWithin": {
-      "$box": [
-        [-74.0, 40.7],  // Bottom left
-        [-73.9, 40.8]   // Top right
-      ]
-    }
-  }
-}
-
-// Within polygon
-POST /stores/query
-{
-  "location": {
-    "$geoWithin": {
-      "$polygon": [
-        [-73.98, 40.75],
-        [-73.95, 40.75],
-        [-73.95, 40.78],
-        [-73.98, 40.78],
-        [-73.98, 40.75]
-      ]
-    }
-  }
-}
-
-// Within circle (center point + radius)
-POST /stores/query
-{
-  "location": {
-    "$geoWithin": {
-      "$centerSphere": [
-        [-73.97, 40.77],  // Center [lng, lat]
-        0.001  // Radius in radians (~ 6.4km)
-      ]
-    }
-  }
-}
-```
-
-### Geospatial Aggregation
-
-```javascript
-// Find nearest stores with details
-POST /stores/aggregate
-[
-  { "$geoNear": {
-    "near": {
-      "type": "Point",
-      "coordinates": [-73.97, 40.77]
-    },
-    "distanceField": "distance",
-    "maxDistance": 5000,
-    "query": { "status": "open" },
-    "includeLocs": "location",
-    "spherical": true
-  }},
-  
-  // Convert distance to km
-  { "$addFields": {
-    "distanceKm": { "$divide": ["$distance", 1000] }
-  }},
-  
-  // Lookup ratings
-  { "$lookup": {
-    "from": "reviews",
-    "localField": "_id",
-    "foreignField": "storeId",
-    "as": "reviews"
-  }},
-  
-  // Calculate average rating
-  { "$addFields": {
-    "avgRating": { "$avg": "$reviews.rating" },
-    "reviewCount": { "$size": "$reviews" }
-  }},
-  
-  // Remove reviews array
-  { "$project": { "reviews": 0 } },
-  
-  // Sort by distance
-  { "$sort": { "distance": 1 } },
-  
-  { "$limit": 20 }
-]
-```
-
 ## Time-Series Queries
 
 ### Date Range Queries
@@ -545,11 +346,11 @@ GET /events?date=gte.thisMonth
 GET /events?date=between.lastWeek
 ```
 
-### Time-Series Aggregation
+### Time-Series function
 
 ```javascript
 // Hourly metrics
-POST /metrics/aggregate
+POST /metrics/function
 [
   { "$match": {
     "timestamp": {
@@ -575,72 +376,7 @@ POST /metrics/aggregate
     "maxValue": { "$max": "$value" }
   }},
   
-  // Fill missing hours
-  { "$densify": {
-    "field": "_id",
-    "range": {
-      "step": 1,
-      "unit": "hour",
-      "bounds": "full"
-    }
-  }},
-  
-  // Default values for missing data
-  { "$set": {
-    "count": { "$ifNull": ["$count", 0] },
-    "avgValue": { "$ifNull": ["$avgValue", 0] }
-  }},
-  
   { "$sort": { "_id": 1 } }
-]
-```
-
-### Moving Averages
-
-```javascript
-POST /prices/aggregate
-[
-  { "$match": { "symbol": "AAPL" } },
-  { "$sort": { "date": 1 } },
-  
-  // Calculate moving averages
-  { "$setWindowFields": {
-    "sortBy": { "date": 1 },
-    "output": {
-      "ma7": {
-        "$avg": "$close",
-        "window": {
-          "range": [-6, 0],
-          "unit": "day"
-        }
-      },
-      "ma30": {
-        "$avg": "$close",
-        "window": {
-          "range": [-29, 0],
-          "unit": "day"
-        }
-      },
-      "volume30d": {
-        "$sum": "$volume",
-        "window": {
-          "range": [-29, 0],
-          "unit": "day"
-        }
-      }
-    }
-  }},
-  
-  // Add technical indicators
-  { "$addFields": {
-    "signal": {
-      "$cond": [
-        { "$gt": ["$ma7", "$ma30"] },
-        "buy",
-        "sell"
-      ]
-    }
-  }}
 ]
 ```
 
@@ -715,88 +451,7 @@ Content-Type: application/json
 }
 ```
 
-### Bulk Import
-
-```javascript
-// CSV import endpoint
-POST /users/import
-Content-Type: multipart/form-data
-
-file: users.csv
-options: {
-  "mapping": {
-    "Name": "name",
-    "Email Address": "email",
-    "Phone": "phone"
-  },
-  "skipHeader": true,
-  "batchSize": 1000,
-  "onDuplicate": "skip", // skip, update, error
-  "validation": true
-}
-
-// JSON import
-POST /products/import
-Content-Type: application/json
-
-{
-  "data": [
-    { "name": "Product 1", "price": 99.99 },
-    { "name": "Product 2", "price": 149.99 }
-  ],
-  "options": {
-    "validate": true,
-    "transform": {
-      "price": { "$multiply": ["$price", 1.1] }
-    }
-  }
-}
-```
-
 ## Query Optimization
-
-### Index Usage
-
-```javascript
-// Check query performance
-POST /users/explain
-{
-  "query": { "email": "john@example.com" },
-  "options": { "executionStats": true }
-}
-
-// Response shows index usage
-{
-  "executionStats": {
-    "executionSuccess": true,
-    "nReturned": 1,
-    "executionTimeMillis": 0,
-    "totalKeysExamined": 1,
-    "totalDocsExamined": 1,
-    "executionStages": {
-      "stage": "IXSCAN",
-      "indexName": "email_1"
-    }
-  }
-}
-```
-
-### Query Hints
-
-```javascript
-// Force specific index
-GET /users?email=john@example.com&$hint=email_1
-
-// Force collection scan
-GET /users?status=active&$hint=$natural
-
-// With aggregation
-POST /orders/aggregate
-[
-  { "$match": { "customerId": "123" } },
-  { "$hint": "customerId_1_createdAt_-1" }
-]
-```
 
 ### Performance Tips
 
@@ -815,10 +470,12 @@ GET /users?skip=10000&limit=20
 GET /users?cursor=lastId&limit=20
 
 // 4. Use aggregation for complex queries
-// Instead of multiple queries:
-// GET /orders?userId=123
-// GET /order-items?orderId=...
-// Use aggregation with $lookup
+// Instead of filter after lookup
+GET /users?dryRun=false&dbType=mongodb&skip=0&limit=10&select=product_reviews()&and=(status=eq.active,product_reviews.status=eq.approved)
+
+// Filter when lookup
+GET /users?dryRun=false&dbType=mongodb&skip=0&limit=10&select=product_reviews(verified=neq.true)&and=(status=eq.active)
+
 
 // 5. Batch operations
 // Instead of:
@@ -833,7 +490,7 @@ await fetch('/users/bulk', {
 });
 ```
 
-### Query Monitoring
+<!-- ### Query Monitoring
 
 ```javascript
 // Enable query profiling
@@ -867,77 +524,7 @@ Response:
   }
 }
 ```
-
-## Advanced Query Patterns
-
-### Recursive Queries
-
-```javascript
-// Find all nested categories
-POST /categories/aggregate
-[
-  { "$match": { "parentId": null } },
-  
-  { "$graphLookup": {
-    "from": "categories",
-    "startWith": "$_id",
-    "connectFromField": "_id",
-    "connectToField": "parentId",
-    "as": "subcategories",
-    "depthField": "level",
-    "maxDepth": 5
-  }},
-  
-  // Build tree structure
-  { "$addFields": {
-    "tree": {
-      "$reduce": {
-        "input": "$subcategories",
-        "initialValue": {},
-        "in": {
-          "$mergeObjects": [
-            "$$value",
-            { "$$this._id": "$$this" }
-          ]
-        }
-      }
-    }
-  }}
-]
-```
-
-### Window Functions
-
-```javascript
-// Rank products by sales within category
-POST /products/aggregate
-[
-  { "$setWindowFields": {
-    "partitionBy": "$category",
-    "sortBy": { "salesCount": -1 },
-    "output": {
-      "rank": { "$rank": {} },
-      "percentile": { "$percentileRank": {} },
-      "categoryTotal": { "$sum": "$salesCount" }
-    }
-  }},
-  
-  // Calculate market share
-  { "$addFields": {
-    "marketShare": {
-      "$multiply": [
-        { "$divide": ["$salesCount", "$categoryTotal"] },
-        100
-      ]
-    }
-  }},
-  
-  // Top 3 per category
-  { "$match": { "rank": { "$lte": 3 } } },
-  
-  { "$sort": { "category": 1, "rank": 1 } }
-]
-```
+ -->
 
 ## Next Steps
 

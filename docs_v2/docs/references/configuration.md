@@ -62,11 +62,6 @@ Chi tiết tất cả options cấu hình.
     max: 100,
     message: 'Too many requests'
   },
-  
-  // Helmet options
-  helmet: {
-    contentSecurityPolicy: false
-  }
 }
 ```
 
@@ -90,23 +85,3 @@ Chi tiết tất cả options cấu hình.
   }
 }
 ```
-
-## Logging Options
-
-```javascript
-{
-  logging: {
-    level: 'info', // error, warn, info, debug
-    format: 'json', // json, simple
-    
-    // File logging
-    file: {
-      filename: 'mongorest.log',
-      maxSize: '10m',
-      maxFiles: 5
-    },
-    
-    // Console logging
-    console: true
-  }
-}

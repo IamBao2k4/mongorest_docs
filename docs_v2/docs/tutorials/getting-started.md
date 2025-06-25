@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Getting Started
 
-Hướng dẫn cài đặt và sử dụng MongoREST từ cơ bản đến nâng cao.
+Hướng dẫn cài đặt và sử dụng MongoREST.
 
 ## Giới thiệu
 
@@ -13,7 +13,6 @@ MongoREST là một REST API server tự động cho MongoDB, giúp bạn:
 - Không cần viết code backend phức tạp
 - Hỗ trợ đầy đủ CRUD operations
 - Authentication và authorization tích hợp sẵn
-- Real-time updates với WebSocket
 - Query phức tạp với aggregation pipeline
 
 ## Yêu cầu hệ thống
@@ -22,11 +21,6 @@ MongoREST là một REST API server tự động cho MongoDB, giúp bạn:
 - Node.js >= 14.0.0
 - MongoDB >= 4.0
 - npm hoặc yarn
-
-### Hệ điều hành hỗ trợ
-- Linux (Ubuntu, CentOS, Debian)
-- macOS 10.12+
-- Windows 10/11
 
 ## Cài đặt
 
@@ -70,22 +64,7 @@ npm link
 
 ## Khởi động nhanh
 
-### 1. Sử dụng CLI
-
-Cách nhanh nhất để bắt đầu:
-
-```bash
-mongorest start --db mongodb://localhost:27017/mydb
-```
-
-Options CLI cơ bản:
-- `--db` - MongoDB connection string (bắt buộc)
-- `--port` - Port để chạy server (mặc định: 3000)
-- `--host` - Host binding (mặc định: 0.0.0.0)
-- `--auth` - Enable authentication
-- `--config` - Đường dẫn đến file config
-
-### 2. Sử dụng programmatic
+### 1. Sử dụng programmatic
 
 Tạo file `server.js`:
 
@@ -114,41 +93,6 @@ Chạy server:
 
 ```bash
 node server.js
-```
-
-### 3. Sử dụng Docker
-
-```dockerfile
-FROM node:16-alpine
-WORKDIR /app
-RUN npm install -g mongorest
-EXPOSE 3000
-CMD ["mongorest", "start", "--db", "${MONGODB_URI}"]
-```
-
-Docker compose:
-
-```yaml
-version: '3.8'
-services:
-  mongodb:
-    image: mongo:5
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-
-  mongorest:
-    image: mongorest/mongorest:latest
-    ports:
-      - "3000:3000"
-    environment:
-      MONGODB_URI: mongodb://mongodb:27017/mydb
-    depends_on:
-      - mongodb
-
-volumes:
-  mongo-data:
 ```
 
 ## Cấu hình cơ bản
@@ -233,25 +177,7 @@ Response:
 }
 ```
 
-### 2. Liệt kê collections
-
-```bash
-curl http://localhost:3000/
-```
-
-Response:
-```json
-{
-  "collections": ["users", "posts", "comments"],
-  "endpoints": {
-    "users": "http://localhost:3000/users",
-    "posts": "http://localhost:3000/posts",
-    "comments": "http://localhost:3000/comments"
-  }
-}
-```
-
-### 3. CRUD operations cơ bản
+### 2. CRUD operations cơ bản
 
 #### Create (POST)
 ```bash
@@ -327,32 +253,79 @@ my-project/
 ```javascript
 module.exports = {
   // Schema definition
-  schema: {
-    name: { type: 'string', required: true },
-    email: { type: 'string', format: 'email', required: true },
-    password: { type: 'string', required: true, hidden: true },
-    age: { type: 'number', min: 0, max: 150 },
-    status: { type: 'string', enum: ['active', 'inactive'], default: 'active' },
-    createdAt: { type: 'date', default: Date.now }
-  },
-  
-  // Indexes
-  indexes: [
-    { fields: { email: 1 }, unique: true },
-    { fields: { createdAt: -1 } }
-  ],
-  
-  // Hooks
-  hooks: {
-    beforeInsert: async (data) => {
-      // Hash password before insert
-      const bcrypt = require('bcrypt');
-      data.password = await bcrypt.hash(data.password, 10);
-      return data;
+  properies: {
+    _id: { type: 'string', pattern: '^[0-9a-fA-F]{24}$', description: 'MongoDB ObjectId', disabled: true },
+    email: {
+      type: 'string',
+      format: 'email',
+      required: true,
+      pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
+      title: 'Email Address',
+      description: 'User email address'
+    },
+    name: {
+      type: 'string',
+      required: true,
+      minLength: 2,
+      maxLength: 100,
+      pattern: '^.{2,100}$',
+      title: 'Full Name',
+      description: 'Full name'
+    },
+    profile: {
+      type: 'object',
+      required: true,
+      title: 'User Profile',
+      properties: {
+        age: { type: 'integer', minimum: 13, maximum: 120, title: 'Age' },
+        country: {
+          type: 'string',
+          enum: ['Vietnam', 'Thailand', 'Malaysia', 'Singapore', 'Indonesia', 'Philippines'],
+          title: 'Country'
+        },
+        interests: {
+          type: 'array',
+          items: { type: 'string', maxLength: 50 },
+          maxItems: 10,
+          title: 'Interests'
+        },
+        avatar: {
+          type: 'string',
+          format: 'uri',
+          pattern: '^(https?://|/).*\\.(jpg|jpeg|png|gif|webp|svg)$',
+          title: 'Avatar'
+        }
+      }
+    },
+    status: {
+      type: 'string',
+      enum: ['active', 'inactive', 'suspended'],
+      default: 'active',
+      title: 'Account Status'
+    },
+    lastLogin: {
+      type: 'string',
+      format: 'date-time',
+      pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$',
+      title: 'Last Login'
+    },
+    createdAt: {
+      type: 'string',
+      format: 'date-time',
+      pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$',
+      title: 'Created At'
+    },
+    updatedAt: {
+      type: 'string',
+      format: 'date-time',
+      pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$',
+      title: 'Updated At'
     }
   }
-};
+}
 ```
+
+Schema file này có thể được tạo một cách đơn giản trên trang dashboard [Admin dashboard](https://admin-reactjs.mangoads.com.vn)
 
 ## Troubleshooting
 
@@ -366,70 +339,6 @@ Giải pháp:
 1. Kiểm tra MongoDB đã chạy chưa: `sudo systemctl status mongod`
 2. Kiểm tra connection string
 3. Kiểm tra firewall/network settings
-
-### Port đã được sử dụng
-
-```
-Error: EADDRINUSE: address already in use :::3000
-```
-
-Giải pháp:
-1. Đổi port: `mongorest start --port 3001`
-2. Hoặc kill process đang dùng port: `lsof -ti:3000 | xargs kill`
-
-### Memory issues
-
-```
-FATAL ERROR: JavaScript heap out of memory
-```
-
-Giải pháp:
-```bash
-node --max-old-space-size=4096 server.js
-```
-
-## Production deployment
-
-### PM2
-
-```bash
-# Install PM2
-npm install -g pm2
-
-# Start with PM2
-pm2 start server.js --name mongorest
-
-# Auto restart on reboot
-pm2 startup
-pm2 save
-```
-
-### Systemd service
-
-Tạo file `/etc/systemd/system/mongorest.service`:
-
-```ini
-[Unit]
-Description=MongoREST API Server
-After=network.target mongodb.service
-
-[Service]
-Type=simple
-User=nodejs
-WorkingDirectory=/opt/mongorest
-ExecStart=/usr/bin/node server.js
-Restart=on-failure
-Environment=NODE_ENV=production
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Kích hoạt service:
-```bash
-sudo systemctl enable mongorest
-sudo systemctl start mongorest
-```
 
 ## Bước tiếp theo
 

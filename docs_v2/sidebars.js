@@ -8,10 +8,6 @@
 
  Create as many sidebars as you want.
  */
-
-// @ts-check
-
-/** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   // By default, Docusaurus generates a sidebar from the docs folder structure
   docs: [
@@ -31,9 +27,7 @@ const sidebars = {
       label: 'How-to Guides',
       items: [
         'how-to-guides/authentication',
-        'how-to-guides/complex-queries',
-        'how-to-guides/file-uploads',
-        'how-to-guides/websocket',
+        'how-to-guides/complex-queries'
       ],
     },
     {
@@ -42,8 +36,7 @@ const sidebars = {
       items: [
         'references/api',
         'references/configuration',
-        'references/schema',
-        'references/hooks',
+        'references/schema'
       ],
     },
     {

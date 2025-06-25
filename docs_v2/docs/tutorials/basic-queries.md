@@ -213,13 +213,20 @@ MongoREST hỗ trợ dot notation cho nested objects:
 ```bash
 # Nested object field
 GET /users?address.city=eq.Hanoi
+```
+Lấy ra user có địa chỉ ở thành phố Hà Nội
 
+```bash
 # Deep nesting
 GET /users?profile.settings.notifications.email=eq.true
-
-# Nested với operators
-GET /orders?items.price=gt.100
 ```
+Lấy ra user có cho phép thông báo qua email
+
+```bash
+# Nested với operators
+GET /orders?items.product.price=gt.100
+```
+Lấy ra những order có giá bán của sản phẩm lớn hơn 100
 
 Ví dụ document structure:
 ```json

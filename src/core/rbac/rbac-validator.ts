@@ -30,8 +30,17 @@ export class RbacValidator {
         return role.some(r => r.user_role === userRoles);
     }
 
+    private canCreate(userRoles: string[]): boolean {
+        const createRoles: RbacRolePattern[] = this.rbacJson.create;
+        return userRoles.some(role => this.hasUserRole(createRoles, role));
+    }
+
     public hasAccess(collection: string, action: string, userRoles: string[]): boolean {
         const rbacCollection: RbacCollection | undefined = this.rbacJson.collections.find((col: RbacCollection) => col.collection_name === collection);
+
+        if(action === 'create') {
+            return this.canCreate(userRoles);
+        }
 
         if (!rbacCollection) {
             return false; // Collection not found
@@ -127,7 +136,7 @@ export class RbacValidator {
         return features.filter(feature => {
             return userRoles.some(role => {
                 return this.hasUserRole(collectionAction, role) &&
-                    collectionAction.some(r => r.user_role === role && r.patterns.some(p => Object.keys(p)[0] === feature));
+                    collectionAction.some(r => r.user_role === role && r.patterns?.some(p => Object.keys(p)[0] === feature));
             });
         });
     }

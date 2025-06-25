@@ -11,14 +11,14 @@ MongoREST là một API REST tự động cho MongoDB, cho phép bạn truy cậ
 - **RESTful API tự động**: Tạo endpoints REST cho collections MongoDB
 - **Query linh hoạt**: Hỗ trợ filtering, sorting, pagination
 - **Authentication**: Bảo mật với JWT tokens
-- **Real-time**: WebSocket support cho real-time updates
 - **Schema validation**: Validate dữ liệu tự động
 
 ## Bắt đầu nhanh
 
 ```bash
 npm install mongorest
-mongorest start --db mongodb://localhost:27017/mydb
+
+import mongorest from 'mongorest';
 ```
 
 ## Cấu trúc Documentation

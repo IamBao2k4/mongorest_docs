@@ -3,6 +3,7 @@ export interface RbacJson {
   version?: string;
   description?: string;
   collections: RbacCollection[];
+  create: RbacRolePattern[];
   rbac_features?: RbacFeatures;
 }
 

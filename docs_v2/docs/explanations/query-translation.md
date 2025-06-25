@@ -27,7 +27,7 @@ db.users.find({
 
 REST Query:
 ```
-GET /users?or=(status.eq.active,role.eq.admin)&age=gte.18
+GET /users?or=(status=eq.active,role=eq.admin)&age=gte.18
 ```
 
 MongoDB Query:
@@ -59,27 +59,24 @@ db.users.find({
 
 ### Text Search
 ```
-GET /posts?$text=mongodb
+GET /posts?text=mongodb
 ```
-→
 ```javascript
 db.posts.find({ $text: { $search: "mongodb" } })
 ```
 
 ### Nested Fields
 ```
-GET /users?address.city=NYC
+GET /users?address.city=eq.NYC
 ```
-→
 ```javascript
-db.users.find({ "address.city": "NYC" })
+db.users.find({ "address.city": {"$eq": "NYC"} })
 ```
 
 ### Array Contains
 ```
 GET /posts?tags=cs.mongodb
 ```
-→
 ```javascript
 db.posts.find({ tags: { $elemMatch: { $eq: "mongodb" } } })
 ```
@@ -87,9 +84,8 @@ db.posts.find({ tags: { $elemMatch: { $eq: "mongodb" } } })
 ## Pagination & Sorting
 
 ```
-GET /users?limit=10&offset=20&order=name.asc,age.desc
+GET /users?limit=10&offset=20&order=name,-age
 ```
-→
 ```javascript
 db.users
   .find({})
@@ -103,7 +99,6 @@ db.users
 ```
 GET /users?select=name,email
 ```
-→
 ```javascript
 db.users.find({}, { name: 1, email: 1, _id: 1 })
 ```

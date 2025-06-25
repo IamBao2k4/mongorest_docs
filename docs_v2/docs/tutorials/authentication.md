@@ -52,166 +52,85 @@ MongoREST tự động tạo collection `users` với schema cơ bản:
 
 ```javascript
 {
-  username: { type: 'string', required: true, unique: true },
-  email: { type: 'string', format: 'email', unique: true },
-  password: { type: 'string', required: true, hidden: true },
-  role: { type: 'string', default: 'user' },
-  permissions: { type: 'array', items: { type: 'string' } },
-  active: { type: 'boolean', default: true },
-  createdAt: { type: 'date', default: Date.now },
-  lastLogin: { type: 'date' },
-  refreshToken: { type: 'string', hidden: true }
-}
-```
-
-## Authentication Endpoints
-
-### Register
-
-```bash
-POST /auth/register
-Content-Type: application/json
-
-{
-  "username": "johndoe",
-  "email": "john@example.com",
-  "password": "SecurePassword123!"
-}
-```
-
-Response:
-```json
-{
-  "user": {
-    "_id": "507f1f77bcf86cd799439011",
-    "username": "johndoe",
-    "email": "john@example.com",
-    "role": "user",
-    "active": true,
-    "createdAt": "2023-01-15T10:30:00Z"
+  username: {
+    type: 'string',
+    required: true,
+    unique: true,
+    widget: 'shortAnswer',
+    title: 'Username',
+    minLength: 3,
+    maxLength: 50,
+    pattern: '^[a-zA-Z0-9_\\-\\.]{3,50}$',
+    description: 'Unique username'
   },
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIs...",
-  "expiresIn": "24h"
-}
-```
-
-### Login
-
-```bash
-POST /auth/login
-Content-Type: application/json
-
-{
-  "username": "johndoe",
-  "password": "SecurePassword123!"
-}
-```
-
-Hoặc login với email:
-
-```bash
-{
-  "email": "john@example.com",
-  "password": "SecurePassword123!"
-}
-```
-
-Response:
-```json
-{
-  "user": {
-    "_id": "507f1f77bcf86cd799439011",
-    "username": "johndoe",
-    "email": "john@example.com",
-    "role": "user"
+  email: {
+    type: 'string',
+    format: 'email',
+    required: true,
+    unique: true,
+    widget: 'shortAnswer',
+    title: 'Email Address',
+    pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
+    description: 'User email address'
   },
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIs...",
-  "expiresIn": "24h"
-}
-```
-
-### Refresh Token
-
-```bash
-POST /auth/refresh
-Content-Type: application/json
-
-{
-  "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
-}
-```
-
-Response:
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIs...",
-  "expiresIn": "24h"
-}
-```
-
-### Logout
-
-```bash
-POST /auth/logout
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
-```
-
-### Get Current User
-
-```bash
-GET /auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
-```
-
-Response:
-```json
-{
-  "_id": "507f1f77bcf86cd799439011",
-  "username": "johndoe",
-  "email": "john@example.com",
-  "role": "user",
-  "permissions": ["read", "write"],
-  "active": true,
-  "lastLogin": "2023-01-15T10:30:00Z"
-}
-```
-
-### Change Password
-
-```bash
-POST /auth/change-password
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
-Content-Type: application/json
-
-{
-  "currentPassword": "OldPassword123!",
-  "newPassword": "NewSecurePassword456!"
-}
-```
-
-### Forgot Password
-
-```bash
-POST /auth/forgot-password
-Content-Type: application/json
-
-{
-  "email": "john@example.com"
-}
-```
-
-### Reset Password
-
-```bash
-POST /auth/reset-password
-Content-Type: application/json
-
-{
-  "token": "reset-token-from-email",
-  "newPassword": "NewSecurePassword789!"
+  password: {
+    type: 'string',
+    required: true,
+    hidden: true,
+    widget: 'password',
+    title: 'Password',
+    minLength: 8,
+    description: 'User password (hashed)'
+  },
+  role: {
+    type: 'string',
+    widget: 'select',
+    title: 'Role',
+    enum: ['user', 'admin', 'moderator'],
+    default: 'user',
+    choices: [
+      { key: 'user', value: 'User' },
+      { key: 'admin', value: 'Admin' },
+      { key: 'moderator', value: 'Moderator' }
+    ],
+    description: 'User role for access control'
+  },
+  permissions: {
+    type: 'array',
+    items: { type: 'string' },
+    widget: 'checkbox',
+    title: 'Permissions',
+    description: 'List of user permissions'
+  },
+  active: {
+    type: 'boolean',
+    default: true,
+    widget: 'switch',
+    title: 'Active',
+    description: 'Is user active?'
+  },
+  createdAt: {
+    type: 'string',
+    widget: 'dateTime',
+    title: 'Created At',
+    format: 'date-time',
+    pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$',
+    disabled: true
+  },
+  lastLogin: {
+    type: 'string',
+    widget: 'dateTime',
+    title: 'Last Login',
+    format: 'date-time',
+    pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$',
+    disabled: true
+  },
+  refreshToken: {
+    type: 'string',
+    hidden: true,
+    widget: 'hidden',
+    description: 'Refresh token for JWT'
+  }
 }
 ```
 
@@ -251,91 +170,102 @@ auth: {
 
 ### Cấu hình roles
 
-```javascript
-auth: {
-  roles: {
-    // Super admin - full access
-    admin: {
-      collections: '*',
-      operations: '*',
-      fields: '*'
-    },
-    
-    // Editor - CRUD on content
-    editor: {
-      collections: ['posts', 'comments', 'media'],
-      operations: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-      fields: '*'
-    },
-    
-    // Author - own content only
-    author: {
-      collections: ['posts', 'comments'],
-      operations: ['GET', 'POST', 'PUT', 'PATCH'],
-      fields: '*',
-      conditions: {
-        'posts': { authorId: '$user._id' },
-        'comments': { userId: '$user._id' }
+```json
+{
+  "collection_name": "users",
+  "rbac_config": {
+    "read": [
+      {
+        "user_role": "default",
+        "patterns": [
+          { "_id": { "type": "string" } },
+          { "name": { "type": "string" } },
+          { "profile.avatar": { "type": "string" } },
+          { "product_reviews": { "type": "relation", "relate_collection": "product_reviews" } }
+        ]
+      },
+      {
+        "user_role": "user",
+        "patterns": [
+          { "_id": { "type": "string" } },
+          { "email": { "type": "string" } },
+          { "name": { "type": "string" } },
+          { "profile": { "type": "object" } },
+          { "status": { "type": "string" } }
+        ]
       }
-    },
-    
-    // Viewer - read only
-    viewer: {
-      collections: ['posts', 'comments'],
-      operations: ['GET'],
-      fields: {
-        'posts': ['title', 'content', 'publishedAt'],
-        'comments': ['text', 'createdAt']
+      {
+        "user_role": "admin",
+        "patterns": [
+          { "_id": { "type": "string" } },
+          { "email": { "type": "string" } },
+          { "name": { "type": "string" } },
+          { "profile": { "type": "object" } },
+          { "status": { "type": "string" } },
+          { "lastLogin": { "type": "string" } },
+          { "createdAt": { "type": "string" } },
+          { "updatedAt": { "type": "string" } }
+        ]
       }
-    },
-    
-    // Guest - limited access
-    guest: {
-      collections: ['posts'],
-      operations: ['GET'],
-      fields: ['title', 'summary'],
-      conditions: {
-        'posts': { status: 'published' }
+    ],
+    "write": [
+      {
+        "user_role": "default",
+        "patterns": [
+          { "name": { "type": "string" } },
+          { "profile.avatar": { "type": "string" } },
+          { "profile.age": { "type": "integer" } }
+        ]
+      },
+      {
+        "user_role": "user",
+        "patterns": [
+          { "name": { "type": "string", "pattern": "^.{2,100}$" } },
+          { "profile.age": { "type": "integer", "minimum": 13, "maximum": 120 } },
+          { "profile.interests": { "type": "array", "maxItems": 10 } },
+          { "profile.avatar": { "type": "string", "pattern": "^(https?://|/).*\\.(jpg|jpeg|png|gif|webp|svg)$" } },
+          { "email": { "type": "string", "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$" } },
+          { "profile.country": { "type": "string", "enum": ["Vietnam", "Thailand", "Malaysia", "Singapore", "Indonesia", "Philippines"] } },
+          { "status": { "type": "string", "enum": ["active", "inactive", "suspended"] } }
+        ]
+      },
+      {
+        "user_role": "admin",
+        "patterns": [
+          { "_id": { "type": "string", "pattern": "^[0-9a-fA-F]{24}$" } },
+          { "email": { "type": "string", "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$" } },
+          { "name": { "type": "string", "pattern": "^.{2,100}$" } },
+          { "profile": { "type": "object" } },
+          { "status": { "type": "string", "enum": ["active", "inactive", "suspended"] } },
+          { "lastLogin": { "type": "string" } },
+          { "createdAt": { "type": "string" } },
+          { "updatedAt": { "type": "string" } }
+        ]
       }
-    }
-  }
-}
-```
-
-### Permission-based access
-
-```javascript
-auth: {
-  permissions: {
-    'users.create': ['admin', 'manager'],
-    'users.read': ['admin', 'manager', 'user'],
-    'users.update': ['admin', 'manager'],
-    'users.delete': ['admin'],
-    
-    'posts.publish': ['admin', 'editor'],
-    'posts.moderate': ['admin', 'moderator']
+    ],
+    "delete": [
+      { "user_role": "admin" },
+      { "user_role": "dev" }
+    ]
   }
 }
 ```
 
 ### Dynamic permissions
 
-```javascript
-// Check permissions in hooks
-hooks: {
-  beforeInsert: async (collection, data, context) => {
-    const { user } = context;
-    
-    if (!user.permissions.includes(`${collection}.create`)) {
-      throw new Error('Permission denied');
+```typescript
+public hasAccess(collection: string, action: string, userRoles: string[]): boolean {
+    const rbacCollection: RbacCollection | undefined = this.rbacJson.collections.find((col: RbacCollection) => col.collection_name === collection);
+
+    if (!rbacCollection) {
+        return false; // Collection not found
     }
-    
-    // Add owner info
-    data.createdBy = user._id;
-    data.organizationId = user.organizationId;
-    
-    return data;
-  }
+
+    const collectionAction: RbacRolePattern[] = action === 'read' ? rbacCollection.rbac_config.read : action === 'write' ? rbacCollection.rbac_config.write : rbacCollection.rbac_config.delete;
+
+    return userRoles.some(role =>
+        this.hasUserRole(collectionAction, role)
+    );
 }
 ```
 
@@ -362,7 +292,6 @@ Content-Type: application/json
 
 {
   "name": "Mobile App",
-  "permissions": ["users.read", "posts.read"],
   "expiresAt": "2024-12-31T23:59:59Z"
 }
 ```
@@ -373,7 +302,6 @@ Response:
   "_id": "507f1f77bcf86cd799439012",
   "name": "Mobile App",
   "key": "mk_live_51H3Bgj2eZvKYlo2CfE3K7...",
-  "permissions": ["users.read", "posts.read"],
   "createdAt": "2023-01-15T10:30:00Z",
   "expiresAt": "2024-12-31T23:59:59Z"
 }
@@ -384,114 +312,6 @@ Response:
 ```bash
 GET /users
 X-API-Key: mk_live_51H3Bgj2eZvKYlo2CfE3K7...
-
-# Or
-GET /users?apikey=mk_live_51H3Bgj2eZvKYlo2CfE3K7...
-```
-
-## OAuth 2.0
-
-### Google OAuth
-
-```javascript
-auth: {
-  oauth: {
-    google: {
-      enabled: true,
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: '/auth/google/callback',
-      scope: ['profile', 'email']
-    }
-  }
-}
-```
-
-### OAuth flow
-
-1. Redirect to provider:
-```bash
-GET /auth/google
-```
-
-2. Handle callback:
-```bash
-GET /auth/google/callback?code=...
-```
-
-3. Response with JWT:
-```json
-{
-  "user": {
-    "_id": "507f1f77bcf86cd799439011",
-    "email": "john@gmail.com",
-    "name": "John Doe",
-    "provider": "google",
-    "providerId": "1234567890"
-  },
-  "token": "eyJhbGciOiJIUzI1NiIs..."
-}
-```
-
-### Multiple OAuth providers
-
-```javascript
-auth: {
-  oauth: {
-    google: { /* config */ },
-    facebook: { /* config */ },
-    github: { /* config */ },
-    twitter: { /* config */ }
-  }
-}
-```
-
-## Custom Authentication
-
-### Custom auth provider
-
-```javascript
-auth: {
-  custom: {
-    enabled: true,
-    provider: async (credentials) => {
-      // Your custom logic
-      const user = await ldapAuth(credentials);
-      
-      if (!user) {
-        throw new Error('Invalid credentials');
-      }
-      
-      return {
-        _id: user.id,
-        username: user.username,
-        email: user.email,
-        role: mapLdapRole(user.groups)
-      };
-    }
-  }
-}
-```
-
-### External JWT validation
-
-```javascript
-auth: {
-  jwt: {
-    validate: async (token) => {
-      // Validate with external service
-      const response = await fetch('https://auth.example.com/validate', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Invalid token');
-      }
-      
-      return response.json();
-    }
-  }
-}
 ```
 
 ## Security Best Practices
@@ -556,29 +376,6 @@ auth: {
         throw new Error('Password too common');
       }
       return true;
-    }
-  }
-}
-```
-
-### 5. Two-factor authentication
-
-```javascript
-auth: {
-  twoFactor: {
-    enabled: true,
-    issuer: 'MongoREST',
-    
-    // TOTP
-    totp: {
-      window: 1,
-      step: 30
-    },
-    
-    // SMS
-    sms: {
-      provider: 'twilio',
-      from: '+1234567890'
     }
   }
 }

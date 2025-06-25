@@ -2,6 +2,20 @@
   "name": "mongorest_rbac_config",
   "version": "2.0.0",
   "description": "RBAC configuration aligned with MongoREST collection schemas",
+  "create": [
+    {
+      "user_role": "default"
+    },
+    {
+      "user_role": "user"
+    },
+    {
+      "user_role": "admin"
+    },
+    {
+      "user_role": "dev"
+    }
+  ],
   "collections": [
     {
       "collection_name": "products",
@@ -11,31 +25,49 @@
             "user_role": "default",
             "patterns": [
               {
-                "sku": { "type": "field" }
+                "sku": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "category": { "type": "field" }
+                "category": {
+                  "type": "field"
+                }
               },
               {
-                "subcategory": { "type": "field" }
+                "subcategory": {
+                  "type": "field"
+                }
               },
               {
-                "price": { "type": "field" }
+                "price": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "ratings": { "type": "field" }
+                "ratings": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -43,49 +75,79 @@
             "user_role": "user",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "sku": { "type": "field" }
+                "sku": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "category": { "type": "field" }
+                "category": {
+                  "type": "field"
+                }
               },
               {
-                "subcategory": { "type": "field" }
+                "subcategory": {
+                  "type": "field"
+                }
               },
               {
-                "price": { "type": "field" }
+                "price": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "inventory.quantity": { "type": "field" }
+                "inventory.quantity": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "tags": { "type": "field" }
+                "tags": {
+                  "type": "field"
+                }
               },
               {
-                "specifications": { "type": "field" }
+                "specifications": {
+                  "type": "field"
+                }
               },
               {
-                "ratings": { "type": "field" }
+                "ratings": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -93,40 +155,64 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "sku": { "type": "field" }
+                "sku": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "category": { "type": "field" }
+                "category": {
+                  "type": "field"
+                }
               },
               {
-                "subcategory": { "type": "field" }
+                "subcategory": {
+                  "type": "field"
+                }
               },
               {
-                "price": { "type": "field" }
+                "price": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "inventory": { "type": "field" }
+                "inventory": {
+                  "type": "field"
+                }
               },
               {
-                "ratings": { "type": "field" }
+                "ratings": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -134,52 +220,84 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "sku": { "type": "field" }
+                "sku": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "category": { "type": "field" }
+                "category": {
+                  "type": "field"
+                }
               },
               {
-                "subcategory": { "type": "field" }
+                "subcategory": {
+                  "type": "field"
+                }
               },
               {
-                "price": { "type": "field" }
+                "price": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "inventory": { "type": "field" }
+                "inventory": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "tags": { "type": "field" }
+                "tags": {
+                  "type": "field"
+                }
               },
               {
-                "specifications": { "type": "field" }
+                "specifications": {
+                  "type": "field"
+                }
               },
               {
-                "ratings": { "type": "field" }
+                "ratings": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -187,52 +305,84 @@
             "user_role": "dev",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "sku": { "type": "field" }
+                "sku": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "category": { "type": "field" }
+                "category": {
+                  "type": "field"
+                }
               },
               {
-                "subcategory": { "type": "field" }
+                "subcategory": {
+                  "type": "field"
+                }
               },
               {
-                "price": { "type": "field" }
+                "price": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "inventory": { "type": "field" }
+                "inventory": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "tags": { "type": "field" }
+                "tags": {
+                  "type": "field"
+                }
               },
               {
-                "specifications": { "type": "field" }
+                "specifications": {
+                  "type": "field"
+                }
               },
               {
-                "ratings": { "type": "field" }
+                "ratings": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           }
@@ -250,7 +400,9 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "ratings": { "type": "field" }
+                "ratings": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -258,52 +410,84 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "sku": { "type": "field" }
+                "sku": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "category": { "type": "field" }
+                "category": {
+                  "type": "field"
+                }
               },
               {
-                "subcategory": { "type": "field" }
+                "subcategory": {
+                  "type": "field"
+                }
               },
               {
-                "price": { "type": "field" }
+                "price": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "inventory": { "type": "field" }
+                "inventory": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "tags": { "type": "field" }
+                "tags": {
+                  "type": "field"
+                }
               },
               {
-                "specifications": { "type": "field" }
+                "specifications": {
+                  "type": "field"
+                }
               },
               {
-                "ratings": { "type": "field" }
+                "ratings": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -311,52 +495,84 @@
             "user_role": "dev",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "sku": { "type": "field" }
+                "sku": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "category": { "type": "field" }
+                "category": {
+                  "type": "field"
+                }
               },
               {
-                "subcategory": { "type": "field" }
+                "subcategory": {
+                  "type": "field"
+                }
               },
               {
-                "price": { "type": "field" }
+                "price": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "inventory": { "type": "field" }
+                "inventory": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "tags": { "type": "field" }
+                "tags": {
+                  "type": "field"
+                }
               },
               {
-                "specifications": { "type": "field" }
+                "specifications": {
+                  "type": "field"
+                }
               },
               {
-                "ratings": { "type": "field" }
+                "ratings": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           }
@@ -378,52 +594,84 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "sku": { "type": "field" }
+                "sku": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "category": { "type": "field" }
+                "category": {
+                  "type": "field"
+                }
               },
               {
-                "subcategory": { "type": "field" }
+                "subcategory": {
+                  "type": "field"
+                }
               },
               {
-                "price": { "type": "field" }
+                "price": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "inventory": { "type": "field" }
+                "inventory": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "tags": { "type": "field" }
+                "tags": {
+                  "type": "field"
+                }
               },
               {
-                "specifications": { "type": "field" }
+                "specifications": {
+                  "type": "field"
+                }
               },
               {
-                "ratings": { "type": "field" }
+                "ratings": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -442,16 +690,25 @@
             "user_role": "default",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "profile.avatar": { "type": "field" }
+                "profile.avatar": {
+                  "type": "field"
+                }
               },
               {
-                "product_reviews": { "type": "relation", "relate_collection": "product_reviews" }
+                "product_reviews": {
+                  "type": "relation",
+                  "relate_collection": "product_reviews"
+                }
               }
             ]
           },
@@ -459,19 +716,29 @@
             "user_role": "user",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "email": { "type": "field" }
+                "email": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "profile": { "type": "field" }
+                "profile": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -479,34 +746,54 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "profile.age": { "type": "field" }
+                "profile.age": {
+                  "type": "field"
+                }
               },
               {
-                "profile.country": { "type": "field" }
+                "profile.country": {
+                  "type": "field"
+                }
               },
               {
-                "profile.interests": { "type": "field" }
+                "profile.interests": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "lastLogin": { "type": "field" }
+                "lastLogin": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "email": { "type": "field" }
+                "email": {
+                  "type": "field"
+                }
               },
               {
-                "profile.avatar": { "type": "field" }
+                "profile.avatar": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -514,28 +801,44 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "email": { "type": "field" }
+                "email": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "profile": { "type": "field" }
+                "profile": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "lastLogin": { "type": "field" }
+                "lastLogin": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -543,28 +846,44 @@
             "user_role": "dev",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "email": { "type": "field" }
+                "email": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "profile": { "type": "field" }
+                "profile": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "lastLogin": { "type": "field" }
+                "lastLogin": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           }
@@ -574,13 +893,19 @@
             "user_role": "default",
             "patterns": [
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "profile.avatar": { "type": "field" }
+                "profile.avatar": {
+                  "type": "field"
+                }
               },
               {
-                "profile.age": { "type": "field" }
+                "profile.age": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -588,25 +913,39 @@
             "user_role": "user",
             "patterns": [
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "profile.age": { "type": "field" }
+                "profile.age": {
+                  "type": "field"
+                }
               },
               {
-                "profile.interests": { "type": "field" }
+                "profile.interests": {
+                  "type": "field"
+                }
               },
               {
-                "profile.avatar": { "type": "field" }
+                "profile.avatar": {
+                  "type": "field"
+                }
               },
               {
-                "email": { "type": "field" }
+                "email": {
+                  "type": "field"
+                }
               },
               {
-                "profile.country": { "type": "field" }
+                "profile.country": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -618,28 +957,44 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "email": { "type": "field" }
+                "email": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "profile": { "type": "field" }
+                "profile": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "lastLogin": { "type": "field" }
+                "lastLogin": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -647,28 +1002,44 @@
             "user_role": "dev",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "email": { "type": "field" }
+                "email": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "profile": { "type": "field" }
+                "profile": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "lastLogin": { "type": "field" }
+                "lastLogin": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           }
@@ -690,28 +1061,44 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "email": { "type": "field" }
+                "email": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "profile": { "type": "field" }
+                "profile": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "lastLogin": { "type": "field" }
+                "lastLogin": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -730,10 +1117,14 @@
             "user_role": "default",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "orderNumber": { "type": "field" }
+                "orderNumber": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -741,49 +1132,75 @@
             "user_role": "user",
             "patterns": [
               {
-                "customerId": { "type": "field" }
+                "customerId": {
+                  "type": "field"
+                }
               },
               {
-                "items": { "type": "field" }
+                "items": {
+                  "type": "field"
+                }
               },
               {
-                "shippingAddress": { "type": "field" }
+                "shippingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "billingAddress": { "type": "field" }
+                "billingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "payment.method": { "type": "field" }
+                "payment.method": {
+                  "type": "field"
+                }
               },
               {
-                "payment.status": { "type": "field" }
+                "payment.status": {
+                  "type": "field"
+                }
               },
               {
-                "payment.amount": { "type": "field" }
+                "payment.amount": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "orderDate": { "type": "field" }
+                "orderDate": {
+                  "type": "field"
+                }
               },
               {
-                "shippedDate": { "type": "field" }
+                "shippedDate": {
+                  "type": "field"
+                }
               },
               {
-                "deliveredDate": { "type": "field" }
+                "deliveredDate": {
+                  "type": "field"
+                }
               },
               {
-                "notes": { "type": "field" }
+                "notes": {
+                  "type": "field"
+                }
               },
               {
-                "customer": { 
+                "customer": {
                   "type": "relation",
                   "relate_collection": "users"
                 }
               },
               {
-                "payment.transactionId": { "type": "field" }
+                "payment.transactionId": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -791,76 +1208,124 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "orderNumber": { "type": "field" }
+                "orderNumber": {
+                  "type": "field"
+                }
               },
               {
-                "customerId": { "type": "field" }
+                "customerId": {
+                  "type": "field"
+                }
               },
               {
-                "items": { "type": "field" }
+                "items": {
+                  "type": "field"
+                }
               },
               {
-                "payment.method": { "type": "field" }
+                "payment.method": {
+                  "type": "field"
+                }
               },
               {
-                "payment.status": { "type": "field" }
+                "payment.status": {
+                  "type": "field"
+                }
               },
               {
-                "payment.amount": { "type": "field" }
+                "payment.amount": {
+                  "type": "field"
+                }
               },
               {
-                "subtotal": { "type": "field" }
+                "subtotal": {
+                  "type": "field"
+                }
               },
               {
-                "tax": { "type": "field" }
+                "tax": {
+                  "type": "field"
+                }
               },
               {
-                "shipping": { "type": "field" }
+                "shipping": {
+                  "type": "field"
+                }
               },
               {
-                "discount": { "type": "field" }
+                "discount": {
+                  "type": "field"
+                }
               },
               {
-                "totalAmount": { "type": "field" }
+                "totalAmount": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "orderDate": { "type": "field" }
+                "orderDate": {
+                  "type": "field"
+                }
               },
               {
-                "shippedDate": { "type": "field" }
+                "shippedDate": {
+                  "type": "field"
+                }
               },
               {
-                "deliveredDate": { "type": "field" }
+                "deliveredDate": {
+                  "type": "field"
+                }
               },
               {
-                "customer._id": { "type": "field" }
+                "customer._id": {
+                  "type": "field"
+                }
               },
               {
-                "customer.name": { "type": "field" }
+                "customer.name": {
+                  "type": "field"
+                }
               },
               {
-                "customer.profile.country": { "type": "field" }
+                "customer.profile.country": {
+                  "type": "field"
+                }
               },
               {
-                "shippingAddress": { "type": "field" }
+                "shippingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "billingAddress": { "type": "field" }
+                "billingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "payment.transactionId": { "type": "field" }
+                "payment.transactionId": {
+                  "type": "field"
+                }
               },
               {
-                "notes": { "type": "field" }
+                "notes": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -868,64 +1333,104 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "orderNumber": { "type": "field" }
+                "orderNumber": {
+                  "type": "field"
+                }
               },
               {
-                "customerId": { "type": "field" }
+                "customerId": {
+                  "type": "field"
+                }
               },
               {
-                "items": { "type": "field" }
+                "items": {
+                  "type": "field"
+                }
               },
               {
-                "shippingAddress": { "type": "field" }
+                "shippingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "billingAddress": { "type": "field" }
+                "billingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "payment": { "type": "field" }
+                "payment": {
+                  "type": "field"
+                }
               },
               {
-                "subtotal": { "type": "field" }
+                "subtotal": {
+                  "type": "field"
+                }
               },
               {
-                "tax": { "type": "field" }
+                "tax": {
+                  "type": "field"
+                }
               },
               {
-                "shipping": { "type": "field" }
+                "shipping": {
+                  "type": "field"
+                }
               },
               {
-                "discount": { "type": "field" }
+                "discount": {
+                  "type": "field"
+                }
               },
               {
-                "totalAmount": { "type": "field" }
+                "totalAmount": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "orderDate": { "type": "field" }
+                "orderDate": {
+                  "type": "field"
+                }
               },
               {
-                "shippedDate": { "type": "field" }
+                "shippedDate": {
+                  "type": "field"
+                }
               },
               {
-                "deliveredDate": { "type": "field" }
+                "deliveredDate": {
+                  "type": "field"
+                }
               },
               {
-                "notes": { "type": "field" }
+                "notes": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -933,64 +1438,104 @@
             "user_role": "dev",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "orderNumber": { "type": "field" }
+                "orderNumber": {
+                  "type": "field"
+                }
               },
               {
-                "customerId": { "type": "field" }
+                "customerId": {
+                  "type": "field"
+                }
               },
               {
-                "items": { "type": "field" }
+                "items": {
+                  "type": "field"
+                }
               },
               {
-                "shippingAddress": { "type": "field" }
+                "shippingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "billingAddress": { "type": "field" }
+                "billingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "payment": { "type": "field" }
+                "payment": {
+                  "type": "field"
+                }
               },
               {
-                "subtotal": { "type": "field" }
+                "subtotal": {
+                  "type": "field"
+                }
               },
               {
-                "tax": { "type": "field" }
+                "tax": {
+                  "type": "field"
+                }
               },
               {
-                "shipping": { "type": "field" }
+                "shipping": {
+                  "type": "field"
+                }
               },
               {
-                "discount": { "type": "field" }
+                "discount": {
+                  "type": "field"
+                }
               },
               {
-                "totalAmount": { "type": "field" }
+                "totalAmount": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "orderDate": { "type": "field" }
+                "orderDate": {
+                  "type": "field"
+                }
               },
               {
-                "shippedDate": { "type": "field" }
+                "shippedDate": {
+                  "type": "field"
+                }
               },
               {
-                "deliveredDate": { "type": "field" }
+                "deliveredDate": {
+                  "type": "field"
+                }
               },
               {
-                "notes": { "type": "field" }
+                "notes": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           }
@@ -1004,13 +1549,19 @@
             "user_role": "user",
             "patterns": [
               {
-                "shippingAddress": { "type": "field" }
+                "shippingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "billingAddress": { "type": "field" }
+                "billingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "notes": { "type": "field" }
+                "notes": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -1022,64 +1573,104 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "orderNumber": { "type": "field" }
+                "orderNumber": {
+                  "type": "field"
+                }
               },
               {
-                "customerId": { "type": "field" }
+                "customerId": {
+                  "type": "field"
+                }
               },
               {
-                "items": { "type": "field" }
+                "items": {
+                  "type": "field"
+                }
               },
               {
-                "shippingAddress": { "type": "field" }
+                "shippingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "billingAddress": { "type": "field" }
+                "billingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "payment": { "type": "field" }
+                "payment": {
+                  "type": "field"
+                }
               },
               {
-                "subtotal": { "type": "field" }
+                "subtotal": {
+                  "type": "field"
+                }
               },
               {
-                "tax": { "type": "field" }
+                "tax": {
+                  "type": "field"
+                }
               },
               {
-                "shipping": { "type": "field" }
+                "shipping": {
+                  "type": "field"
+                }
               },
               {
-                "discount": { "type": "field" }
+                "discount": {
+                  "type": "field"
+                }
               },
               {
-                "totalAmount": { "type": "field" }
+                "totalAmount": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "orderDate": { "type": "field" }
+                "orderDate": {
+                  "type": "field"
+                }
               },
               {
-                "shippedDate": { "type": "field" }
+                "shippedDate": {
+                  "type": "field"
+                }
               },
               {
-                "deliveredDate": { "type": "field" }
+                "deliveredDate": {
+                  "type": "field"
+                }
               },
               {
-                "notes": { "type": "field" }
+                "notes": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -1087,64 +1678,104 @@
             "user_role": "dev",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "orderNumber": { "type": "field" }
+                "orderNumber": {
+                  "type": "field"
+                }
               },
               {
-                "customerId": { "type": "field" }
+                "customerId": {
+                  "type": "field"
+                }
               },
               {
-                "items": { "type": "field" }
+                "items": {
+                  "type": "field"
+                }
               },
               {
-                "shippingAddress": { "type": "field" }
+                "shippingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "billingAddress": { "type": "field" }
+                "billingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "payment": { "type": "field" }
+                "payment": {
+                  "type": "field"
+                }
               },
               {
-                "subtotal": { "type": "field" }
+                "subtotal": {
+                  "type": "field"
+                }
               },
               {
-                "tax": { "type": "field" }
+                "tax": {
+                  "type": "field"
+                }
               },
               {
-                "shipping": { "type": "field" }
+                "shipping": {
+                  "type": "field"
+                }
               },
               {
-                "discount": { "type": "field" }
+                "discount": {
+                  "type": "field"
+                }
               },
               {
-                "totalAmount": { "type": "field" }
+                "totalAmount": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "orderDate": { "type": "field" }
+                "orderDate": {
+                  "type": "field"
+                }
               },
               {
-                "shippedDate": { "type": "field" }
+                "shippedDate": {
+                  "type": "field"
+                }
               },
               {
-                "deliveredDate": { "type": "field" }
+                "deliveredDate": {
+                  "type": "field"
+                }
               },
               {
-                "notes": { "type": "field" }
+                "notes": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           }
@@ -1166,64 +1797,104 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "orderNumber": { "type": "field" }
+                "orderNumber": {
+                  "type": "field"
+                }
               },
               {
-                "customerId": { "type": "field" }
+                "customerId": {
+                  "type": "field"
+                }
               },
               {
-                "items": { "type": "field" }
+                "items": {
+                  "type": "field"
+                }
               },
               {
-                "shippingAddress": { "type": "field" }
+                "shippingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "billingAddress": { "type": "field" }
+                "billingAddress": {
+                  "type": "field"
+                }
               },
               {
-                "payment": { "type": "field" }
+                "payment": {
+                  "type": "field"
+                }
               },
               {
-                "subtotal": { "type": "field" }
+                "subtotal": {
+                  "type": "field"
+                }
               },
               {
-                "tax": { "type": "field" }
+                "tax": {
+                  "type": "field"
+                }
               },
               {
-                "shipping": { "type": "field" }
+                "shipping": {
+                  "type": "field"
+                }
               },
               {
-                "discount": { "type": "field" }
+                "discount": {
+                  "type": "field"
+                }
               },
               {
-                "totalAmount": { "type": "field" }
+                "totalAmount": {
+                  "type": "field"
+                }
               },
               {
-                "currency": { "type": "field" }
+                "currency": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "orderDate": { "type": "field" }
+                "orderDate": {
+                  "type": "field"
+                }
               },
               {
-                "shippedDate": { "type": "field" }
+                "shippedDate": {
+                  "type": "field"
+                }
               },
               {
-                "deliveredDate": { "type": "field" }
+                "deliveredDate": {
+                  "type": "field"
+                }
               },
               {
-                "notes": { "type": "field" }
+                "notes": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -1242,46 +1913,64 @@
             "user_role": "default",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "slug": { "type": "field" }
+                "slug": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "parentId": { "type": "field" }
+                "parentId": {
+                  "type": "field"
+                }
               },
               {
-                "image": { "type": "field" }
+                "image": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "featured": { "type": "field" }
+                "featured": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "parent": { 
+                "parent": {
                   "type": "relation",
                   "relate_collection": "categories"
                 }
               },
               {
-                "children": { 
+                "children": {
                   "type": "relation",
                   "relate_collection": "categories"
                 }
               },
               {
-                "products": { 
+                "products": {
                   "type": "relation",
                   "relate_collection": "products"
                 }
@@ -1292,55 +1981,79 @@
             "user_role": "user",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "slug": { "type": "field" }
+                "slug": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "parentId": { "type": "field" }
+                "parentId": {
+                  "type": "field"
+                }
               },
               {
-                "image": { "type": "field" }
+                "image": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "featured": { "type": "field" }
+                "featured": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "seo": { "type": "field" }
+                "seo": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               },
               {
-                "parent": { 
+                "parent": {
                   "type": "relation",
                   "relate_collection": "categories"
                 }
               },
               {
-                "children": { 
+                "children": {
                   "type": "relation",
                   "relate_collection": "categories"
                 }
               },
               {
-                "products": { 
+                "products": {
                   "type": "relation",
                   "relate_collection": "products"
                 }
@@ -1351,40 +2064,64 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "slug": { "type": "field" }
+                "slug": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "parentId": { "type": "field" }
+                "parentId": {
+                  "type": "field"
+                }
               },
               {
-                "image": { "type": "field" }
+                "image": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "featured": { "type": "field" }
+                "featured": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "seo": { "type": "field" }
+                "seo": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -1392,40 +2129,64 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "slug": { "type": "field" }
+                "slug": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "parentId": { "type": "field" }
+                "parentId": {
+                  "type": "field"
+                }
               },
               {
-                "image": { "type": "field" }
+                "image": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "featured": { "type": "field" }
+                "featured": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "seo": { "type": "field" }
+                "seo": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -1433,40 +2194,64 @@
             "user_role": "dev",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "slug": { "type": "field" }
+                "slug": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "parentId": { "type": "field" }
+                "parentId": {
+                  "type": "field"
+                }
               },
               {
-                "image": { "type": "field" }
+                "image": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "featured": { "type": "field" }
+                "featured": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "seo": { "type": "field" }
+                "seo": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           }
@@ -1488,40 +2273,64 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "slug": { "type": "field" }
+                "slug": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "parentId": { "type": "field" }
+                "parentId": {
+                  "type": "field"
+                }
               },
               {
-                "image": { "type": "field" }
+                "image": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "featured": { "type": "field" }
+                "featured": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "seo": { "type": "field" }
+                "seo": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -1529,40 +2338,64 @@
             "user_role": "dev",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "slug": { "type": "field" }
+                "slug": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "parentId": { "type": "field" }
+                "parentId": {
+                  "type": "field"
+                }
               },
               {
-                "image": { "type": "field" }
+                "image": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "featured": { "type": "field" }
+                "featured": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "seo": { "type": "field" }
+                "seo": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           }
@@ -1584,40 +2417,64 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "name": { "type": "field" }
+                "name": {
+                  "type": "field"
+                }
               },
               {
-                "slug": { "type": "field" }
+                "slug": {
+                  "type": "field"
+                }
               },
               {
-                "description": { "type": "field" }
+                "description": {
+                  "type": "field"
+                }
               },
               {
-                "parentId": { "type": "field" }
+                "parentId": {
+                  "type": "field"
+                }
               },
               {
-                "image": { "type": "field" }
+                "image": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "featured": { "type": "field" }
+                "featured": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "seo": { "type": "field" }
+                "seo": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -1636,34 +2493,54 @@
             "user_role": "default",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "rating": { "type": "field" }
+                "rating": {
+                  "type": "field"
+                }
               },
               {
-                "content": { "type": "field" }
+                "content": {
+                  "type": "field"
+                }
               },
               {
-                "helpful": { "type": "field" }
+                "helpful": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "product.name": { "type": "field" }
+                "product.name": {
+                  "type": "field"
+                }
               },
               {
-                "user.name": { "type": "field" }
+                "user.name": {
+                  "type": "field"
+                }
               },
               {
-                "user.profile.avatar": { "type": "field" }
+                "user.profile.avatar": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -1671,49 +2548,73 @@
             "user_role": "user",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "userId": { "type": "field" }
+                "userId": {
+                  "type": "field"
+                }
               },
               {
-                "rating": { "type": "field" }
+                "rating": {
+                  "type": "field"
+                }
               },
               {
-                "title": { "type": "field" }
+                "title": {
+                  "type": "field"
+                }
               },
               {
-                "content": { "type": "field" }
+                "content": {
+                  "type": "field"
+                }
               },
               {
-                "verified": { "type": "field" }
+                "verified": {
+                  "type": "field"
+                }
               },
               {
-                "helpful": { "type": "field" }
+                "helpful": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               },
               {
-                "product": { 
+                "product": {
                   "type": "relation",
                   "relate_collection": "products"
                 }
               },
               {
-                "user": { 
+                "user": {
                   "type": "relation",
                   "relate_collection": "users"
                 }
@@ -1724,52 +2625,84 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "userId": { "type": "field" }
+                "userId": {
+                  "type": "field"
+                }
               },
               {
-                "rating": { "type": "field" }
+                "rating": {
+                  "type": "field"
+                }
               },
               {
-                "title": { "type": "field" }
+                "title": {
+                  "type": "field"
+                }
               },
               {
-                "content": { "type": "field" }
+                "content": {
+                  "type": "field"
+                }
               },
               {
-                "verified": { "type": "field" }
+                "verified": {
+                  "type": "field"
+                }
               },
               {
-                "helpful": { "type": "field" }
+                "helpful": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               },
               {
-                "product._id": { "type": "field" }
+                "product._id": {
+                  "type": "field"
+                }
               },
               {
-                "product.name": { "type": "field" }
+                "product.name": {
+                  "type": "field"
+                }
               },
               {
-                "product.sku": { "type": "field" }
+                "product.sku": {
+                  "type": "field"
+                }
               },
               {
-                "user._id": { "type": "field" }
+                "user._id": {
+                  "type": "field"
+                }
               },
               {
-                "user.name": { "type": "field" }
+                "user.name": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -1777,40 +2710,64 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "userId": { "type": "field" }
+                "userId": {
+                  "type": "field"
+                }
               },
               {
-                "rating": { "type": "field" }
+                "rating": {
+                  "type": "field"
+                }
               },
               {
-                "title": { "type": "field" }
+                "title": {
+                  "type": "field"
+                }
               },
               {
-                "content": { "type": "field" }
+                "content": {
+                  "type": "field"
+                }
               },
               {
-                "verified": { "type": "field" }
+                "verified": {
+                  "type": "field"
+                }
               },
               {
-                "helpful": { "type": "field" }
+                "helpful": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -1818,40 +2775,64 @@
             "user_role": "dev",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "userId": { "type": "field" }
+                "userId": {
+                  "type": "field"
+                }
               },
               {
-                "rating": { "type": "field" }
+                "rating": {
+                  "type": "field"
+                }
               },
               {
-                "title": { "type": "field" }
+                "title": {
+                  "type": "field"
+                }
               },
               {
-                "content": { "type": "field" }
+                "content": {
+                  "type": "field"
+                }
               },
               {
-                "verified": { "type": "field" }
+                "verified": {
+                  "type": "field"
+                }
               },
               {
-                "helpful": { "type": "field" }
+                "helpful": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           }
@@ -1865,31 +2846,49 @@
             "user_role": "user",
             "patterns": [
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "rating": { "type": "field" }
+                "rating": {
+                  "type": "field"
+                }
               },
               {
-                "title": { "type": "field" }
+                "title": {
+                  "type": "field"
+                }
               },
               {
-                "content": { "type": "field" }
+                "content": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "userId": { "type": "field" }
+                "userId": {
+                  "type": "field"
+                }
               },
               {
-                "verified": { "type": "field" }
+                "verified": {
+                  "type": "field"
+                }
               },
               {
-                "helpful": { "type": "field" }
+                "helpful": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -1897,10 +2896,14 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "helpful": { "type": "field" }
+                "helpful": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -1908,40 +2911,64 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "userId": { "type": "field" }
+                "userId": {
+                  "type": "field"
+                }
               },
               {
-                "rating": { "type": "field" }
+                "rating": {
+                  "type": "field"
+                }
               },
               {
-                "title": { "type": "field" }
+                "title": {
+                  "type": "field"
+                }
               },
               {
-                "content": { "type": "field" }
+                "content": {
+                  "type": "field"
+                }
               },
               {
-                "verified": { "type": "field" }
+                "verified": {
+                  "type": "field"
+                }
               },
               {
-                "helpful": { "type": "field" }
+                "helpful": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -1949,40 +2976,64 @@
             "user_role": "dev",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "userId": { "type": "field" }
+                "userId": {
+                  "type": "field"
+                }
               },
               {
-                "rating": { "type": "field" }
+                "rating": {
+                  "type": "field"
+                }
               },
               {
-                "title": { "type": "field" }
+                "title": {
+                  "type": "field"
+                }
               },
               {
-                "content": { "type": "field" }
+                "content": {
+                  "type": "field"
+                }
               },
               {
-                "verified": { "type": "field" }
+                "verified": {
+                  "type": "field"
+                }
               },
               {
-                "helpful": { "type": "field" }
+                "helpful": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           }
@@ -1996,7 +3047,9 @@
             "user_role": "user",
             "patterns": [
               {
-                "reviews": { "type": "field" }
+                "reviews": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -2008,40 +3061,64 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "userId": { "type": "field" }
+                "userId": {
+                  "type": "field"
+                }
               },
               {
-                "rating": { "type": "field" }
+                "rating": {
+                  "type": "field"
+                }
               },
               {
-                "title": { "type": "field" }
+                "title": {
+                  "type": "field"
+                }
               },
               {
-                "content": { "type": "field" }
+                "content": {
+                  "type": "field"
+                }
               },
               {
-                "verified": { "type": "field" }
+                "verified": {
+                  "type": "field"
+                }
               },
               {
-                "helpful": { "type": "field" }
+                "helpful": {
+                  "type": "field"
+                }
               },
               {
-                "status": { "type": "field" }
+                "status": {
+                  "type": "field"
+                }
               },
               {
-                "images": { "type": "field" }
+                "images": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "updatedAt": { "type": "field" }
+                "updatedAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -2060,28 +3137,38 @@
             "user_role": "default",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "categoryId": { "type": "field" }
+                "categoryId": {
+                  "type": "field"
+                }
               },
               {
-                "isPrimary": { "type": "field" }
+                "isPrimary": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "product": { 
+                "product": {
                   "type": "relation",
                   "relate_collection": "products"
                 }
               },
               {
-                "category": { 
+                "category": {
                   "type": "relation",
                   "relate_collection": "categories"
                 }
@@ -2092,31 +3179,43 @@
             "user_role": "user",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "categoryId": { "type": "field" }
+                "categoryId": {
+                  "type": "field"
+                }
               },
               {
-                "isPrimary": { "type": "field" }
+                "isPrimary": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               },
               {
-                "product": { 
+                "product": {
                   "type": "relation",
                   "relate_collection": "products"
                 }
               },
               {
-                "category": { 
+                "category": {
                   "type": "relation",
                   "relate_collection": "categories"
                 }
@@ -2127,22 +3226,34 @@
             "user_role": "analyst",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "categoryId": { "type": "field" }
+                "categoryId": {
+                  "type": "field"
+                }
               },
               {
-                "isPrimary": { "type": "field" }
+                "isPrimary": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -2150,22 +3261,34 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "categoryId": { "type": "field" }
+                "categoryId": {
+                  "type": "field"
+                }
               },
               {
-                "isPrimary": { "type": "field" }
+                "isPrimary": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -2173,22 +3296,34 @@
             "user_role": "dev",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "categoryId": { "type": "field" }
+                "categoryId": {
+                  "type": "field"
+                }
               },
               {
-                "isPrimary": { "type": "field" }
+                "isPrimary": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               }
             ]
           }
@@ -2210,22 +3345,34 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "categoryId": { "type": "field" }
+                "categoryId": {
+                  "type": "field"
+                }
               },
               {
-                "isPrimary": { "type": "field" }
+                "isPrimary": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               }
             ]
           },
@@ -2233,22 +3380,34 @@
             "user_role": "dev",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "categoryId": { "type": "field" }
+                "categoryId": {
+                  "type": "field"
+                }
               },
               {
-                "isPrimary": { "type": "field" }
+                "isPrimary": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               }
             ]
           }
@@ -2270,22 +3429,34 @@
             "user_role": "admin",
             "patterns": [
               {
-                "_id": { "type": "field" }
+                "_id": {
+                  "type": "field"
+                }
               },
               {
-                "productId": { "type": "field" }
+                "productId": {
+                  "type": "field"
+                }
               },
               {
-                "categoryId": { "type": "field" }
+                "categoryId": {
+                  "type": "field"
+                }
               },
               {
-                "isPrimary": { "type": "field" }
+                "isPrimary": {
+                  "type": "field"
+                }
               },
               {
-                "sortOrder": { "type": "field" }
+                "sortOrder": {
+                  "type": "field"
+                }
               },
               {
-                "createdAt": { "type": "field" }
+                "createdAt": {
+                  "type": "field"
+                }
               }
             ]
           },
