@@ -227,7 +227,6 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     
     try {
       const collection = this.db.collection(this.getCurrentCollection());
-      console.log(this.getCurrentCollection())
       let result: any;
       let data: T[] = [];
       
