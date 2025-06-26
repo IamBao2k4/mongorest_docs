@@ -77,12 +77,12 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     }
 
     // 3. Add projection stage
-    // if (query.select && query.select.fields && query.select.fields.length > 0) {
-    //   const projection = this.convertProjection(query.select);
-    //   if (Object.keys(projection).length > 0) {
-    //     pipeline.push({ $project: projection });
-    //   }
-    // }
+    if (query.select && query.select.fields && query.select.fields.length > 0) {
+      const projection = this.convertProjection(query.select);
+      if (Object.keys(projection).length > 0) {
+        pipeline.push({ $project: projection });
+      }
+    }
 
     // 4. Add sort stage
     if (query.sort && query.sort.length > 0) {
@@ -219,7 +219,6 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     options?: ExecutionOptions
   ): Promise<IntermediateQueryResult<T>> {
     this.ensureInitialized();
-    
     if (!this.db) {
       throw new Error('MongoDB database connection is not available');
     }
@@ -227,13 +226,13 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     const startTime = Date.now();
     
     try {
-      const collection = this.db.collection('users');
+      const collection = this.db.collection(this.getCurrentCollection());
+      console.log(this.getCurrentCollection())
       let result: any;
       let data: T[] = [];
       
       // Handle different operation types
       if (Array.isArray(nativeQuery)) {
-        console.log(collection)
         // Read operation (aggregation pipeline)
         const cursor = collection.aggregate(nativeQuery, {
           maxTimeMS: options?.timeout || 30000,
@@ -241,7 +240,6 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
           ...options?.driverOptions
         });
         data = await cursor.toArray();
-        console.log(data);
       } else if (nativeQuery.operation) {
         // CRUD operations
         switch (nativeQuery.operation) {
@@ -705,30 +703,30 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
   /**
    * Convert select clause to MongoDB projection
    */
-  // private convertProjection(select: any): any {
-  //   const projection: any = {};
+  private convertProjection(select: any): any {
+    const projection: any = {};
 
-  //   if (select.fields && select.fields.length > 0) {
-  //     select.fields.forEach((field: string) => {
-  //       if (field.includes('.')) {
-  //         projection[field] = 1;
-  //       } else if (field === '*') {
-  //         return {};
-  //       } else {
-  //         projection[field] = 1;
-  //       }
-  //     });
-  //   }
+    if (select.fields && select.fields.length > 0) {
+      select.fields.forEach((field: string) => {
+        if (field.includes('.')) {
+          projection[field] = 1;
+        } else if (field === '*') {
+          return {};
+        } else {
+          projection[field] = 1;
+        }
+      });
+    }
 
-  //   // Handle aliases
-  //   if (select.aliases) {
-  //     Object.entries(select.aliases).forEach(([alias, field]) => {
-  //       projection[alias] = `$${field}`;
-  //     });
-  //   }
+    // Handle aliases
+    if (select.aliases) {
+      Object.entries(select.aliases).forEach(([alias, field]) => {
+        projection[alias] = `$${field}`;
+      });
+    }
 
-  //   return projection;
-  // }
+    return projection;
+  }
 
   /**
    * Convert sort clauses to MongoDB sort object

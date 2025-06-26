@@ -123,7 +123,7 @@ export class QueryConverter {
           
           // Add field for projection
           if (!result.fields) result.fields = [];
-          result.fields.push(`${joinClause.alias || joinClause.target}.*`);
+          result.fields.push(`${joinClause.alias || joinClause.target}`);
         }
       } else {
         // Regular field

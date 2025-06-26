@@ -45,7 +45,13 @@ export class NewCore {
     databaseType: DatabaseType = "mongodb",
     adapterName?: string
   ): Promise<IntermediateQueryResult<T>> {
-    return this.processQuery(params, collection, roles, databaseType, adapterName);
+    return this.processQuery(
+      params,
+      collection,
+      roles,
+      databaseType,
+      adapterName
+    );
   }
 
   /**
@@ -76,6 +82,8 @@ export class NewCore {
     // 4. Apply RBAC field restrictions
     this.applyRbacRestrictions(intermediateQuery, collection, roles);
 
+    console.log(intermediateQuery);
+
     // 5. Get appropriate database adapter
     const adapter = this.getAdapter(databaseType, adapterName);
 
@@ -89,37 +97,14 @@ export class NewCore {
     const nativeQuery = adapter.convertQuery(intermediateQuery);
 
     // 8. Set adapter context and execute query
-    if ("setCurrentContext" in adapter && typeof (adapter as any).setCurrentContext === 'function') {
+    if (
+      "setCurrentContext" in adapter &&
+      typeof (adapter as any).setCurrentContext === "function"
+    ) {
       try {
         (adapter as any).setCurrentContext(intermediateQuery);
       } catch (error) {
         throw CoreErrors.adapterContextFailed(error);
-      }
-    }
-
-    console.log("nativeQuery", JSON.stringify(nativeQuery));
-
-    if (databaseType === "mongodb") {
-      const projection: Record<string, number> = {};
-      try {
-        const features = this.rbacValidator.getRbacFeatures(collection, "read", roles);
-        if (Array.isArray(features)) {
-          features.forEach((f: string) => {
-            if (typeof f === 'string') {
-              projection[f] = 1;
-            }
-          });
-        } else {
-          throw CoreErrors.rbacFeaturesInvalid();
-        }
-      } catch (error) {
-        throw CoreErrors.rbacFeaturesFailed(error);
-      }
-
-      if (Object.keys(projection).length > 0 && Array.isArray(nativeQuery)) {
-        nativeQuery.push({
-          $project: projection,
-        });
       }
     }
 
@@ -230,11 +215,11 @@ export class NewCore {
         // Populate join conditions from relationship registry
         const relationships =
           this.relationshipRegistry!.getRelationships(sourceCollection);
-        
+
         if (!Array.isArray(relationships)) {
           throw CoreErrors.relationshipNotFound(sourceCollection);
         }
-        
+
         const relationship = relationships.find(
           (rel) => rel.name === join.relationship!.name
         );
@@ -278,48 +263,55 @@ export class NewCore {
   private applyRbacRestrictions(
     query: IntermediateQuery,
     collection: string,
-    roles: string[]
+    roles: string[],
+    action: string = "read"
   ): void {
-    if (!query) {
-      throw CoreErrors.queryObjectRequired();
+    // console.log("query", query);
+    // if (!query) {
+    //   throw CoreErrors.queryObjectRequired();
+    // }
+
+    // if (!collection || typeof collection !== "string") {
+    //   throw CoreErrors.collectionNameInvalid();
+    // }
+
+    // if (!Array.isArray(roles)) {
+    //   throw CoreErrors.rolesInvalidType();
+    // }
+    if (!query.select) {
+      query.select = { fields: [] };
     }
-    
-    if (!collection || typeof collection !== 'string') {
-      throw CoreErrors.collectionNameInvalid();
-    }
-    
-    if (!Array.isArray(roles)) {
-      throw CoreErrors.rolesInvalidType();
-    }
-    
     const rbacValidator = new RbacValidator();
-    
-    let allowedFields: string[];
-    try {
-      allowedFields = rbacValidator.getRbacFeatures(
-        collection,
-        "read",
-        roles
-      );
-    } catch (error) {
-      throw CoreErrors.rbacRestrictionFailed(error);
-    }
+    query.select.fields = rbacValidator.filterRbacFeatures(
+      collection,
+      action,
+      roles,
+      query.select.fields
+    );
+    // let allowedFields: string[];
+    // try {
+    //   allowedFields = rbacValidator.getRbacFeatures(collection, "read", roles);
+    // } catch (error) {
+    //   throw CoreErrors.rbacRestrictionFailed(error);
+    // }
 
-    if (allowedFields.length > 0) {
-      if (!query.select) {
-        query.select = { fields: [] };
-      }
+    // if (allowedFields.length > 0) {
+    //
 
-      if (!query.select.fields || query.select.fields.length === 0) {
-        // If no specific fields requested, apply RBAC restrictions
-        query.select.fields = allowedFields;
-      } else {
-        // Filter requested fields by RBAC permissions
-        query.select.fields = query.select.fields.filter(
-          (field) => allowedFields.includes(field) || field.includes("*")
-        );
-      }
-    }
+    //   if (!query.select.fields || query.select.fields.length === 0) {
+    //     // If no specific fields requested, apply RBAC restrictions
+    //     query.select.fields = allowedFields;
+    //   } else {
+    //     // Filter requested fields by RBAC permissions
+    //     if (query.select.fields.includes("*")) {
+    //       query.select.fields = allowedFields;
+    //     } else {
+    //       query.select.fields = query.select.fields.filter((field) =>
+    //         allowedFields.includes(field)
+    //       );
+    //     }
+    //   }
+    // }
   }
 
   /**
@@ -377,6 +369,8 @@ export class NewCore {
       throw CoreErrors.accessDeniedCreate(collection, roles);
     }
 
+    console.log(collection);
+
     // Get appropriate database adapter
     const adapter = this.getAdapter(databaseType, adapterName);
 
@@ -391,10 +385,21 @@ export class NewCore {
         database: databaseType,
         timestamp: new Date(),
         user: {
-          roles
-        }
-      }
+          roles,
+        },
+      },
     };
+    // 8. Set adapter context and execute query
+    if (
+      "setCurrentContext" in adapter &&
+      typeof (adapter as any).setCurrentContext === "function"
+    ) {
+      try {
+        (adapter as any).setCurrentContext(intermediateQuery);
+      } catch (error) {
+        throw CoreErrors.adapterContextFailed(error);
+      }
+    }
 
     // Apply RBAC field restrictions
     this.applyRbacRestrictions(intermediateQuery, collection, roles);
@@ -436,17 +441,28 @@ export class NewCore {
         {
           field: "_id",
           operator: "eq",
-          value: id
-        }
+          value: id,
+        },
       ],
       metadata: {
         database: databaseType,
         timestamp: new Date(),
         user: {
-          roles
-        }
-      }
+          roles,
+        },
+      },
     };
+    // 8. Set adapter context and execute query
+    if (
+      "setCurrentContext" in adapter &&
+      typeof (adapter as any).setCurrentContext === "function"
+    ) {
+      try {
+        (adapter as any).setCurrentContext(intermediateQuery);
+      } catch (error) {
+        throw CoreErrors.adapterContextFailed(error);
+      }
+    }
 
     // Apply RBAC field restrictions
     this.applyRbacRestrictions(intermediateQuery, collection, roles);
@@ -492,20 +508,31 @@ export class NewCore {
         {
           field: "_id",
           operator: "eq",
-          value: id
-        }
+          value: id,
+        },
       ],
       options: {
-        partial: true
+        partial: true,
       },
       metadata: {
         database: databaseType,
         timestamp: new Date(),
         user: {
-          roles
-        }
-      }
+          roles,
+        },
+      },
     };
+    // 8. Set adapter context and execute query
+    if (
+      "setCurrentContext" in adapter &&
+      typeof (adapter as any).setCurrentContext === "function"
+    ) {
+      try {
+        (adapter as any).setCurrentContext(intermediateQuery);
+      } catch (error) {
+        throw CoreErrors.adapterContextFailed(error);
+      }
+    }
 
     // Apply RBAC field restrictions
     this.applyRbacRestrictions(intermediateQuery, collection, roles);
@@ -549,18 +576,29 @@ export class NewCore {
         {
           field: "_id",
           operator: "eq",
-          value: id
-        }
+          value: id,
+        },
       ],
       metadata: {
         database: databaseType,
         timestamp: new Date(),
         user: {
-          roles
-        }
-      }
+          roles,
+        },
+      },
     };
 
+    // 8. Set adapter context and execute query
+    if (
+      "setCurrentContext" in adapter &&
+      typeof (adapter as any).setCurrentContext === "function"
+    ) {
+      try {
+        (adapter as any).setCurrentContext(intermediateQuery);
+      } catch (error) {
+        throw CoreErrors.adapterContextFailed(error);
+      }
+    }
     // Execute the delete
     const result = await adapter.executeQuery(
       adapter.convertQuery(intermediateQuery)
@@ -595,19 +633,29 @@ export class NewCore {
         {
           field: "_id",
           operator: "eq",
-          value: new ObjectId(id)
-        }
+          value: new ObjectId(id),
+        },
       ],
       limit: 1,
       metadata: {
         database: databaseType,
         timestamp: new Date(),
         user: {
-          roles
-        }
-      }
+          roles,
+        },
+      },
     };
-    
+
+    if (
+      "setCurrentContext" in adapter &&
+      typeof (adapter as any).setCurrentContext === "function"
+    ) {
+      try {
+        (adapter as any).setCurrentContext(intermediateQuery);
+      } catch (error) {
+        throw CoreErrors.adapterContextFailed(error);
+      }
+    }
     // Apply RBAC field restrictions
     this.applyRbacRestrictions(intermediateQuery, collection, roles);
 

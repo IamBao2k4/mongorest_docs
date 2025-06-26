@@ -114,7 +114,7 @@ export class RbacValidator {
         collection: string,
         action: string,
         userRoles: string[],
-        features: string[]
+        features?: string[]
     ): string[] {
         const rbacCollection: RbacCollection = this.rbacJson.collections.find((col: RbacCollection) => col.collection_name === collection)!;
 
@@ -124,12 +124,20 @@ export class RbacValidator {
 
         const collectionAction: RbacRolePattern[] = action === 'read' ? rbacCollection.rbac_config.read : action === 'write' ? rbacCollection.rbac_config.write : rbacCollection.rbac_config.delete;
 
-        return features.filter(feature => {
+        if (!features || features.includes('*') || features.length == 0) {
+            return this.getRbacFeatures(collection, action, userRoles)
+        }
+
+        const filteredFeatures = features.filter(feature => {
             return userRoles.some(role => {
                 return this.hasUserRole(collectionAction, role) &&
                     collectionAction.some(r => r.user_role === role && r.patterns.some(p => Object.keys(p)[0] === feature));
             });
         });
+        if (filteredFeatures.length == 0) {
+            return ['_id']
+        }
+        return filteredFeatures;
     }
 
     private objectize(features: string[]): Record<string, any> {
