@@ -666,6 +666,45 @@ export class NewCore {
 
     return result.data && result.data.length > 0 ? result.data[0] : null;
   }
+
+  async getRbacByCollection(
+    collection: string,
+    dbType: DatabaseType = "mongodb",
+    adapterName?: string
+  ): Promise<any> {
+    const adapter = this.getAdapter(dbType, adapterName);
+
+    return adapter.getRbacByCollection(collection);
+  }
+
+  async getAllRbac(
+    dbType: DatabaseType = "mongodb",
+    adapterName?: string
+  ): Promise<any> {
+    const adapter = this.getAdapter(dbType, adapterName);
+
+    return adapter.getRbacByCollection("*");
+  }
+
+  async updateRbacConfig(
+    rbacJson: any,
+    dbType: DatabaseType = "mongodb",
+    adapterName?: string
+  ): Promise<void> {
+    const adapter = this.getAdapter(dbType, adapterName);
+
+    return adapter.updateRbacConfig(rbacJson);
+  }
+
+  async createRbacConfig(
+    rbacJson: any,
+    dbType: DatabaseType = "mongodb",
+    adapterName?: string
+  ): Promise<void> {
+    const adapter = this.getAdapter(dbType, adapterName);
+
+    return adapter.createRbacConfig(rbacJson);
+  }
 }
 
 /**

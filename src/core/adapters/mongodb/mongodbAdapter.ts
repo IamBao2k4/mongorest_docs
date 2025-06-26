@@ -1,12 +1,12 @@
-import { 
-  BaseDatabaseAdapter, 
-  DatabaseType, 
-  AdapterCapabilities, 
+import {
+  BaseDatabaseAdapter,
+  DatabaseType,
+  AdapterCapabilities,
   ExecutionOptions,
   AdapterConfig
 } from '../base/databaseAdapter';
-import { 
-  IntermediateQuery, 
+import {
+  IntermediateQuery,
   IntermediateQueryResult,
   FilterCondition,
   FieldCondition,
@@ -125,7 +125,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
    */
   private convertUpdateQuery(query: IntermediateQuery): any {
     const filter = query.filters ? this.convertSimpleFilters(query.filters) : {};
-    
+
     return {
       operation: query.options?.partial ? 'updateOne' : 'replaceOne',
       filter,
@@ -138,7 +138,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
    */
   private convertDeleteQuery(query: IntermediateQuery): any {
     const filter = query.filters ? this.convertSimpleFilters(query.filters) : {};
-    
+
     return {
       operation: 'deleteOne',
       filter
@@ -148,12 +148,12 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
   /**
    * Convert simple filters array to MongoDB filter
    */
-  private convertSimpleFilters(filters: Array<{field: string; operator: string; value: any}>): any {
+  private convertSimpleFilters(filters: Array<{ field: string; operator: string; value: any }>): any {
     const mongoFilter: any = {};
-    
+
     filters.forEach(filter => {
       const { field, operator, value } = filter;
-      
+
       // Convert string to ObjectId for _id field
       let processedValue = value;
       if (field === '_id' && typeof value === 'string') {
@@ -164,7 +164,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
           processedValue = value;
         }
       }
-      
+
       switch (operator) {
         case 'eq':
           mongoFilter[field] = processedValue;
@@ -207,7 +207,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
           mongoFilter[field] = processedValue;
       }
     });
-    
+
     return mongoFilter;
   }
 
@@ -215,7 +215,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
    * Execute MongoDB query
    */
   async executeQuery<T = any>(
-    nativeQuery: any, 
+    nativeQuery: any,
     options?: ExecutionOptions
   ): Promise<IntermediateQueryResult<T>> {
     this.ensureInitialized();
@@ -224,13 +224,13 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     }
     console.log(nativeQuery)
     const startTime = Date.now();
-    
+
     try {
       const collection = this.db.collection(this.getCurrentCollection());
       console.log(this.getCurrentCollection())
       let result: any;
       let data: T[] = [];
-      
+
       // Handle different operation types
       if (Array.isArray(nativeQuery)) {
         // Read operation (aggregation pipeline)
@@ -247,7 +247,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
             result = await collection.insertOne(nativeQuery.document);
             data = [{ ...nativeQuery.document, _id: result.insertedId }] as T[];
             break;
-            
+
           case 'updateOne':
             result = await collection.updateOne(nativeQuery.filter, nativeQuery.update);
             if (result.modifiedCount > 0) {
@@ -255,7 +255,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
               data = updated ? [updated] : [];
             }
             break;
-            
+
           case 'replaceOne':
             result = await collection.replaceOne(nativeQuery.filter, nativeQuery.update);
             if (result.modifiedCount > 0) {
@@ -263,12 +263,12 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
               data = replaced ? [replaced] : [];
             }
             break;
-            
+
           case 'deleteOne':
             result = await collection.deleteOne(nativeQuery.filter);
             data = [];
             break;
-            
+
           default:
             throw new Error(`Unsupported operation: ${nativeQuery.operation}`);
         }
@@ -276,7 +276,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
 
       const executionTime = Date.now() - startTime;
       const queryResult = this.createResult(data, this.getCurrentQuery(), nativeQuery, executionTime);
-      
+
       // Add operation metadata for CRUD operations
       if (result) {
         queryResult.metadata = {
@@ -287,7 +287,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
           matchedCount: result.matchedCount || 0
         };
       }
-      
+
       return queryResult;
     } catch (error) {
       throw new Error(`MongoDB query execution failed: ${(error as Error).message}`);
@@ -326,18 +326,18 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
    */
   async initialize(config: AdapterConfig): Promise<void> {
     await super.initialize(config);
-    
+
     if (config.custom?.db) {
       this.db = config.custom.db;
     } else if (config.connection) {
       // Initialize MongoDB connection if not provided
       const { MongoClient } = await import('mongodb');
-      const connectionString = config.connection.connectionString || 
+      const connectionString = config.connection.connectionString ||
         this.buildConnectionString(config.connection);
-      
+
       const client = new MongoClient(connectionString);
       await client.connect();
-      
+
       // Extract database name from connection string or use provided database
       let dbName = config.connection.database;
       if (!dbName && config.connection.connectionString) {
@@ -347,7 +347,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
           dbName = match[1];
         }
       }
-      
+
       this.db = client.db(dbName);
     }
   }
@@ -391,7 +391,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
   private convertSingleJoin(join: JoinClause, sourceCollection: string): any | null {
     // Handle relationship-based joins
     if (join.relationship && this.relationshipRegistry) {
-      const relationships = this.relationshipRegistry.getForTable ? 
+      const relationships = this.relationshipRegistry.getForTable ?
         this.relationshipRegistry.getForTable(sourceCollection) :
         [];
       const relationship = relationships.find((rel: any) => rel.name === join.relationship!.name);
@@ -484,7 +484,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
         {
           $lookup: {
             from: join.target,
-            let: { 
+            let: {
               junction_ids: {
                 $map: {
                   input: '$_junction',
@@ -592,7 +592,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
 
     // Handle field conditions
     if (filter.conditions && filter.conditions.length > 0) {
-      const conditions = filter.conditions.map(condition => 
+      const conditions = filter.conditions.map(condition =>
         this.convertFieldCondition(condition)
       );
       if (conditions.length === 1) {
@@ -604,7 +604,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
 
     // Handle nested conditions
     if (filter.nested && filter.nested.length > 0) {
-      const nestedConditions = filter.nested.map(nested => 
+      const nestedConditions = filter.nested.map(nested =>
         this.convertFilter(nested)
       );
 
@@ -624,7 +624,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
 
     // Handle logical operator for conditions
     if (filter.operator && filter.conditions && filter.conditions.length > 0) {
-      const conditions = filter.conditions.map(condition => 
+      const conditions = filter.conditions.map(condition =>
         this.convertFieldCondition(condition)
       );
 
@@ -647,54 +647,54 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     switch (operator) {
       case 'eq':
         return { [field]: value };
-      
+
       case 'neq':
         return { [field]: { $ne: value } };
-      
+
       case 'gt':
         return { [field]: { $gt: value } };
-      
+
       case 'gte':
         return { [field]: { $gte: value } };
-      
+
       case 'lt':
         return { [field]: { $lt: value } };
-      
+
       case 'lte':
         return { [field]: { $lte: value } };
-      
+
       case 'in':
         return { [field]: { $in: Array.isArray(value) ? value : [value] } };
-      
+
       case 'nin':
         return { [field]: { $nin: Array.isArray(value) ? value : [value] } };
-      
+
       case 'exists':
         return { [field]: { $exists: value === true } };
-      
+
       case 'null':
         return { [field]: null };
-      
+
       case 'notnull':
         return { [field]: { $ne: null } };
-      
+
       case 'regex':
         return { [field]: { $regex: value, $options: 'i' } };
-      
+
       case 'like':
       case 'ilike':
         const pattern = value.replace(/%/g, '.*').replace(/_/g, '.');
         return { [field]: { $regex: pattern, $options: 'i' } };
-      
+
       case 'contains':
         return { [field]: { $regex: value, $options: 'i' } };
-      
+
       case 'startswith':
         return { [field]: { $regex: `^${value}`, $options: 'i' } };
-      
+
       case 'endswith':
         return { [field]: { $regex: `${value}$`, $options: 'i' } };
-      
+
       default:
         throw new Error(`Unsupported operator: ${operator}`);
     }
@@ -743,15 +743,15 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
 
   private buildConnectionString(config: any): string {
     const { host = 'localhost', port = 27017, username, password, database } = config;
-    
+
     let connectionString = 'mongodb://';
-    
+
     if (username && password) {
       connectionString += `${username}:${password}@`;
     }
-    
+
     connectionString += `${host}:${port}`;
-    
+
     if (database) {
       connectionString += `/${database}`;
     }
@@ -775,5 +775,72 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
   setCurrentContext(query: IntermediateQuery): void {
     this.currentQuery = query;
     this.currentCollection = query.collection;
+  }
+
+  public getRbacByCollection(collectionName: string) {
+    if (!this.db) {
+      throw new Error('MongoDB database connection is not available');
+    }
+
+    // Fetch RBAC configuration from a specific collection
+    return this.db.collection('rbac').findOne({ collection_name: collectionName })
+      .then((rbac: any) => {
+        if (!rbac) {
+          throw new Error(`RBAC configuration not found for collection: ${collectionName}`);
+        }
+        return rbac;
+      })
+      .catch((error: Error) => {
+        throw new Error(`Failed to fetch RBAC configuration: ${error.message}`);
+      });
+  }
+
+  public getAllRbac() {
+    if (!this.db) {
+      throw new Error('MongoDB database connection is not available');
+    }
+
+    // Fetch all RBAC configurations
+    return this.db.collection('rbac').find({}).toArray()
+      .then((rbacList: any[]) => {
+        if (rbacList.length === 0) {
+          throw new Error('No RBAC configurations found');
+        }
+        return rbacList;
+      })
+      .catch((error: Error) => {
+        throw new Error(`Failed to fetch all RBAC configurations: ${error.message}`);
+      });
+  }
+
+  public updateRbacConfig(rbacJson: any): void {
+    if (!this.db) {
+      throw new Error('MongoDB database connection is not available');
+    }
+
+    // Update RBAC configuration in the database
+    this.db.collection('rbac').updateOne(
+      { collection_name: rbacJson.collection_name },
+      { $set: rbacJson },
+      { upsert: true }
+    ).then(() => {
+      console.log(`RBAC configuration for ${rbacJson.collection_name} updated successfully`);
+    }).catch((error: Error) => {
+      throw new Error(`Failed to update RBAC configuration: ${error.message}`);
+    });
+  }
+
+  public createRbacConfig(rbacJson: any): void {
+    if (!this.db) {
+      throw new Error('MongoDB database connection is not available');
+    }
+    
+    this.db.collection('rbac').insertOne(rbacJson)
+      .then(() => {
+        console.log(`RBAC configuration for ${rbacJson.collection_name} created successfully`);
+      })
+      .catch((error: Error) => {
+        throw new Error(`Failed to create RBAC configuration: ${error.message}`);
+      });
   }
 }
