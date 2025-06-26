@@ -223,16 +223,17 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     if (!this.db) {
       throw new Error('MongoDB database connection is not available');
     }
-
+    console.log(nativeQuery)
     const startTime = Date.now();
     
     try {
-      const collection = this.db.collection(this.getCurrentCollection());
+      const collection = this.db.collection('users');
       let result: any;
       let data: T[] = [];
       
       // Handle different operation types
       if (Array.isArray(nativeQuery)) {
+        console.log(collection)
         // Read operation (aggregation pipeline)
         const cursor = collection.aggregate(nativeQuery, {
           maxTimeMS: options?.timeout || 30000,
@@ -240,6 +241,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
           ...options?.driverOptions
         });
         data = await cursor.toArray();
+        console.log(data);
       } else if (nativeQuery.operation) {
         // CRUD operations
         switch (nativeQuery.operation) {

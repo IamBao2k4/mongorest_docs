@@ -20,6 +20,7 @@ class MongoDBService {
     this.entitiesFilePath = path.join(process.cwd(), 'json/entities', '_entities.json');
     console.log(`MongoDBService initialized: ${this.dbName}`);
     this.initFileWatcher();
+    console.log('Entity Cache initialized', this.entitiesCache);
   }
 
   private initFileWatcher() {

@@ -1,93 +1,451 @@
-# mongorest
+# MongoREST
 
+<div align="center">
+  <h1>🚀 MongoREST</h1>
+  <p><strong>A modern, type-safe REST API library for multiple databases</strong></p>
+  
+  [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![npm version](https://img.shields.io/npm/v/mongorest.svg)](https://www.npmjs.com/package/mongorest)
+  [![Documentation](https://img.shields.io/badge/docs-available-green.svg)](https://mongorest.dev)
+</div>
 
+---
 
-## Getting started
+## ✨ Features
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+- 🔥 **Simple & Intuitive API** - Fluent interface for building queries
+- 🎯 **Type-Safe** - Full TypeScript support with intelligent type inference
+- 🔌 **Multi-Database** - Support for MongoDB, PostgreSQL, MySQL, Elasticsearch, SQLite
+- 🔐 **Built-in RBAC** - Role-based access control out of the box
+- 🚀 **High Performance** - Query optimization and caching
+- 🔧 **Extensible** - Plugin system for custom functionality
+- 📝 **Auto-Documentation** - Generate API docs from your schemas
+- 🌐 **Real-time Support** - WebSocket integration for live updates
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## 📦 Installation
 
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
+```bash
+npm install mongorest
+# or
+yarn add mongorest
+# or
+pnpm add mongorest
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/mangoads/mongorest.git
-git branch -M main
-git push -uf origin main
+
+## 🚀 Quick Start
+
+```typescript
+import { MongoREST } from 'mongorest';
+
+// Initialize
+const api = new MongoREST({
+  database: 'mongodb',
+  connection: 'mongodb://localhost:27017/myapp'
+});
+
+// Connect
+await api.connect();
+
+// Simple query
+const users = await api.collection('users').find();
+
+// Advanced query with relationships
+const posts = await api
+  .collection('posts')
+  .where('status', '=', 'published')
+  .include('author', 'comments')
+  .orderBy('createdAt', 'desc')
+  .paginate(1, 20)
+  .find();
 ```
 
-## Integrate with your tools
+## 📖 Core Concepts
 
-- [ ] [Set up project integrations](https://gitlab.com/mangoads/mongorest/-/settings/integrations)
+### Collections
 
-## Collaborate with your team
+Collections are the main entry point for database operations:
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+```typescript
+const users = api.collection<User>('users');
 
-## Test and Deploy
+// CRUD operations
+const user = await users.create({ name: 'John', email: 'john@example.com' });
+const found = await users.findOne(user.id);
+await users.update(user.id, { name: 'Jane' });
+await users.delete(user.id);
+```
 
-Use the built-in continuous integration in GitLab.
+### Query Builder
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Build complex queries with a fluent interface:
 
-***
+```typescript
+const results = await api
+  .collection('products')
+  .where('price', '>', 100)
+  .where('category', 'in', ['electronics', 'computers'])
+  .orWhere('featured', '=', true)
+  .include('reviews', 'category')
+  .select('id', 'name', 'price')
+  .orderBy('price', 'asc')
+  .limit(20)
+  .find();
+```
 
-# Editing this README
+### Relationships
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+Define and query relationships between collections:
 
-## Suggestions for a good README
+```typescript
+// Define relationships
+api.defineRelationships('users', [
+  {
+    name: 'posts',
+    type: 'one-to-many',
+    target: 'posts',
+    localField: 'id',
+    foreignField: 'userId'
+  }
+]);
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+// Query with relationships
+const usersWithPosts = await api
+  .collection('users')
+  .include('posts')
+  .find();
 
-## Name
-Choose a self-explaining name for your project.
+// Nested relationships
+const users = await api
+  .collection('users')
+  .include({
+    relation: 'posts',
+    includes: ['comments']
+  })
+  .find();
+```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+### Schema Validation
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+Define schemas for automatic validation:
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+```typescript
+api.defineSchema('users', {
+  fields: {
+    id: { type: 'uuid', required: true },
+    email: { type: 'email', required: true, unique: true },
+    name: { type: 'string', required: true },
+    age: { type: 'number', validate: [{ type: 'min', value: 0 }] },
+    status: { type: 'string', default: 'active' }
+  },
+  timestamps: true
+});
+```
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### RBAC (Role-Based Access Control)
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+Configure fine-grained permissions:
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+```typescript
+api.configureRBAC({
+  enabled: true,
+  roles: {
+    admin: {
+      name: 'admin',
+      permissions: [
+        { resource: '*', actions: ['read', 'create', 'update', 'delete'] }
+      ]
+    },
+    user: {
+      name: 'user',
+      permissions: [
+        { 
+          resource: 'users', 
+          actions: ['read', 'update'],
+          conditions: [{ field: 'id', operator: '=', value: '$userId' }]
+        }
+      ]
+    }
+  }
+});
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+// Use with context
+const userContext = { userId: 'user-123', roles: ['user'] };
+api.setContext(userContext);
+```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+## 🔌 Plugins
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+Extend functionality with plugins:
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+```typescript
+import { CachePlugin } from 'mongorest-cache';
+import { AuditPlugin } from 'mongorest-audit';
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+api.use(new CachePlugin({
+  driver: 'redis',
+  ttl: 3600
+}));
 
-## License
-For open source projects, say how it is licensed.
+api.use(new AuditPlugin({
+  collections: ['users', 'orders'],
+  events: ['create', 'update', 'delete']
+}));
+```
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+### Creating Custom Plugins
+
+```typescript
+import { createPlugin } from 'mongorest';
+
+const myPlugin = createPlugin({
+  name: 'my-plugin',
+  version: '1.0.0',
+  initialize(core) {
+    console.log('Plugin initialized');
+  },
+  hooks: {
+    beforeQuery(query) {
+      console.log('Before query:', query);
+      return query;
+    },
+    afterCreate(result, collection) {
+      console.log(`Created in ${collection}:`, result);
+      return result;
+    }
+  }
+});
+
+api.use(myPlugin);
+```
+
+## 🛠️ Advanced Features
+
+### Transactions
+
+```typescript
+await api.transaction(async (trx) => {
+  const user = await trx.collection('users').create({ name: 'John' });
+  const order = await trx.collection('orders').create({ 
+    userId: user.id,
+    total: 100 
+  });
+  return { user, order };
+});
+```
+
+### Aggregations
+
+```typescript
+const stats = await api
+  .collection('orders')
+  .aggregate([
+    { $match: { status: 'completed' } },
+    { $group: { 
+      _id: '$userId', 
+      totalSpent: { $sum: '$total' },
+      orderCount: { $sum: 1 }
+    }},
+    { $sort: { totalSpent: -1 } },
+    { $limit: 10 }
+  ]);
+```
+
+### Real-time Subscriptions
+
+```typescript
+const subscription = await api
+  .collection('messages')
+  .where('roomId', '=', 'room-123')
+  .subscribe((message) => {
+    console.log('New message:', message);
+  });
+
+// Later...
+subscription.unsubscribe();
+```
+
+### Raw Queries
+
+```typescript
+// When you need full control
+const results = await api.raw({
+  collection: 'users',
+  operation: 'find',
+  query: { age: { $gte: 18 } },
+  options: { sort: { createdAt: -1 } }
+});
+```
+
+## 🔧 Configuration
+
+### Database Adapters
+
+```typescript
+// MongoDB
+const api = new MongoREST({
+  database: 'mongodb',
+  connection: 'mongodb://localhost:27017/myapp'
+});
+
+// PostgreSQL
+const api = new MongoREST({
+  database: 'postgresql',
+  connection: {
+    host: 'localhost',
+    port: 5432,
+    database: 'myapp',
+    username: 'user',
+    password: 'password'
+  }
+});
+
+// MySQL
+const api = new MongoREST({
+  database: 'mysql',
+  connection: {
+    host: 'localhost',
+    port: 3306,
+    database: 'myapp',
+    username: 'user',
+    password: 'password'
+  }
+});
+```
+
+### Options
+
+```typescript
+const api = new MongoREST({
+  database: 'mongodb',
+  connection: 'mongodb://localhost:27017/myapp',
+  options: {
+    debug: true,
+    logger: customLogger,
+    cache: {
+      enabled: true,
+      driver: 'redis',
+      ttl: 3600
+    },
+    validation: {
+      strict: true,
+      coerceTypes: true
+    },
+    hooks: {
+      onError(error) {
+        console.error('Global error:', error);
+      }
+    }
+  }
+});
+```
+
+## 📚 Examples
+
+### Blog API
+
+```typescript
+// Define schemas
+api.defineSchema('posts', {
+  fields: {
+    id: { type: 'uuid', required: true },
+    title: { type: 'string', required: true },
+    content: { type: 'string', required: true },
+    authorId: { type: 'uuid', required: true },
+    status: { type: 'string', default: 'draft' },
+    tags: { type: 'array' }
+  },
+  timestamps: true
+});
+
+// Define relationships
+api.defineRelationships('posts', [
+  { name: 'author', type: 'many-to-one', target: 'users', localField: 'authorId', foreignField: 'id' },
+  { name: 'comments', type: 'one-to-many', target: 'comments', localField: 'id', foreignField: 'postId' }
+]);
+
+// Query posts with author and comments
+const posts = await api
+  .collection('posts')
+  .where('status', '=', 'published')
+  .include('author', 'comments')
+  .orderBy('createdAt', 'desc')
+  .paginate(1, 10)
+  .find();
+```
+
+### E-commerce API
+
+```typescript
+// Product search with filters
+const products = await api
+  .collection('products')
+  .where('price', 'between', [10, 100])
+  .where('category', 'in', ['electronics', 'accessories'])
+  .where('inStock', '=', true)
+  .include('reviews', 'category')
+  .orderBy('rating', 'desc')
+  .limit(20)
+  .find();
+
+// Order with user and items
+const order = await api
+  .collection('orders')
+  .include({
+    relation: 'user',
+    select: ['id', 'name', 'email']
+  })
+  .include({
+    relation: 'items',
+    includes: ['product']
+  })
+  .findOne(orderId);
+```
+
+## 🧪 Testing
+
+```typescript
+import { MongoREST, createMockAdapter } from 'mongorest';
+
+// Use mock adapter for testing
+const api = new MongoREST({
+  database: 'mock',
+  adapter: createMockAdapter({
+    users: [
+      { id: '1', name: 'John' },
+      { id: '2', name: 'Jane' }
+    ]
+  })
+});
+
+// Test your queries
+const users = await api.collection('users').find();
+expect(users).toHaveLength(2);
+```
+
+## 📊 Performance
+
+- **Query Optimization**: Automatic query optimization for better performance
+- **Connection Pooling**: Built-in connection pooling
+- **Caching**: Multiple caching strategies (memory, Redis)
+- **Lazy Loading**: Load relationships only when needed
+- **Batch Operations**: Optimize multiple operations
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## 📄 License
+
+MongoREST is [MIT licensed](LICENSE).
+
+## 🙏 Acknowledgments
+
+Built with ❤️ by the MongoREST team and contributors.
+
+---
+
+<div align="center">
+  <p>⭐ Star us on GitHub if you find this project useful!</p>
+  <p>📖 <a href="https://mongorest.dev/docs">Full Documentation</a> | 💬 <a href="https://discord.gg/mongorest">Discord Community</a> | 🐦 <a href="https://twitter.com/mongorest">Twitter</a></p>
+</div>

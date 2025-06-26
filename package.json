@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "tsx src/transports/express/index.ts",
+    "start": "tsx src/index.ts",
     "dev_test": "nodemon --watch src --ext ts --exec \"npx ts-node src/core/rbac/rbac-test.ts\"",
     "dev": "concurrently \"tsc --watch\" \"nodemon\"",
     "dev:demo": "nodemon --exec tsx src/transports/express/demo-server.ts",

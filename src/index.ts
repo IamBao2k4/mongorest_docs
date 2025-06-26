@@ -4,6 +4,8 @@ import { registerGlobalErrorHandler } from './common/exceptions/global.exception
 import { responseInterceptor } from './common/interceptors/response.interceptor';
 import * as fs from 'fs';
 import * as path from 'path';
+import { coreGlobal, InitialCore } from './configs/core-global';
+import { NewCore } from './core/main/newCore';
 
 function writeFatalLog(type: string, error: any) {
     const logsDir = path.join(process.cwd(), 'logs');
@@ -86,9 +88,12 @@ const loadSchemasFromSubfolders = async (schemasPath: string) => {
     return allSchemas;
 };
 
+
+
 const start = async () => {
     try {
         // Load all schemas from schemas folder and subfolders
+        await InitialCore();
         const schemasPath = path.join(__dirname, 'schemas');
         
         if (!fs.existsSync(schemasPath)) {

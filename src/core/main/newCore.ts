@@ -15,7 +15,7 @@ import {
 import { RbacValidator } from "../rbac/rbac-validator";
 import { RelationshipRegistry } from "../adapters/base/relationship/RelationshipRegistry";
 import { CoreErrors } from "../errors/errorFactories";
-
+import { ObjectId } from "mongodb"; // Assuming MongoDB is used for ObjectId type
 /**
  * New core architecture with clean separation of concerns
  */
@@ -36,6 +36,16 @@ export class NewCore {
 
     // Load RBAC configuration
     this.rbacValidator.loadConfig();
+  }
+
+  async findAll<T = any>(
+    params: QueryParams,
+    collection: string,
+    roles: string[],
+    databaseType: DatabaseType = "mongodb",
+    adapterName?: string
+  ): Promise<IntermediateQueryResult<T>> {
+    return this.processQuery(params, collection, roles, databaseType, adapterName);
   }
 
   /**
@@ -576,7 +586,6 @@ export class NewCore {
 
     // Get appropriate database adapter
     const adapter = this.getAdapter(databaseType, adapterName);
-
     // Create intermediate query for finding by ID
     const intermediateQuery: IntermediateQuery = {
       type: "read",
@@ -586,7 +595,7 @@ export class NewCore {
         {
           field: "_id",
           operator: "eq",
-          value: id
+          value: new ObjectId(id)
         }
       ],
       limit: 1,
@@ -598,7 +607,7 @@ export class NewCore {
         }
       }
     };
-
+    
     // Apply RBAC field restrictions
     this.applyRbacRestrictions(intermediateQuery, collection, roles);
 
