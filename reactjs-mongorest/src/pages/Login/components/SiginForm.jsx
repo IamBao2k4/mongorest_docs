@@ -35,7 +35,9 @@ export function SiginForm() {
     setLoading(true);
     try {
       const res = await login(data);
+      console.log('🚀 ~ onSubmit ~ res:', res);
       const _token = res?.data?.accessToken;
+      console.log('🚀 ~ onSubmit ~ _token:', _token);
       if (_token) {
         setToken(_token);
         Cookies.set('userToken', _token);

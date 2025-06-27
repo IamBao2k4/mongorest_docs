@@ -5,7 +5,8 @@ import { responseInterceptor } from './common/interceptors/response.interceptor'
 import * as fs from 'fs';
 import * as path from 'path';
 import { coreGlobal, InitialCore } from './configs/core-global';
-import { NewCore } from './core/main/newCore';
+
+import cors from '@fastify/cors';
 
 function writeFatalLog(type: string, error: any) {
     const logsDir = path.join(process.cwd(), 'logs');
@@ -31,6 +32,8 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 const app = Fastify();
+
+app.register(cors);
 
 app.addHook('onSend', responseInterceptor);
 

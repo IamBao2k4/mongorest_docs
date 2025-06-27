@@ -18,7 +18,7 @@ export const appSettings = {
   prefixApi: process.env.PREFIX_API,
   corsOrigin: ["*"],
   mongo: {
-    url: "mongodb+srv://doadmin:0R28DB154wK6vnx9@mangoads-mongodb-2025-1627f768.mongo.ondigitalocean.com",
+    url: "mongodb://localhost:27017/mongorest",
     dbName: "test",
     options: "?tls=true&authSource=admin&replicaSet=mangoads-mongodb-2025",
     isReplicaSet: process.env.IS_REPLICA_SET === "true" ? true : false,
@@ -116,33 +116,33 @@ export const settingCore = {
         connection: {
           connectionString:
             process.env.MONGODB_URL ||
-            "mongodb://thaily:Th%40i2004@localhost:27017/mongorest?authSource=admin",
+            "mongodb://localhost:27017/mongorest",
         },
       },
-      postgresql: {
-        connection: {
-          host: process.env.POSTGRES_HOST || "localhost",
-          port: parseInt(process.env.POSTGRES_PORT || "5432"),
-          database: process.env.POSTGRES_DB || "mydb",
-          username: process.env.POSTGRES_USER || "admin",
-          password: process.env.POSTGRES_PASSWORD || "secret",
-        },
-      },
-      elasticsearch: {
-        connection: {
-          host: process.env.ELASTICSEARCH_HOST || "localhost",
-          port: parseInt(process.env.ELASTICSEARCH_PORT || "9200"),
-        },
-      },
-      mysql: {
-        connection: {
-          host: process.env.MYSQL_HOST || "localhost",
-          port: parseInt(process.env.MYSQL_PORT || "3306"),
-          database: process.env.MYSQL_DB || "myappdb",
-          username: process.env.MYSQL_USER || "thaily",
-          password: process.env.MYSQL_PASSWORD || "Th@i2004",
-        },
-      },
+      // postgresql: {
+      //   connection: {
+      //     host: process.env.POSTGRES_HOST || "localhost",
+      //     port: parseInt(process.env.POSTGRES_PORT || "5432"),
+      //     database: process.env.POSTGRES_DB || "mydb",
+      //     username: process.env.POSTGRES_USER || "admin",
+      //     password: process.env.POSTGRES_PASSWORD || "secret",
+      //   },
+      // },
+      // elasticsearch: {
+      //   connection: {
+      //     host: process.env.ELASTICSEARCH_HOST || "localhost",
+      //     port: parseInt(process.env.ELASTICSEARCH_PORT || "9200"),
+      //   },
+      // },
+      // mysql: {
+      //   connection: {
+      //     host: process.env.MYSQL_HOST || "localhost",
+      //     port: parseInt(process.env.MYSQL_PORT || "3306"),
+      //     database: process.env.MYSQL_DB || "myappdb",
+      //     username: process.env.MYSQL_USER || "thaily",
+      //     password: process.env.MYSQL_PASSWORD || "Th@i2004",
+      //   },
+      // },
     },
   },
 };

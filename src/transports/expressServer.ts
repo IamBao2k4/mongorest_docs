@@ -512,6 +512,28 @@ app.get('/examples', (req, res) => {
   });
 });
 
+app.post('/api/v1/auth/login', (req, res) => {
+  // Dummy login endpoint for demonstration
+  const { username, password } = req.body;
+  
+  if (username === 'admin' && password === 'password') {
+    res.json({
+      success: true,
+      token: 'dummy-jwt-token',
+      user: {
+        id: '1',
+        username: 'admin',
+        roles: ['admin', 'user']
+      }
+    });
+  } else {
+    res.status(401).json({
+      success: false,
+      message: 'Invalid credentials'
+    });
+  }
+});
+
 // Start server
 async function startServer() {
   await initializeCore();

@@ -69,7 +69,7 @@ api.interceptors.request.use(
   async function (error) {
     if (error?.response?.status === 403) {
       Cookies.remove('userToken');
-      if (error?.config?.url === 'api/v1/auth/me') {
+      if (error?.config?.url === 'api/v1/me') {
         window.location.href = '/login';
       }
     }

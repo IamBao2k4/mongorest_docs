@@ -8,10 +8,3 @@ export function Slug(data: any, title: string): any {
         slug: slug
     };
 }
-
-const data = {
-    title: "Example Title"
-};
-
-//test cases
-console.log(Slug(data, data.title));
