@@ -64,10 +64,10 @@ export class NewCore {
     databaseType: DatabaseType = "mongodb",
     adapterName?: string
   ): Promise<IntermediateQueryResult<T>> {
-    // 1. Validate RBAC access
-    if (!this.rbacValidator.hasAccess(collection, "read", roles)) {
-      throw CoreErrors.accessDeniedRead(collection, roles);
-    }
+    // // 1. Validate RBAC access
+    // if (!this.rbacValidator.hasAccess(collection, "read", roles)) {
+    //   throw CoreErrors.accessDeniedRead(collection, roles);
+    // }
 
     // 2. Convert URL params to intermediate JSON format
     const intermediateQuery = this.queryConverter.convert(
@@ -79,10 +79,10 @@ export class NewCore {
     // 3. Enhance query with relationship data
     this.enhanceQueryWithRelationships(intermediateQuery);
 
-    // 4. Apply RBAC field restrictions
-    this.applyRbacRestrictions(intermediateQuery, collection, roles);
+    // // 4. Apply RBAC field restrictions
+    // this.applyRbacRestrictions(intermediateQuery, collection, roles);
 
-    console.log(intermediateQuery);
+    // console.log(intermediateQuery);
 
     // 5. Get appropriate database adapter
     const adapter = this.getAdapter(databaseType, adapterName);
@@ -337,7 +337,7 @@ export class NewCore {
   ): IntermediateQuery {
     const query = this.queryConverter.convert(params, collection, roles);
     this.enhanceQueryWithRelationships(query);
-    this.applyRbacRestrictions(query, collection, roles);
+    // this.applyRbacRestrictions(query, collection, roles);
     return query;
   }
 
@@ -363,10 +363,10 @@ export class NewCore {
     databaseType: DatabaseType = "mongodb",
     adapterName?: string
   ): Promise<T> {
-    // Validate RBAC access
-    if (!this.rbacValidator.hasAccess(collection, "create", roles)) {
-      throw CoreErrors.accessDeniedCreate(collection, roles);
-    }
+    // // Validate RBAC access
+    // if (!this.rbacValidator.hasAccess(collection, "create", roles)) {
+    //   throw CoreErrors.accessDeniedCreate(collection, roles);
+    // }
 
     console.log(collection);
 
@@ -401,7 +401,7 @@ export class NewCore {
     }
 
     // Apply RBAC field restrictions
-    this.applyRbacRestrictions(intermediateQuery, collection, roles);
+    // this.applyRbacRestrictions(intermediateQuery, collection, roles);
 
     // Execute the insert
     const result = await adapter.executeQuery<T>(
@@ -422,10 +422,10 @@ export class NewCore {
     databaseType: DatabaseType = "mongodb",
     adapterName?: string
   ): Promise<T> {
-    // Validate RBAC access
-    if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
-      throw CoreErrors.accessDeniedUpdate(collection, roles);
-    }
+    // // Validate RBAC access
+    // if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
+    //   throw CoreErrors.accessDeniedUpdate(collection, roles);
+    // }
 
     // Get appropriate database adapter
     const adapter = this.getAdapter(databaseType, adapterName);
@@ -464,7 +464,7 @@ export class NewCore {
     }
 
     // Apply RBAC field restrictions
-    this.applyRbacRestrictions(intermediateQuery, collection, roles);
+    // this.applyRbacRestrictions(intermediateQuery, collection, roles);
 
     // Execute the update
     const result = await adapter.executeQuery<T>(
@@ -489,10 +489,10 @@ export class NewCore {
     databaseType: DatabaseType = "mongodb",
     adapterName?: string
   ): Promise<T> {
-    // Validate RBAC access
-    if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
-      throw CoreErrors.accessDeniedUpdate(collection, roles);
-    }
+    // // Validate RBAC access
+    // if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
+    //   throw CoreErrors.accessDeniedUpdate(collection, roles);
+    // }
 
     // Get appropriate database adapter
     const adapter = this.getAdapter(databaseType, adapterName);
@@ -534,7 +534,7 @@ export class NewCore {
     }
 
     // Apply RBAC field restrictions
-    this.applyRbacRestrictions(intermediateQuery, collection, roles);
+    // this.applyRbacRestrictions(intermediateQuery, collection, roles);
 
     // Execute the partial update
     const result = await adapter.executeQuery<T>(
@@ -558,10 +558,10 @@ export class NewCore {
     databaseType: DatabaseType = "mongodb",
     adapterName?: string
   ): Promise<boolean> {
-    // Validate RBAC access
-    if (!this.rbacValidator.hasAccess(collection, "delete", roles)) {
-      throw CoreErrors.accessDeniedDelete(collection, roles);
-    }
+    // // Validate RBAC access
+    // if (!this.rbacValidator.hasAccess(collection, "delete", roles)) {
+    //   throw CoreErrors.accessDeniedDelete(collection, roles);
+    // }
 
     // Get appropriate database adapter
     const adapter = this.getAdapter(databaseType, adapterName);

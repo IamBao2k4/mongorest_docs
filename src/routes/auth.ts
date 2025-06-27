@@ -6,6 +6,7 @@ export async function AuthRoutes(app: FastifyInstance) {
     app.post('/api/v1/auth/login', async (request: FastifyRequest, reply) => {
         const { email, password } = request.body as { email: string; password: string };
         // Simulate authentication logic
+        console.log("hihi")
         if (email === 'tiennt1242@gmail.com' && password === 'tiennt1242@gmail.com') {
             // Generate a token (in a real application, use JWT or similar)
             const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YTMzMzczMDM2Nzk5MjVlNDJiYjRkOCIsImVtYWlsIjoidGllbm50MTI0MkBnbWFpbC5jb20iLCJ1c2VybmFtZSI6InRpZW5udDEyNDJAZ21haWwuY29tIiwicm9sZV9zeXN0ZW0iOiJ1c2VyIiwiaWF0IjoxNzUwOTkzMzU0LCJleHAiOjE3NTEwNzk3NTR9.rtnJXMuQHpSDN4bVYypi9mib917_LVzOasr70uzCimc';
