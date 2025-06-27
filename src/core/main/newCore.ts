@@ -44,14 +44,15 @@ export class NewCore {
     roles: string[],
     databaseType: DatabaseType = "mongodb",
     adapterName?: string
-  ): Promise<IntermediateQueryResult<T>> {
-    return this.processQuery(
+  ): Promise<T[]> {
+    const result = await this.processQuery(
       params,
       collection,
       roles,
       databaseType,
       adapterName
     );
+    return result.data;
   }
 
   /**

@@ -15,11 +15,10 @@ export async function CommonRoutes(app: FastifyInstance) {
       queryData,
       roles
     );
-    reply.send({
-      success: true,
-      ...result,
-      timestamp: new Date().toISOString(),
-    });
+    reply.send(
+
+      result
+    );
   });
 
   // Get entity details by id

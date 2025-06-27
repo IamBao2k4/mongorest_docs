@@ -9,7 +9,8 @@ export function responseInterceptor(
     payload = typeof payload === 'string' ? JSON.parse(payload) : payload;
     if (!payload?.is_err) {
         const wrapped = {
-            success: true,
+            message: "Success",
+            statusCode: 200,
             data: payload,
         };
         done(null, JSON.stringify(wrapped));
