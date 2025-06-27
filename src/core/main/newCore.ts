@@ -107,7 +107,6 @@ export class NewCore {
         throw CoreErrors.adapterContextFailed(error);
       }
     }
-
     return adapter.executeQuery<T>(nativeQuery);
   }
 
@@ -667,44 +666,44 @@ export class NewCore {
     return result.data && result.data.length > 0 ? result.data[0] : null;
   }
 
-  async getRbacByCollection(
-    collection: string,
-    dbType: DatabaseType = "mongodb",
-    adapterName?: string
-  ): Promise<any> {
-    const adapter = this.getAdapter(dbType, adapterName);
+  // async getRbacByCollection(
+  //   collection: string,
+  //   dbType: DatabaseType = "mongodb",
+  //   adapterName?: string
+  // ): Promise<any> {
+  //   const adapter = this.getAdapter(dbType, adapterName);
 
-    return adapter.getRbacByCollection(collection);
-  }
+  //   return adapter.getRbacByCollection(collection);
+  // }
 
-  async getAllRbac(
-    dbType: DatabaseType = "mongodb",
-    adapterName?: string
-  ): Promise<any> {
-    const adapter = this.getAdapter(dbType, adapterName);
+  // async getAllRbac(
+  //   dbType: DatabaseType = "mongodb",
+  //   adapterName?: string
+  // ): Promise<any> {
+  //   const adapter = this.getAdapter(dbType, adapterName);
 
-    return adapter.getRbacByCollection("*");
-  }
+  //   return adapter.getRbacByCollection("*");
+  // }
 
-  async updateRbacConfig(
-    rbacJson: any,
-    dbType: DatabaseType = "mongodb",
-    adapterName?: string
-  ): Promise<void> {
-    const adapter = this.getAdapter(dbType, adapterName);
+  // async updateRbacConfig(
+  //   rbacJson: any,
+  //   dbType: DatabaseType = "mongodb",
+  //   adapterName?: string
+  // ): Promise<void> {
+  //   const adapter = this.getAdapter(dbType, adapterName);
 
-    return adapter.updateRbacConfig(rbacJson);
-  }
+  //   return adapter.updateRbacConfig(rbacJson);
+  // }
 
-  async createRbacConfig(
-    rbacJson: any,
-    dbType: DatabaseType = "mongodb",
-    adapterName?: string
-  ): Promise<void> {
-    const adapter = this.getAdapter(dbType, adapterName);
+  // async createRbacConfig(
+  //   rbacJson: any,
+  //   dbType: DatabaseType = "mongodb",
+  //   adapterName?: string
+  // ): Promise<void> {
+  //   const adapter = this.getAdapter(dbType, adapterName);
 
-    return adapter.createRbacConfig(rbacJson);
-  }
+  //   return adapter.createRbacConfig(rbacJson);
+  // }
 }
 
 /**

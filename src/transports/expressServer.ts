@@ -324,6 +324,7 @@ app.get('/api/:collection', async (req, res) => {
     } else {
       // Execute the actual query
       const result = await core.processQuery(queryParams as any, collection, roles, dbType);
+
       res.json({
         success: true,
         ...result,
