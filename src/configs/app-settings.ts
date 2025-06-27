@@ -117,7 +117,8 @@ export const settingCore = {
           connectionString:
             process.env.MONGODB_URL ||
             "mongodb://thaily:Th%40i2004@localhost:27017/mongorest?authSource=admin",
-        },
+          
+        }
       },
       postgresql: {
         connection: {

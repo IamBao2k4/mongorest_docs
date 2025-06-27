@@ -1,85 +1,103 @@
 {
   "documents": [
     {
-      "_id": "67d83adf13dd97e218421d4e",
-      "title": "users",
-      "collection_name": "users",
+      "_id": "67e8fc29e6cc2bbdc8510ded",
+      "title": "collection users",
+      "mongodb_collection_name": "users",
       "json_schema": {
-        "$jsonSchema": {
-          "bsonType": "object",
-          "required": [
-            "_id",
-            "createdAt",
-            "email",
-            "lastLogin",
-            "name",
-            "profile",
-            "status",
-            "updatedAt"
-          ],
-          "properties": {
-            "_id": {
-              "_id": "ID",
-              "type": "ObjectId",
-              "description": "Nhập thông tin title"
-            },
-            "createdAt": {
-              "bsonType": "date"
-            },
-            "email": {
-              "bsonType": "string"
-            },
-            "lastLogin": {
-              "bsonType": ["date", "null"]
-            },
-            "name": {
-              "bsonType": "string"
-            },
-            "profile": {
-              "bsonType": "object",
-              "properties": {
-                "age": {
-                  "bsonType": ["null", "int"]
-                },
-                "avatar": {
-                  "bsonType": ["null", "string"]
-                },
-                "country": {
-                  "bsonType": "string"
-                },
-                "interests": {
-                  "bsonType": "array",
-                  "items": {
-                    "bsonType": "string"
-                  }
+        "type": "object",
+        "expanded": true,
+        "properties": {
+          "email": {
+            "title": "email",
+            "type": "string",
+            "widget": "shortAnswer"
+          },
+          "_id": {
+            "title": "_id",
+            "type": "string",
+            "widget": "shortAnswer"
+          },
+          "name": {
+            "title": "name",
+            "type": "string",
+            "widget": "shortAnswer"
+          },
+          "profile": {
+            "title": "profile",
+            "type": "object",
+            "properties": {
+              "age": {
+                "title": "age",
+                "type": "string",
+                "widget": "numberInput"
+              },
+              "interests": {
+                "title": "interests",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "title": ""
                 }
               },
-              "required": ["age", "avatar", "country", "interests"]
+              "avatar": {
+                "title": "avatar",
+                "type": "string",
+                "widget": "shortAnswer"
+              }
             },
-            "status": {
-              "bsonType": "string"
-            },
-            "updatedAt": {
-              "bsonType": "date"
-            }
+            "dependencies": {},
+            "required": []
+          },
+          "status": {
+            "title": "status",
+            "type": "string",
+            "widget": "shortAnswer"
+          },
+          "lastLogin": {
+            "title": "lastLogin",
+            "type": "string",
+            "widget": "dateTime",
+            "displayFormat": "yyyy/MM/dd HH:mm:ss",
+            "formatDate": "date-time",
+            "disabled": false,
+            "field": "single",
+            "mode": "dateTime"
           }
-        }
+        },
+        "dependencies": {},
+        "required": []
+      },
+      "ui_schema": {
+        "email": {
+          "ui:widget": "shortAnswer"
+        },
+        "_id": {
+          "ui:widget": "shortAnswer"
+        },
+        "name": {
+          "ui:widget": "shortAnswer"
+        },
+        "profile": {
+          "age": {
+            "ui:widget": "numberInput"
+          },
+          "interests": {
+            "items": {}
+          },
+          "avatar": {
+            "ui:widget": "shortAnswer"
+          },
+          "ui:order": ["age", "interests", "avatar"]
+        },
+        "status": {
+          "ui:widget": "shortAnswer"
+        },
+        "lastLogin": {
+          "ui:widget": "dateTime"
+        },
+        "ui:order": ["email", "_id", "name", "profile", "status", "lastLogin"]
       }
-    },
-    {
-      "_id": "67d835db13dd97e218421c2a",
-      "title": "hêh",
-      "collection_name": "users"
-    },
-    {
-      "_id": "67d835db13dd97e218421c2a",
-      "title": "huhu",
-      "collection_name": "aaaa"
-    },
-    {
-      "_id": "67d835db13dd97e218421c2a",
-      "title": "hihi",
-      "collection_name": "bbbb"
     }
   ]
 }

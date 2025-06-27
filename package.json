@@ -9,7 +9,10 @@
     "dev": "concurrently \"tsc --watch\" \"nodemon\"",
     "dev:demo": "nodemon --exec tsx src/transports/express/demo-server.ts",
     "demo:new": "tsx src/transports/expressServer.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

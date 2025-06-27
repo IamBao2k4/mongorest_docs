@@ -107,7 +107,6 @@ export class NewCore {
         throw CoreErrors.adapterContextFailed(error);
       }
     }
-
     return adapter.executeQuery<T>(nativeQuery);
   }
 
