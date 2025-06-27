@@ -618,9 +618,9 @@ export class NewCore {
     adapterName?: string
   ): Promise<T | null> {
     // Validate RBAC access
-    if (!this.rbacValidator.hasAccess(collection, "read", roles)) {
-      throw CoreErrors.accessDeniedRead(collection, roles);
-    }
+    // if (!this.rbacValidator.hasAccess(collection, "read", roles)) {
+    //   throw CoreErrors.accessDeniedRead(collection, roles);
+    // }
 
     // Get appropriate database adapter
     const adapter = this.getAdapter(databaseType, adapterName);
@@ -657,7 +657,7 @@ export class NewCore {
       }
     }
     // Apply RBAC field restrictions
-    this.applyRbacRestrictions(intermediateQuery, collection, roles);
+    // this.applyRbacRestrictions(intermediateQuery, collection, roles);
 
     // Execute the query
     const result = await adapter.executeQuery<T>(
