@@ -1,10 +1,4 @@
-import { Filter, ObjectId } from 'mongodb';
 import { HttpError } from '../../utils/http-error';
-import { checkRelationFields } from '../../utils/check-relation-field';
-import { checkRequiredFields } from '../../utils/check-required-field';
-import { filterDataBySchema } from '../../utils/filter-payload';
-import { appSettings } from '../../configs/app-settings';
-import { generateAggregationPipeline, getRelationFields } from '../../utils/build-query.tool';
 import { mongoDBService } from '../../common/bases/mongodb.base';
 import { coreGlobal } from '../../configs/core-global';
 import { IntermediateQueryResult } from '../../core/types/intermediateQuery';

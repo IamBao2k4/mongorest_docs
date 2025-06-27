@@ -1,8 +1,8 @@
 import { NewCore, CoreConfig } from './main/newCore';
 import { AdapterPluginSystem, adapterRegistry } from './adapters/base/adapterRegistry';
 import { MongoDBAdapter } from './adapters/mongodb/mongodbAdapter';
-import { PostgreSQLAdapter } from './adapters/postgresql/postgresqlAdapter';
-import { ElasticsearchAdapter } from './adapters/elasticsearch/elasticsearchAdapter';
+// import { PostgreSQLAdapter } from './adapters/postgresql/postgresqlAdapter';
+// import { ElasticsearchAdapter } from './adapters/elasticsearch/elasticsearchAdapter';
 import { MySQLAdapter } from './adapters/mysql/mysqlAdapter';
 import { RelationshipRegistry } from './adapters/base/relationship/RelationshipRegistry';
 import { BootstrapErrors } from './errors/errorFactories';
@@ -104,20 +104,20 @@ export class CoreBootstrap {
       adapterRegistry.register(mongoAdapter);
       console.log('✅ MongoDB adapter registered');
 
-      // Register PostgreSQL adapter
-      const postgresAdapter = new PostgreSQLAdapter();
-      adapterRegistry.register(postgresAdapter);
-      console.log('✅ PostgreSQL adapter registered');
+      // // Register PostgreSQL adapter
+      // const postgresAdapter = new PostgreSQLAdapter();
+      // adapterRegistry.register(postgresAdapter);
+      // console.log('✅ PostgreSQL adapter registered');
 
-      // Register Elasticsearch adapter
-      const elasticsearchAdapter = new ElasticsearchAdapter();
-      adapterRegistry.register(elasticsearchAdapter);
-      console.log('✅ Elasticsearch adapter registered');
+      // // Register Elasticsearch adapter
+      // const elasticsearchAdapter = new ElasticsearchAdapter();
+      // adapterRegistry.register(elasticsearchAdapter);
+      // console.log('✅ Elasticsearch adapter registered');
 
-      // Register MySQL adapter
-      const mysqlAdapter = new MySQLAdapter();
-      adapterRegistry.register(mysqlAdapter);
-      console.log('✅ MySQL adapter registered');
+      // // Register MySQL adapter
+      // const mysqlAdapter = new MySQLAdapter();
+      // adapterRegistry.register(mysqlAdapter);
+      // console.log('✅ MySQL adapter registered');
 
     } catch (error) {
       console.error('❌ Failed to register built-in adapters:', error);

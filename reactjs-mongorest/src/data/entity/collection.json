@@ -1,0 +1,58 @@
+{
+  "json": {
+    "type": "object",
+    "expanded": true,
+    "properties": {
+      "title": {
+        "title": "Title",
+        "description": "Nhập tên collection",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": true
+      },
+      "slug": {
+        "widget": "UriKeyGen",
+        "depend_field": "root_title",
+        "description": "Nhập slug cho collection",
+        "title": "Slug",
+        "type": "string",
+        "expanded": true,
+        "filter": true
+      },
+      "entity": {
+        "type": "string",
+        "description": "Chọn entity",
+        "typeSelect": "once",
+        "widget": "relation",
+        "title": "Entity",
+        "expanded": true,
+        "filter": true
+      },
+      "conditions": {
+        "type": "string",
+        "description": "Chọn điều kiện",
+        "widget": "condition",
+        "title": "Conditions",
+        "expanded": true,
+        "fieldRelation": "entity"
+      }
+    },
+    "dependencies": {},
+    "required": ["title", "slug", "entity"]
+  },
+  "ui": {
+    "title": {
+      "ui:widget": "shortAnswer"
+    },
+    "slug": {
+      "ui:widget": "UriKeyGen"
+    },
+    "entity": {
+      "ui:widget": "relation"
+    },
+    "conditions": {
+      "ui:widget": "condition"
+    },
+    "ui:order": ["title", "slug", "entity", "conditions"]
+  }
+}

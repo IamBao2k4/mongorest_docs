@@ -1,0 +1,28 @@
+{
+  "json": {
+    "type": "object",
+    "description": "Chỉnh sửa thông tin file",
+    "properties": {
+      "title": {
+        "title": "Title",
+        "description": "Nhập thông tin tiêu đề",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": true
+      },
+      "permission": {
+        "title": "Permission",
+        "description": "Nhập thông tin tiêu đề",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": false,
+        "hidden": true
+      }
+    },
+    "dependencies": {},
+    "required": ["title"]
+  },
+  "ui": {
+    "ui:order": ["title", "permission"]
+  }
+}

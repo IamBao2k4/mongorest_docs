@@ -1,7 +1,7 @@
-import { 
-  BaseDatabaseAdapter, 
-  DatabaseType, 
-  AdapterCapabilities, 
+import {
+  BaseDatabaseAdapter,
+  DatabaseType,
+  AdapterCapabilities,
   ExecutionOptions,
   AdapterConfig,
   ValidationResult
@@ -95,12 +95,12 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
       throw new Error(`Collection '${collectionName}' is not registered in entities. Please add it to _entities.json first.`);
     }
     const startTime = Date.now();
-    
+
     try {
       const collection: Collection = this.db.collection(this.getCurrentCollection());
       let result: any;
       let data: T[] = [];
-      
+
       // Handle different operation types
       if (Array.isArray(nativeQuery)) {
         const cursor = collection.aggregate(nativeQuery);
@@ -112,7 +112,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
             result = await collection.insertOne(nativeQuery.document);
             data = [{ ...nativeQuery.document, _id: result.insertedId }] as T[];
             break;
-            
+
           case 'updateOne':
             result = await collection.updateOne(nativeQuery.filter, nativeQuery.update);
             if (result.modifiedCount > 0) {
@@ -120,7 +120,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
               data = updated ? [updated as unknown as T] : [];
             }
             break;
-            
+
           case 'replaceOne':
             result = await collection.replaceOne(nativeQuery.filter, nativeQuery.update);
             if (result.modifiedCount > 0) {
@@ -128,12 +128,12 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
               data = replaced ? [replaced as unknown as T] : [];
             }
             break;
-            
+
           case 'deleteOne':
             result = await collection.deleteOne(nativeQuery.filter);
             data = [];
             break;
-            
+
           default:
             throw new Error(`Unsupported operation: ${nativeQuery.operation}`);
         }
@@ -141,7 +141,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
 
       const executionTime = Date.now() - startTime;
       const queryResult = this.createResult(data, this.getCurrentQuery(), nativeQuery, executionTime);
-      
+
       // Add operation metadata for CRUD operations
       if (result) {
         queryResult.metadata = {
@@ -152,7 +152,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
           matchedCount: result.matchedCount || 0
         };
       }
-      
+
       return queryResult;
     } catch (error) {
       throw new Error(`MongoDB query execution failed: ${(error as Error).message}`);
@@ -202,12 +202,12 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     } else if (config.connection) {
       // Initialize MongoDB connection if not provided
       const { MongoClient } = await import('mongodb');
-      const connectionString = config.connection.connectionString || 
+      const connectionString = config.connection.connectionString ||
         this.buildConnectionString(config.connection);
       
       client = new MongoClient(connectionString);
       await client.connect();
-      
+
       // Extract database name from connection string or use provided database
       dbName = config.connection.database || '';
       
@@ -256,15 +256,15 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
 
   private buildConnectionString(config: any): string {
     const { host = 'localhost', port = 27017, username, password, database } = config;
-    
+
     let connectionString = 'mongodb://';
-    
+
     if (username && password) {
       connectionString += `${username}:${password}@`;
     }
-    
+
     connectionString += `${host}:${port}`;
-    
+
     if (database) {
       connectionString += `/${database}`;
     }

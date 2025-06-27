@@ -51,6 +51,26 @@ export interface DatabaseAdapter {
    * Test adapter connection
    */
   testConnection(): Promise<boolean>;
+
+  // /**
+  //  * Get RBAC By Collection
+  //  */
+  // getRbacByCollection(collectionName: string): any;
+
+  // /**
+  //  * Get all RBAC
+  //  */
+  // getAllRbac(): any;
+
+  // /**
+  //  * Update RBAC configuration
+  //  */
+  // updateRbacConfig(rbacJson: any): void;
+
+  // /**
+  //  * Create RBAC configuration
+  //  */
+  // createRbacConfig(rbacJson: any): void;
 }
 
 export type DatabaseType = 
@@ -225,6 +245,10 @@ export abstract class BaseDatabaseAdapter implements DatabaseAdapter {
 
   abstract convertQuery(query: IntermediateQuery): any;
   abstract executeQuery<T = any>(nativeQuery: any, options?: ExecutionOptions): Promise<IntermediateQueryResult<T>>;
+  // abstract getRbacByCollection(collectionName: string): any;
+  // abstract getAllRbac(): any;
+  // abstract updateRbacConfig(rbacJson: any): void;
+  // abstract createRbacConfig(rbacJson: any): void;
 
   validateQuery(query: IntermediateQuery): ValidationResult {
     const errors: ValidationError[] = [];
