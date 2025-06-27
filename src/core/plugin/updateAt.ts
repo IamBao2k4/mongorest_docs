@@ -25,7 +25,7 @@ function evaluateSafeDateExpression(expr: string): number {
   }
 }
 
-export function createAt(
+export function updateAt(
   data: any,
   date: string = new Date(Date.now()).toISOString()
 ): any {
@@ -51,20 +51,17 @@ export function createAt(
 
   if (data && typeof data === "object") {
     if (Array.isArray(data)) {
-      return data.map((item) => createAt(item, date));
+      return data.map((item) => updateAt(item, date));
     } else {
       return {
         ...data,
-        createdAt: date,
+        updatedAt: date,
       };
     }
   }
   return data;
 }
 
-console.log(createAt({ name: "Test" })); // { name: "Test", createdAt: "2023-10-01T00:00:00.000Z" }
-console.log(createAt([{ name: "Test1" }, { name: "Test2" }]));
-// [{ name: "Test1", createdAt: "2023-10-01T00:00:00.000Z" }, { name: "Test2", createdAt: "2023-10-01T00:00:00.000Z" }]
-
-// valid ISO date
-console.log(createAt({ name: "Test" }, "sudo apt update"));
+console.log(updateAt({ name: "Test" })); // { name: "Test", updatedAt: "2023-10-01T00:00:00.000Z" }
+console.log(updateAt([{ name: "Test1" }, { name: "Test2" }]));
+// [{ name: "Test1", updatedAt: "2023-10-01T00:00:00.000Z" }, { name: "Test2", updatedAt: "2023-10-01T00:00:00.000Z" }]

@@ -15,10 +15,27 @@ import {
 } from '../../types/intermediateQuery';
 import { RelationshipRegistry } from '../base/relationship/RelationshipRegistry';
 import { ObjectId } from 'mongodb';
+import * as fs from 'fs';
+import * as path from 'path';
+import Ajv from 'ajv';
+import { ValidationResult } from '../base/databaseAdapter';
 
 /**
  * MongoDB adapter for converting intermediate queries to MongoDB aggregation pipelines
  */
+export interface EntityConfig {
+  _id?: string;
+  title: string;
+  collection_name: string;
+  unique_key?: string;
+  use_parent?: boolean;
+  use_parent_delete_childs?: boolean;
+}
+
+export interface EntitiesData {
+  documents: EntityConfig[];
+}
+
 export class MongoDBAdapter extends BaseDatabaseAdapter {
   readonly name = 'mongodb';
   readonly type: DatabaseType = 'mongodb';
@@ -26,16 +43,164 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
 
   private relationshipRegistry?: RelationshipRegistry;
   private db?: any; // MongoDB database instance
+  private ajv: Ajv;
+  private entitiesCache: EntitiesData | null = null;
+  private entitiesFilePath: string;
+  private fileWatcher: fs.FSWatcher | null = null;
 
   constructor(relationshipRegistry?: RelationshipRegistry) {
     super();
     this.relationshipRegistry = relationshipRegistry;
+    this.ajv = new Ajv();
+    this.entitiesFilePath = path.join(process.cwd(), 'json/entities', '_entities.json');
+    this.initializeEntityCache();
+  }
+
+  private initializeEntityCache(): void {
+    this.loadEntitiesFromFile();
+    this.initFileWatcher();
+  }
+
+  private initFileWatcher(): void {
+    if (fs.existsSync(this.entitiesFilePath)) {
+      this.fileWatcher = fs.watch(this.entitiesFilePath, (eventType) => {
+        if (eventType === 'change') {
+          console.log('[MongoDBAdapter] Entities file changed, reloading cache...');
+          this.loadEntitiesFromFile();
+        }
+      });
+      console.log(`[MongoDBAdapter] File watcher initialized for: ${this.entitiesFilePath}`);
+    } else {
+      console.warn(`[MongoDBAdapter] Entities file not found: ${this.entitiesFilePath}`);
+    }
+  }
+
+  private loadEntitiesFromFile(): void {
+    try {
+      if (!fs.existsSync(this.entitiesFilePath)) {
+        console.warn(`[MongoDBAdapter] File ${this.entitiesFilePath} not found`);
+        this.entitiesCache = null;
+        return;
+      }
+
+      const data = fs.readFileSync(this.entitiesFilePath, 'utf8');
+      const entities = JSON.parse(data) as EntitiesData;
+
+      const schema = {
+        type: 'object',
+        properties: {
+          documents: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                _id: { type: 'string' },
+                title: { type: 'string' },
+                collection_name: { type: 'string' },
+                unique_key: { type: 'string' },
+                use_parent: { type: 'boolean' },
+                use_parent_delete_childs: { type: 'boolean' }
+              },
+              required: ['title', 'collection_name']
+            }
+          }
+        },
+        required: ['documents']
+      };
+
+      const validate = this.ajv.compile(schema);
+      const valid = validate(entities);
+
+      if (!valid) {
+        console.error('[MongoDBAdapter] Invalid entities JSON structure:', validate.errors);
+        throw new Error(`Invalid entities JSON structure: ${JSON.stringify(validate.errors)}`);
+      }
+
+      this.entitiesCache = entities;
+      console.log('[MongoDBAdapter] Entities loaded and cached successfully');
+    } catch (error) {
+      console.error('[MongoDBAdapter] Error loading entities file:', error);
+      this.entitiesCache = null;
+    }
+  }
+
+  getEntities(): EntitiesData | null {
+    return this.entitiesCache;
+  }
+
+  getEntityByCollectionName(collectionName: string): EntityConfig | undefined {
+    if (!this.entitiesCache) {
+      return undefined;
+    }
+    return this.entitiesCache.documents.find(
+      entity => entity.collection_name === collectionName
+    );
+  }
+
+  getCollectionNames(): string[] {
+    if (!this.entitiesCache) {
+      return [];
+    }
+    return this.entitiesCache.documents.map(entity => entity.collection_name);
+  }
+
+  reloadEntities(): void {
+    this.loadEntitiesFromFile();
+  }
+
+  /**
+   * Check if collection is allowed based on entities
+   */
+  private isCollectionAllowed(collectionName: string): boolean {
+    // Special case: always allow 'entity' collection for management
+    if (collectionName === 'entity' || collectionName === '_entities') {
+      return true;
+    }
+    
+    // Check if collection exists in entities cache
+    if (!this.entitiesCache || !this.entitiesCache.documents) {
+      console.warn('[MongoDBAdapter] No entities loaded, rejecting collection access');
+      return false;
+    }
+    
+    return this.entitiesCache.documents.some(
+      entity => entity.collection_name === collectionName
+    );
+  }
+
+  /**
+   * Validate query before conversion
+   */
+  validateQuery(query: IntermediateQuery): ValidationResult {
+    // Call parent validation first
+    const result = super.validateQuery(query);
+    
+    // Add custom validation for entity existence
+    if (!this.isCollectionAllowed(query.collection)) {
+      result.valid = false;
+      result.errors.push({
+        code: 'COLLECTION_NOT_REGISTERED',
+        message: `Collection '${query.collection}' is not registered in entities. Please add it to _entities.json first.`,
+        path: 'collection'
+      });
+    }
+    
+    return result;
   }
 
   /**
    * Convert intermediate query to MongoDB query
    */
   convertQuery(query: IntermediateQuery): any {
+    // Store current context for validation
+    this.setCurrentContext(query);
+    
+    // Validate collection exists in entities before any operation
+    const collectionName = query.collection;
+    if (!this.isCollectionAllowed(collectionName)) {
+      throw new Error(`Collection '${collectionName}' is not registered in entities. Please add it to _entities.json first.`);
+    }
+    
     // Handle different query types
     switch (query.type) {
       case 'insert':
@@ -222,6 +387,13 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     if (!this.db) {
       throw new Error('MongoDB database connection is not available');
     }
+    
+    // Validate collection exists in entities
+    const collectionName = this.getCurrentCollection();
+    if (!this.isCollectionAllowed(collectionName)) {
+      throw new Error(`Collection '${collectionName}' is not registered in entities. Please add it to _entities.json first.`);
+    }
+    
     console.log(nativeQuery)
     const startTime = Date.now();
     
@@ -362,6 +534,24 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Cleanup adapter resources including file watcher
+   */
+  async dispose(): Promise<void> {
+    // Clean up file watcher
+    if (this.fileWatcher) {
+      this.fileWatcher.close();
+      this.fileWatcher = null;
+      console.log('[MongoDBAdapter] File watcher disposed');
+    }
+
+    // Clear cache
+    this.entitiesCache = null;
+
+    // Call parent dispose
+    await super.dispose();
   }
 
   /**

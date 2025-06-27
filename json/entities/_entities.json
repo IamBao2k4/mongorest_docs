@@ -2,16 +2,84 @@
   "documents": [
     {
       "_id": "67d83adf13dd97e218421d4e",
-      "title": "validate",
-      "collection_name": "validate",
-      "unique_key": "[\n    {\n        \"title\": 1\n    }\n]",
-      "use_parent": false,
-      "use_parent_delete_childs": false
+      "title": "users",
+      "collection_name": "users",
+      "json_schema": {
+        "$jsonSchema": {
+          "bsonType": "object",
+          "required": [
+            "_id",
+            "createdAt",
+            "email",
+            "lastLogin",
+            "name",
+            "profile",
+            "status",
+            "updatedAt"
+          ],
+          "properties": {
+            "_id": {
+              "_id": "ID",
+              "type": "ObjectId",
+              "description": "Nhập thông tin title"
+            },
+            "createdAt": {
+              "bsonType": "date"
+            },
+            "email": {
+              "bsonType": "string"
+            },
+            "lastLogin": {
+              "bsonType": ["date", "null"]
+            },
+            "name": {
+              "bsonType": "string"
+            },
+            "profile": {
+              "bsonType": "object",
+              "properties": {
+                "age": {
+                  "bsonType": ["null", "int"]
+                },
+                "avatar": {
+                  "bsonType": ["null", "string"]
+                },
+                "country": {
+                  "bsonType": "string"
+                },
+                "interests": {
+                  "bsonType": "array",
+                  "items": {
+                    "bsonType": "string"
+                  }
+                }
+              },
+              "required": ["age", "avatar", "country", "interests"]
+            },
+            "status": {
+              "bsonType": "string"
+            },
+            "updatedAt": {
+              "bsonType": "date"
+            }
+          }
+        }
+      }
     },
     {
       "_id": "67d835db13dd97e218421c2a",
       "title": "hêh",
-      "collection_name": "workflow"
+      "collection_name": "users"
+    },
+    {
+      "_id": "67d835db13dd97e218421c2a",
+      "title": "huhu",
+      "collection_name": "aaaa"
+    },
+    {
+      "_id": "67d835db13dd97e218421c2a",
+      "title": "hihi",
+      "collection_name": "bbbb"
     }
   ]
 }
