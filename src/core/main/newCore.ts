@@ -65,9 +65,9 @@ export class NewCore {
     adapterName?: string
   ): Promise<IntermediateQueryResult<T>> {
     // 1. Validate RBAC access
-    if (!this.rbacValidator.hasAccess(collection, "read", roles)) {
-      throw CoreErrors.accessDeniedRead(collection, roles);
-    }
+    // if (!this.rbacValidator.hasAccess(collection, "read", roles)) {
+    //   throw CoreErrors.accessDeniedRead(collection, roles);
+    // }
 
     // 2. Convert URL params to intermediate JSON format
     const intermediateQuery = this.queryConverter.convert(
@@ -90,6 +90,7 @@ export class NewCore {
     // 6. Validate query against adapter capabilities
     const validation = adapter.validateQuery(intermediateQuery);
     if (!validation.valid) {
+      console.log("chay vao day")
       throw CoreErrors.queryValidationFailed(validation.errors);
     }
 
@@ -153,10 +154,10 @@ export class NewCore {
     }
 
     // Update RBAC configuration if provided
-    if (config.rbac) {
-      // Update RBAC configuration
-      this.rbacValidator.updateConfig(config.rbac);
-    }
+    // if (config.rbac) {
+    //   // Update RBAC configuration
+    //   this.rbacValidator.updateConfig(config.rbac);
+    // }
   }
 
   /**
@@ -277,16 +278,16 @@ export class NewCore {
     // if (!Array.isArray(roles)) {
     //   throw CoreErrors.rolesInvalidType();
     // }
-    if (!query.select) {
-      query.select = { fields: [] };
-    }
-    const rbacValidator = new RbacValidator();
-    query.select.fields = rbacValidator.filterRbacFeatures(
-      collection,
-      action,
-      roles,
-      query.select.fields
-    );
+    // if (!query.select) {
+    //   query.select = { fields: [] };
+    // }
+    // const rbacValidator = new RbacValidator();
+    // query.select.fields = rbacValidator.filterRbacFeatures(
+    //   collection,
+    //   action,
+    //   roles,
+    //   query.select.fields
+    // );
     // let allowedFields: string[];
     // try {
     //   allowedFields = rbacValidator.getRbacFeatures(collection, "read", roles);
@@ -337,7 +338,7 @@ export class NewCore {
   ): IntermediateQuery {
     const query = this.queryConverter.convert(params, collection, roles);
     this.enhanceQueryWithRelationships(query);
-    this.applyRbacRestrictions(query, collection, roles);
+    // this.applyRbacRestrictions(query, collection, roles);
     return query;
   }
 
@@ -364,9 +365,9 @@ export class NewCore {
     adapterName?: string
   ): Promise<T> {
     // Validate RBAC access
-    if (!this.rbacValidator.hasAccess(collection, "create", roles)) {
-      throw CoreErrors.accessDeniedCreate(collection, roles);
-    }
+    // if (!this.rbacValidator.hasAccess(collection, "create", roles)) {
+    //   throw CoreErrors.accessDeniedCreate(collection, roles);
+    // }
 
     console.log(collection);
 
@@ -401,7 +402,7 @@ export class NewCore {
     }
 
     // Apply RBAC field restrictions
-    this.applyRbacRestrictions(intermediateQuery, collection, roles);
+    // this.applyRbacRestrictions(intermediateQuery, collection, roles);
 
     // Execute the insert
     const result = await adapter.executeQuery<T>(
@@ -423,9 +424,9 @@ export class NewCore {
     adapterName?: string
   ): Promise<T> {
     // Validate RBAC access
-    if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
-      throw CoreErrors.accessDeniedUpdate(collection, roles);
-    }
+    // if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
+    //   throw CoreErrors.accessDeniedUpdate(collection, roles);
+    // }
 
     // Get appropriate database adapter
     const adapter = this.getAdapter(databaseType, adapterName);
@@ -464,7 +465,7 @@ export class NewCore {
     }
 
     // Apply RBAC field restrictions
-    this.applyRbacRestrictions(intermediateQuery, collection, roles);
+    // this.applyRbacRestrictions(intermediateQuery, collection, roles);
 
     // Execute the update
     const result = await adapter.executeQuery<T>(
@@ -490,9 +491,9 @@ export class NewCore {
     adapterName?: string
   ): Promise<T> {
     // Validate RBAC access
-    if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
-      throw CoreErrors.accessDeniedUpdate(collection, roles);
-    }
+    // if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
+    //   throw CoreErrors.accessDeniedUpdate(collection, roles);
+    // }
 
     // Get appropriate database adapter
     const adapter = this.getAdapter(databaseType, adapterName);
@@ -534,7 +535,7 @@ export class NewCore {
     }
 
     // Apply RBAC field restrictions
-    this.applyRbacRestrictions(intermediateQuery, collection, roles);
+    // this.applyRbacRestrictions(intermediateQuery, collection, roles);
 
     // Execute the partial update
     const result = await adapter.executeQuery<T>(
@@ -559,9 +560,9 @@ export class NewCore {
     adapterName?: string
   ): Promise<boolean> {
     // Validate RBAC access
-    if (!this.rbacValidator.hasAccess(collection, "delete", roles)) {
-      throw CoreErrors.accessDeniedDelete(collection, roles);
-    }
+    // if (!this.rbacValidator.hasAccess(collection, "delete", roles)) {
+    //   throw CoreErrors.accessDeniedDelete(collection, roles);
+    // }
 
     // Get appropriate database adapter
     const adapter = this.getAdapter(databaseType, adapterName);

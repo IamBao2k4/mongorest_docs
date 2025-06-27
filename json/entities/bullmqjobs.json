@@ -1,0 +1,84 @@
+{
+  "_id": "68217bae1d50e98cb4b40225",
+  "title": "bull-mq-jobs",
+  "mongodb_collection_name": "bullmqjobs",
+  "languages": [],
+  "is_active": true,
+  "use_locale": false,
+  "use_parent": false,
+  "use_parent_delete_childs": false,
+  "use_block": false,
+  "use_content_review": false,
+  "use_like": false,
+  "use_comment": false,
+  "use_save": false,
+  "use_seo_path": false,
+  "entity_group": null,
+  "created_at": "2025-05-12T04:40:14.492Z",
+  "__v": 0,
+  "id": "68217bae1d50e98cb4b40225",
+  "json_schema": {
+    "type": "object",
+    "properties": {
+      "bullMQ": {
+        "items": {
+          "type": "object",
+          "title": "item",
+          "properties": {
+            "data": {
+              "title": "data",
+              "type": "object"
+            },
+            "options": {
+              "title": "options",
+              "type": "object",
+              "required": []
+            },
+            "queueName": {
+              "title": "queueName",
+              "type": "string",
+              "widget": "shortAnswer",
+              "min": 1,
+              "max": 10
+            },
+            "name": {
+              "title": "name",
+              "type": "string",
+              "widget": "shortAnswer",
+              "min": 1,
+              "max": 10
+            }
+          },
+          "required": []
+        },
+        "title": "bullMQ",
+        "type": "array"
+      }
+    },
+    "required": []
+  },
+  "ui_schema": {
+    "bullMQ": {
+      "items": {
+        "options": {
+          "ui:order": []
+        },
+        "queueName": {
+          "ui:widget": "shortAnswer"
+        },
+        "name": {
+          "ui:widget": "shortAnswer"
+        },
+        "ui:order": [
+          "data",
+          "options",
+          "queueName",
+          "name"
+        ]
+      }
+    },
+    "ui:order": [
+      "bullMQ"
+    ]
+  }
+}

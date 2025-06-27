@@ -5,7 +5,7 @@ import { coreGlobal } from "../configs/core-global";
 
 export async function CommonRoutes(app: FastifyInstance) {
   // Get entity list
-  app.get("/common/:entityName", async (request, reply) => {
+  app.get("/api/v1/:entityName", async (request, reply) => {
     const { entityName } = request.params as { entityName: string };
     const queryData = request.query as any;
     console.log(`Fetching list for entity: ${entityName}`, queryData);
@@ -23,7 +23,7 @@ export async function CommonRoutes(app: FastifyInstance) {
   });
 
   // Get entity details by id
-  app.get("/common/:entityName/:id", async (request, reply) => {
+  app.get("/api/v1/:entityName/:id", async (request, reply) => {
     const { entityName, id } = request.params as {
       entityName: string;
       id: string;
@@ -57,4 +57,5 @@ export async function CommonRoutes(app: FastifyInstance) {
     // TODO: Delete entity from DB
     return await commonService.hardDelete(entityName, id, ["user"], "mongodb");
   });
+
 }

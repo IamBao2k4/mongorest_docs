@@ -1,0 +1,168 @@
+{
+  "_id": "67ab1ad32754c1bdc0414a0c",
+  "title": "Group Field",
+  "mongodb_collection_name": "group-field",
+  "languages": [],
+  "is_active": true,
+  "use_locale": false,
+  "use_parent": false,
+  "use_parent_delete_childs": false,
+  "use_block": false,
+  "use_content_review": false,
+  "use_like": false,
+  "use_comment": false,
+  "use_save": false,
+  "use_seo_path": false,
+  "entity_group": null,
+  "created_at": "2025-02-11T09:39:31.509Z",
+  "__v": 0,
+  "json_schema": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "title": "Title",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": true
+      },
+      "slug": {
+        "widget": "UriKeyGen",
+        "title": "Slug",
+        "type": "string"
+      },
+      "featured_image": {
+        "title": "Featured Image",
+        "type": "string",
+        "widget": "file",
+        "filter": true
+      },
+      "folder": {
+        "title": "Folder",
+        "type": "string",
+        "widget": "relation",
+        "typeRelation": {
+          "title": "categories-block-image",
+          "_id": "categories-block-image",
+          "type": "n-1"
+        },
+        "filter": true
+      },
+      "tag": {
+        "title": "Tag",
+        "type": "string",
+        "widget": "relation",
+        "typeRelation": {
+          "title": "tags-group-field",
+          "_id": "tags-group-field",
+          "type": "n-1"
+        },
+        "filter": false
+      },
+      "sourceJSX": {
+        "title": "Source JSX",
+        "type": "string",
+        "widget": "longAnswer",
+        "customRole": "textarea"
+      },
+      "isGenerated": {
+        "title": "Is Generated",
+        "type": "string",
+        "default": false,
+        "widget": "boolean"
+      },
+      "isActive": {
+        "title": "Is Active",
+        "type": "string",
+        "default": false,
+        "widget": "boolean"
+      },
+      "defaultData": {
+        "widget": "longAnswer",
+        "customRole": "textarea",
+        "title": "Default Data",
+        "type": "string"
+      },
+      "json_schema": {
+        "title": "json_schema",
+        "type": "string",
+        "widget": "longAnswer",
+        "customRole": "textarea"
+      },
+      "ui_schema": {
+        "title": "ui_schema",
+        "type": "string",
+        "widget": "longAnswer",
+        "customRole": "textarea"
+      },
+      "block_original": {
+        "type": "string",
+        "typeRelation": {
+          "title": "group-field",
+          "_id": "group-field",
+          "type": "1-n",
+          "filter": {
+            "combinator": "and",
+            "rules": [],
+            "id": "863d3043-e634-41e0-ac6d-6d612f9fcc21"
+          }
+        },
+        "widget": "relation",
+        "typeSelect": "multiple",
+        "title": "Block Original"
+      }
+    },
+    "required": []
+  },
+  "ui_schema": {
+    "title": {
+      "ui:widget": "shortAnswer"
+    },
+    "slug": {
+      "ui:widget": "UriKeyGen"
+    },
+    "featured_image": {
+      "ui:widget": "file"
+    },
+    "folder": {
+      "ui:widget": "relation"
+    },
+    "tag": {
+      "ui:widget": "relation"
+    },
+    "sourceJSX": {
+      "ui:widget": "textarea"
+    },
+    "isGenerated": {
+      "ui:widget": "boolean"
+    },
+    "isActive": {
+      "ui:widget": "boolean"
+    },
+    "defaultData": {
+      "ui:widget": "longAnswer"
+    },
+    "json_schema": {
+      "ui:widget": "textarea"
+    },
+    "ui_schema": {
+      "ui:widget": "textarea"
+    },
+    "block_original": {
+      "ui:widget": "relation"
+    },
+    "ui:order": [
+      "title",
+      "slug",
+      "featured_image",
+      "folder",
+      "tag",
+      "sourceJSX",
+      "isGenerated",
+      "isActive",
+      "defaultData",
+      "json_schema",
+      "ui_schema",
+      "block_original"
+    ]
+  }
+}
