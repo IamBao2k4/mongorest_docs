@@ -1,0 +1,19 @@
+variables:
+  IMAGE_NAME: '$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA'
+  CONTAINER_NAME: tav-dashboard
+  PUBLIC_PORT: 5000
+  INTERNAL_DOCKER_CONTAINER_PORT: 3000
+
+stages:
+  - deploy
+deploy:
+  stage: deploy
+  tags:
+    - macos
+  script:
+    - git checkout -ff main
+    - git pull -ff origin main
+    - yarn install
+    - NODE_OPTIONS="--max-old-space-size=8192" yarn build
+    - docker compose down
+    - docker compose up -d --build

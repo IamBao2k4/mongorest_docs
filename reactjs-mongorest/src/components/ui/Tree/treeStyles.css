@@ -1,0 +1,205 @@
+/* treeStyles.css */
+
+/* Ẩn switcher mặc định của rc-tree */
+.rc-tree-switcher {
+  position: relative;
+  display: inline-block;
+  width: 24px;
+  margin-right: 2px;
+  background: none !important;
+}
+
+/* Loại bỏ biểu tượng mặc định của rc-tree */
+.rc-tree-switcher_open,
+.rc-tree-switcher_close {
+  background: none !important;
+}
+
+/* Tùy chỉnh khoảng cách và căn chỉnh các node */
+.rc-tree-treenode {
+  padding: 4px 0 !important;
+  height: 28px;
+  display: flex;
+  align-items: center;
+}
+
+/* Cải thiện giao diện khi hover */
+.rc-tree-node-content-wrapper:hover {
+  background-color: hsl(var(--muted) / 0.5);
+  border-radius: 4px;
+}
+
+/* Custom style cho node đang được selected */
+.rc-tree-node-selected {
+  background-color: hsl(var(--primary) / 0.1) !important;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.2);
+}
+
+/* Cải thiện hiển thị của lines trong tree */
+.rc-tree-show-line .rc-tree-indent-unit::before {
+  border-color: hsl(var(--border) / 0.5) !important;
+}
+
+/* Animation cho collapse/expand */
+.rc-tree-child-tree {
+  display: block;
+  height: auto;
+  overflow: hidden;
+  transition:
+    height 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rc-tree-child-tree-hide {
+  display: none;
+}
+
+/* Animation cho collapse/expand */
+.rc-tree-motion-collapse {
+  overflow: hidden !important;
+  transition: height 0.18s ease-in-out;
+}
+
+/* Animation cho motion nodes */
+.rc-tree-treenode-motion {
+  transition: height 0.18s ease-in-out;
+}
+
+.rc-tree-treenode-motion-appear,
+.rc-tree-treenode-motion-enter {
+  height: 0;
+}
+
+.rc-tree-treenode-motion-appear-active,
+.rc-tree-treenode-motion-enter-active {
+  transition: height 0.18s ease-in-out;
+}
+
+.rc-tree-treenode-motion-leave {
+  transition: height 0.18s ease-in-out;
+}
+
+.rc-tree-treenode-motion-leave-active {
+  transition: height 0.18s ease-in-out;
+}
+
+/* Animation cho expand/collapse */
+.rc-tree-treenode-expand-show-appear,
+.rc-tree-treenode-expand-show-enter {
+  display: block;
+}
+
+.rc-tree-treenode-expand-show-appear-active,
+.rc-tree-treenode-expand-show-enter-active {
+  display: block;
+}
+
+/* Animation cho ChevronRight */
+.rc-tree-switcher-icon {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rc-tree-switcher_open .rc-tree-switcher-icon {
+  transform: rotate(90deg);
+}
+
+/* Đảm bảo content-wrapper không bị ảnh hưởng bởi display:none */
+.rc-tree-indent + .rc-tree-switcher + .rc-tree-node-content-wrapper {
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 4px;
+  margin-left: 4px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+}
+
+/* Style cho kéo thả */
+.rc-tree-node-content-wrapper.dragging {
+  background-color: transparent;
+  border: 0;
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+.rc-tree-node-content-wrapper.drop-target {
+  background-color: hsl(var(--primary) / 0.15);
+}
+
+.rc-tree-drop-indicator {
+  background-color: hsl(var(--primary)) !important;
+  height: 2px;
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+/* Style cho drop target */
+.rc-tree-drop-target {
+  background-color: hsl(var(--primary) / 0.15);
+}
+
+.rc-tree-drop-target-highlight {
+  background-color: hsl(var(--primary) / 0.3);
+  border: 1px dashed hsl(var(--primary));
+}
+
+/* Style cải thiện cho checkbox */
+.rc-tree-checkbox {
+  margin-right: 8px !important;
+}
+
+.rc-tree-checkbox-checked .rc-tree-checkbox-inner {
+  background-color: hsl(var(--primary)) !important;
+  border-color: hsl(var(--primary)) !important;
+}
+
+.rc-tree-checkbox:hover .rc-tree-checkbox-inner {
+  border-color: hsl(var(--primary)) !important;
+}
+
+/* Style cho drag icons */
+.rc-tree-draggable-icon {
+  cursor: grab;
+  margin-right: 4px;
+}
+
+.rc-tree-dragging {
+  cursor: grabbing;
+}
+
+/* Vùng xem trước khi thả */
+.rc-tree-drop-preview {
+  border: 1px dashed hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.1);
+  border-radius: 4px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rc-tree .rc-tree-treenode {
+  padding: 0;
+  margin: 0;
+}
+
+.rc-tree .rc-tree-list {
+  padding: 0;
+  margin: 0;
+}
+
+.rc-tree-list-holder,
+.rc-tree-list-holder-inner {
+  width: 100%;
+}
+
+/* Animation fade-in cho node mới */
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

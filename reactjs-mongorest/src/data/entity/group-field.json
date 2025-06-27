@@ -1,0 +1,129 @@
+{
+  "json": {
+    "type": "object",
+    "dependencies": {},
+    "required": ["title", "slug"],
+    "properties": {
+      "title": {
+        "title": "Title",
+        "description": "Nhập thông tin tiêu đề",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": true
+      },
+      "slug": {
+        "title": "Slug",
+        "description": "Nhập slug cho posttype",
+        "type": "string",
+        "depend_field": "root_title",
+        "filter": true,
+        "widget": "autoGenKeyFromAnotherField"
+      },
+      "featured_image": {
+        "title": "Featured Image",
+        "type": "string",
+        "widget": "file",
+        "library_setting": "all",
+        "objectKey": "featured_image",
+        "description": "Chọn hình ảnh đại diện",
+        "filter": true
+      },
+      "folder": {
+        "type": "string",
+        "typeSelect": "multiple",
+        "typeRelation": {
+          "title": "categories-block-image",
+          "_id": "categories-block-image",
+          "type": "n-1"
+        },
+        "navigateTo": "detail",
+        "widget": "relation",
+        "title": "Folder",
+        "filter": true,
+        "objectKey": "folder",
+        "description": "Chọn folder"
+      },
+      "tag": {
+        "type": "string",
+        "typeSelect": "multiple",
+        "typeRelation": {
+          "title": "tags-group-field",
+          "_id": "tags-group-field",
+          "type": "n-1"
+        },
+        "navigateTo": "detail",
+        "widget": "relation",
+        "title": "Tag",
+        "filter": false,
+        "objectKey": "tag",
+        "description": "Chọn tag"
+      },
+      "sourceJSX": {
+        "title": "Source JSX",
+        "type": "string",
+        "widget": "function",
+        "customRole": "textarea"
+      },
+      "defaultData": {
+        "title": "Default Data",
+        "type": "string",
+        "widget": "longAnswer",
+        "customRole": "textarea"
+      },
+
+      "isActive": {
+        "title": "Is Active",
+        "type": "string",
+        "default": true,
+        "widget": "boolean"
+      },
+      "json_schema": {
+        "type": "string",
+        "title": "Json",
+        "hidden": true
+      },
+      "ui_schema": {
+        "type": "string",
+        "title": "Json",
+        "hidden": true
+      }
+    }
+  },
+  "ui": {
+    "slug": {
+      "ui:widget": "UriKeyGen"
+    },
+    "featured_image": {
+      "ui:widget": "file"
+    },
+    "folder": {
+      "ui:widget": "relation"
+    },
+    "tag": {
+      "ui:widget": "relation"
+    },
+    "sourceJSX": {
+      "ui:widget": "function"
+    },
+    "defaultData": {
+      "ui:widget": "textarea"
+    },
+
+    "isActive": {
+      "ui:widget": "boolean"
+    },
+
+    "ui:order": [
+      "title",
+      "slug",
+      "featured_image",
+      "json_schema",
+      "ui_schema",
+      "folder",
+      "tag",
+      "sourceJSX",
+      "defaultData",
+      "isActive"
+    ]
+  }
+}
