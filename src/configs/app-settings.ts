@@ -116,7 +116,7 @@ export const settingCore = {
         connection: {
           connectionString:
             process.env.MONGODB_URL ||
-            "mongodb://localhost:27017/prototype_3",
+            "mongodb://localhost:27017/prototype_3?authSource=admin",
         },
       },
       // postgresql: {

@@ -33,7 +33,15 @@ process.on('unhandledRejection', (reason, promise) => {
 
 const app = Fastify();
 
-app.register(cors);
+app.register(cors, {
+    origin: (origin, callback) => {
+        // Allow all origins
+        callback(null, true);
+    },
+    methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD', 'TRACE', 'CONNECT'],
+    allowedHeaders: '*', // Accept all headers
+    credentials: true
+});
 
 app.addHook('onSend', responseInterceptor);
 

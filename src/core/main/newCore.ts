@@ -44,14 +44,15 @@ export class NewCore {
     roles: string[],
     databaseType: DatabaseType = "mongodb",
     adapterName?: string
-  ): Promise<IntermediateQueryResult<T>> {
-    return this.processQuery(
+  ): Promise<T[]> {
+    const result = await this.processQuery(
       params,
       collection,
       roles,
       databaseType,
       adapterName
     );
+    return result.data;
   }
 
   /**
@@ -64,7 +65,7 @@ export class NewCore {
     databaseType: DatabaseType = "mongodb",
     adapterName?: string
   ): Promise<IntermediateQueryResult<T>> {
-    // // 1. Validate RBAC access
+    // 1. Validate RBAC access
     // if (!this.rbacValidator.hasAccess(collection, "read", roles)) {
     //   throw CoreErrors.accessDeniedRead(collection, roles);
     // }
@@ -90,6 +91,7 @@ export class NewCore {
     // 6. Validate query against adapter capabilities
     const validation = adapter.validateQuery(intermediateQuery);
     if (!validation.valid) {
+      console.log("chay vao day")
       throw CoreErrors.queryValidationFailed(validation.errors);
     }
 
@@ -153,10 +155,10 @@ export class NewCore {
     }
 
     // Update RBAC configuration if provided
-    if (config.rbac) {
-      // Update RBAC configuration
-      this.rbacValidator.updateConfig(config.rbac);
-    }
+    // if (config.rbac) {
+    //   // Update RBAC configuration
+    //   this.rbacValidator.updateConfig(config.rbac);
+    // }
   }
 
   /**
@@ -277,16 +279,16 @@ export class NewCore {
     // if (!Array.isArray(roles)) {
     //   throw CoreErrors.rolesInvalidType();
     // }
-    if (!query.select) {
-      query.select = { fields: [] };
-    }
-    const rbacValidator = new RbacValidator();
-    query.select.fields = rbacValidator.filterRbacFeatures(
-      collection,
-      action,
-      roles,
-      query.select.fields
-    );
+    // if (!query.select) {
+    //   query.select = { fields: [] };
+    // }
+    // const rbacValidator = new RbacValidator();
+    // query.select.fields = rbacValidator.filterRbacFeatures(
+    //   collection,
+    //   action,
+    //   roles,
+    //   query.select.fields
+    // );
     // let allowedFields: string[];
     // try {
     //   allowedFields = rbacValidator.getRbacFeatures(collection, "read", roles);
@@ -363,7 +365,7 @@ export class NewCore {
     databaseType: DatabaseType = "mongodb",
     adapterName?: string
   ): Promise<T> {
-    // // Validate RBAC access
+    // Validate RBAC access
     // if (!this.rbacValidator.hasAccess(collection, "create", roles)) {
     //   throw CoreErrors.accessDeniedCreate(collection, roles);
     // }
@@ -422,7 +424,7 @@ export class NewCore {
     databaseType: DatabaseType = "mongodb",
     adapterName?: string
   ): Promise<T> {
-    // // Validate RBAC access
+    // Validate RBAC access
     // if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
     //   throw CoreErrors.accessDeniedUpdate(collection, roles);
     // }
@@ -467,9 +469,11 @@ export class NewCore {
     // this.applyRbacRestrictions(intermediateQuery, collection, roles);
 
     // Execute the update
+    console.log(1)
     const result = await adapter.executeQuery<T>(
       adapter.convertQuery(intermediateQuery)
     );
+    console.log(2)
 
     if (!result.data || result.data.length === 0) {
       throw CoreErrors.resourceNotFound(collection, id);
@@ -489,7 +493,7 @@ export class NewCore {
     databaseType: DatabaseType = "mongodb",
     adapterName?: string
   ): Promise<T> {
-    // // Validate RBAC access
+    // Validate RBAC access
     // if (!this.rbacValidator.hasAccess(collection, "update", roles)) {
     //   throw CoreErrors.accessDeniedUpdate(collection, roles);
     // }
@@ -558,7 +562,7 @@ export class NewCore {
     databaseType: DatabaseType = "mongodb",
     adapterName?: string
   ): Promise<boolean> {
-    // // Validate RBAC access
+    // Validate RBAC access
     // if (!this.rbacValidator.hasAccess(collection, "delete", roles)) {
     //   throw CoreErrors.accessDeniedDelete(collection, roles);
     // }

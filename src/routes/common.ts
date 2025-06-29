@@ -42,6 +42,7 @@ export async function CommonRoutes(app: FastifyInstance) {
       id: string;
     };
     const body = request.body;
+    console.log('body', body);
     return await commonService.update(entityName, id, body, ["user"], "mongodb");
   });
 
@@ -54,4 +55,5 @@ export async function CommonRoutes(app: FastifyInstance) {
     // TODO: Delete entity from DB
     return await commonService.hardDelete(entityName, id, ["user"], "mongodb");
   });
+
 }

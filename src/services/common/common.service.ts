@@ -34,7 +34,7 @@ class CommonService {
     collectionName: string,
     queryData: any = {},
     roles: string[] = ['default'],
-  ): Promise<IntermediateQueryResult<any>> {
+  ): Promise<any[]> {
     const result = coreGlobal.findAll(queryData as any, collectionName, roles, 'mongodb');
     return result;
   }
