@@ -528,6 +528,4 @@ Response:
 
 ## Next Steps
 
-- [File Uploads](./file-uploads) - Handle file uploads
-- [WebSocket](./websocket) - Real-time features
 - [Performance](../explanations/performance) - Optimization guide

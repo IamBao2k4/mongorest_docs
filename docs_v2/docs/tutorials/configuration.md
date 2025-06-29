@@ -407,4 +407,3 @@ module.exports = config;
 
 - [API Reference](../references/api) - Chi tiết về API
 - [Performance](../explanations/performance) - Tối ưu hiệu năng
-- [Production Deployment](../how-to-guides/deployment) - Triển khai production

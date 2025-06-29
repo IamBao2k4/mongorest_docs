@@ -345,4 +345,3 @@ Giải pháp:
 - [Basic Queries](./basic-queries) - Học cách query dữ liệu
 - [Authentication](./authentication) - Bảo mật API với JWT
 - [Configuration](./configuration) - Cấu hình nâng cao
-- [API Reference](/references/api) - Chi tiết về các endpoints
