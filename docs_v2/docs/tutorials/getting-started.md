@@ -236,9 +236,10 @@ my-project/
 ├── mongorest.config.js    # Configuration
 ├── .env                   # Environment variables
 ├── schemas/              # Schema definitions
-│   ├── users.js
-│   ├── posts.js
-│   └── comments.js
+│   ├── users.json
+│   ├── posts.json
+│   ├── rbac.json
+│   └── comments.json
 ├── hooks/                # Custom hooks
 │   ├── auth.js
 │   └── validation.js
@@ -250,76 +251,89 @@ my-project/
 ### Ví dụ schema file
 
 `schemas/users.js`:
-```javascript
-module.exports = {
-  // Schema definition
-  properies: {
-    _id: { type: 'string', pattern: '^[0-9a-fA-F]{24}$', description: 'MongoDB ObjectId', disabled: true },
-    email: {
-      type: 'string',
-      format: 'email',
-      required: true,
-      pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
-      title: 'Email Address',
-      description: 'User email address'
+
+```json
+{
+  "properties": {
+    "_id": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{24}$",
+      "description": "MongoDB ObjectId",
+      "disabled": true
     },
-    name: {
-      type: 'string',
-      required: true,
-      minLength: 2,
-      maxLength: 100,
-      pattern: '^.{2,100}$',
-      title: 'Full Name',
-      description: 'Full name'
+    "email": {
+      "type": "string",
+      "format": "email",
+      "required": true,
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "title": "Email Address",
+      "description": "User email address"
     },
-    profile: {
-      type: 'object',
-      required: true,
-      title: 'User Profile',
-      properties: {
-        age: { type: 'integer', minimum: 13, maximum: 120, title: 'Age' },
-        country: {
-          type: 'string',
-          enum: ['Vietnam', 'Thailand', 'Malaysia', 'Singapore', 'Indonesia', 'Philippines'],
-          title: 'Country'
+    "name": {
+      "type": "string",
+      "required": true,
+      "minLength": 2,
+      "maxLength": 100,
+      "pattern": "^.{2,100}$",
+      "title": "Full Name",
+      "description": "Full name"
+    },
+    "profile": {
+      "type": "object",
+      "required": true,
+      "title": "User Profile",
+      "properties": {
+        "age": {
+          "type": "integer",
+          "minimum": 13,
+          "maximum": 120,
+          "title": "Age"
         },
-        interests: {
-          type: 'array',
-          items: { type: 'string', maxLength: 50 },
-          maxItems: 10,
-          title: 'Interests'
+        "country": {
+          "type": "string",
+          "enum": ["Vietnam", "Thailand", "Malaysia", "Singapore", "Indonesia", "Philippines"],
+          "title": "Country"
         },
-        avatar: {
-          type: 'string',
-          format: 'uri',
-          pattern: '^(https?://|/).*\\.(jpg|jpeg|png|gif|webp|svg)$',
-          title: 'Avatar'
+        "interests": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "maxItems": 10,
+          "title": "Interests"
+        },
+        "avatar": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^(https?://|/).*\\.(jpg|jpeg|png|gif|webp|svg)$",
+          "title": "Avatar"
         }
       }
     },
-    status: {
-      type: 'string',
-      enum: ['active', 'inactive', 'suspended'],
-      default: 'active',
-      title: 'Account Status'
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "suspended"],
+      "default": "active",
+      "title": "Account Status"
     },
-    lastLogin: {
-      type: 'string',
-      format: 'date-time',
-      pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$',
-      title: 'Last Login'
+    "lastLogin": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
+      "title": "Last Login"
     },
-    createdAt: {
-      type: 'string',
-      format: 'date-time',
-      pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$',
-      title: 'Created At'
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
+      "title": "Created At"
     },
-    updatedAt: {
-      type: 'string',
-      format: 'date-time',
-      pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$',
-      title: 'Updated At'
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
+      "title": "Updated At"
     }
   }
 }
