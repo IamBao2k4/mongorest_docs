@@ -46,7 +46,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
   validateQuery(query: IntermediateQuery): ValidationResult {
     // Call parent validation first
     const result = super.validateQuery(query);
-    
+
     // Add custom validation for entity existence
     if (!this.entityManager.isCollectionAllowed(query.collection)) {
       result.valid = false;
@@ -97,7 +97,7 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
     const startTime = Date.now();
 
     try {
-      const collection: Collection = this.db.collection(this.getCurrentCollection());
+      const collection: Collection = this.db.collection(collectionName);
       let result: any;
       let data: T[] = [];
 
@@ -215,7 +215,6 @@ export class MongoDBAdapter extends BaseDatabaseAdapter {
       if (!dbName && config.connection.connectionString) {
         const match = config.connection.connectionString.match(/\/([^/?]+)(\?|$)/);
         if (match) {
-          console.log("match", match);
           dbName = match[1];
         }
       }

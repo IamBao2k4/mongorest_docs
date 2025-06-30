@@ -93,7 +93,7 @@ function JsonForm({
     );
   }
   
-  console.log('🚀 ~ parsedSchema:', parsedUiSchema);
+  //console.log('🚀 ~ parsedSchema:', parsedUiSchema);
 
   try {
     return (

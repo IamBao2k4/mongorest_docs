@@ -150,6 +150,129 @@
       "use_parent_delete_childs": false
     },
     {
+      "_id": "6717481115fa361bfc39f993",
+      "title": "Role",
+      "mongodb_collection_name": "role",
+      "json_schema": {
+        "title": "",
+        "description": "",
+        "type": "object",
+        "properties": {
+          "title": {
+            "title": "title",
+            "type": "string",
+            "widget": "shortAnswer"
+          },
+          "is_active": {
+            "title": "is_active",
+            "type": "string",
+            "default": true,
+            "widget": "boolean",
+            "appearance": "checkbox"
+          },
+          "tenant_id": {
+            "title": "tenant_id",
+            "type": "string",
+            "widget": "relation",
+            "typeRelation": {
+              "title": "tenant",
+              "_id": "tenant",
+              "type": "n-1",
+              "filter": {
+                "combinator": "and",
+                "rules": [],
+                "id": "32822eaa-c4e8-4705-9482-1518e06d2d56"
+              }
+            }
+          },
+          "created_by": {
+            "title": "created_by",
+            "type": "string",
+            "widget": "relation",
+            "typeRelation": {
+              "title": "entity",
+              "entity": "entity",
+              "type": "n-1",
+              "filter": {
+                "combinator": "and",
+                "rules": [],
+                "id": "671af541-3919-4106-ae75-7d25b81e3447"
+              }
+            }
+          },
+          "updated_by": {
+            "title": "updated_by",
+            "type": "string",
+            "widget": "relation",
+            "typeRelation": {
+              "title": "entity",
+              "entity": "entity",
+              "type": "n-1",
+              "filter": {
+                "combinator": "and",
+                "rules": [],
+                "id": "4e140c23-1e1d-4e6d-be1c-5d13e514e171"
+              }
+            }
+          },
+          "created_at": {
+            "title": "created_at",
+            "type": "string",
+            "widget": "dateTime",
+            "displayFormat": "yyyy/MM/dd HH:mm:ss",
+            "formatDate": "date-time",
+            "disabled": false,
+            "field": "single",
+            "mode": "dateTime"
+          },
+          "updated_at": {
+            "title": "updated_at",
+            "type": "string",
+            "widget": "dateTime",
+            "displayFormat": "yyyy/MM/dd HH:mm:ss",
+            "formatDate": "date-time",
+            "disabled": false,
+            "field": "single",
+            "mode": "dateTime"
+          }
+        },
+        "required": [],
+        "dependencies": {},
+        "ui": {
+          "title": {
+            "ui:widget": "shortAnswer"
+          },
+          "is_active": {
+            "ui:widget": "boolean"
+          },
+          "tenant_id": {
+            "ui:widget": "relation"
+          },
+          "created_by": {
+            "ui:widget": "relation"
+          },
+          "updated_by": {
+            "ui:widget": "relation"
+          },
+          "created_at": {
+            "ui:widget": "dateTime"
+          },
+          "updated_at": {
+            "ui:widget": "dateTime"
+          },
+          "ui:order": [
+            "title",
+            "is_active",
+            "tenant_id",
+            "created_by",
+            "updated_by",
+            "created_at",
+            "updated_at"
+          ]
+        }
+      }
+    },
+    {
       "_id": "6717504e1ed82866d5e1c034",
       "title": "category",
       "mongodb_collection_name": "category",

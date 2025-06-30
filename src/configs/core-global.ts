@@ -1,5 +1,5 @@
-import { createCoreSystem } from "../core/bootstrap";
-import { NewCore } from "../core/main/newCore";
+import { createCoreSystem } from "../mongorest_core/bootstrap";
+import { NewCore } from "../mongorest_core/main/newCore";
 import { settingCore } from "./app-settings";
 export let coreGlobal: NewCore;
 

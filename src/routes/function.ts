@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
-import { entityService } from '../services/entity/entity.service';
+import { entityService } from '../core_v1/_entity/entity.service';
 
 
 export async function FunctionRoutes(app: FastifyInstance) {

@@ -355,9 +355,9 @@ export class EntityManager {
       console.warn('[EntityManager] No entities loaded, rejecting collection access');
       return false;
     }
-    
+
     return this.entitiesCache.documents.some(
-      entity => (entity.mongodb_collection_name || entity.collection_name) === collectionName
+      entity => (entity.mongodb_collection_name || entity.collection_name) == collectionName
     );
   }
 

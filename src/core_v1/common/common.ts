@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
-import { commonService } from "../services/common/common.service";
-import { queryBuilderMiddleware } from "../common/middlewares/query-builder.middleware";
-import { coreGlobal } from "../configs/core-global";
+import { commonService } from "./common.service";
+import { queryBuilderMiddleware } from "../../common/middlewares/query-builder.middleware";
+import { coreGlobal } from "../../configs/core-global";
 
 export async function CommonRoutes(app: FastifyInstance) {
   // Get entity list
@@ -42,7 +42,6 @@ export async function CommonRoutes(app: FastifyInstance) {
       id: string;
     };
     const body = request.body;
-    console.log('body', body);
     return await commonService.update(entityName, id, body, ["user"], "mongodb");
   });
 

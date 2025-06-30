@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { HttpError } from '../../utils/http-error';
-import  { NewCore } from '../../core/main/newCore';
+import  { NewCore } from '../../mongorest_core/main/newCore';
 
 class RbacService {
     private newCore: NewCore = new NewCore();

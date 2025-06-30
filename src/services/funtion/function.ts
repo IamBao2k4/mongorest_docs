@@ -1,4 +1,4 @@
-import { commonService } from "../common/common.service"
+import { commonService } from "../../core_v1/common/common.service"
 
 export function function1(): { message: string } {
     return { message: "Function 1 executed" }

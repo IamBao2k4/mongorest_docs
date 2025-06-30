@@ -1,7 +1,7 @@
 import express from 'express';
-import { createCoreSystem } from '../core/bootstrap';
-import { NewCore } from '../core/main/newCore';
-import { DatabaseType } from '../core/adapters/base/databaseAdapter';
+import { createCoreSystem } from '../mongorest_core/bootstrap';
+import { NewCore } from '../mongorest_core/main/newCore';
+import { DatabaseType } from '../mongorest_core/adapters/base/databaseAdapter';
 
 const app = express();
 const port = 3003;

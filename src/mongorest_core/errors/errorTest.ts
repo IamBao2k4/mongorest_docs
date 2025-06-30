@@ -8,7 +8,7 @@ import {
   QueryErrors, 
   AdapterErrors, 
   RbacErrors 
-} from '../errors/errorFactories';
+} from './errorFactories';
 
 // Test Bootstrap Errors
 console.log('=== Testing Bootstrap Errors ===');
@@ -92,7 +92,7 @@ try {
 
 // Test error response format
 console.log('\n=== Testing Error Response Format ===');
-import { toErrorResponse } from '../errors';
+import { toErrorResponse } from '.';
 
 const error = CoreErrors.accessDeniedRead('sensitive-data', ['user']);
 const response = toErrorResponse(error, false, '/api/crud/sensitive-data');

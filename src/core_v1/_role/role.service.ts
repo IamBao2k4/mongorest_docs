@@ -1,8 +1,7 @@
 import { HttpError } from '../../utils/http-error';
 import { mongoDBService } from '../../common/bases/mongodb.base';
 import { coreGlobal } from '../../configs/core-global';
-import { IntermediateQueryResult } from '../../core/types/intermediateQuery';
-import { DatabaseType } from '../../core/adapters/base/databaseAdapter';
+import { DatabaseType } from '../../mongorest_core/adapters/base/databaseAdapter';
 
 export interface PaginatedResult<T> {
     limit: number;
@@ -11,7 +10,7 @@ export interface PaginatedResult<T> {
     count: number;
 }
 
-class CommonService {
+class RoleService {
 
   LIST_ENTITY_WITHOUT_TENANT = [
     'user',
@@ -31,34 +30,48 @@ class CommonService {
   }
 
   async findAllQuery(
-    collectionName: string,
     queryData: any = {},
     roles: string[] = ['default'],
+    dbType: DatabaseType = 'mongodb',
   ): Promise<any[]> {
-    const result = coreGlobal.findAll(queryData as any, collectionName, roles, 'mongodb');
+    const result = coreGlobal.findAll(queryData as any, 'role', roles, dbType);
     return result;
   }
-  async findOne(collectionName: string, id: string, roles: string[] = ['default'], dbType: DatabaseType = 'mongodb'): Promise<any> {
+  async findOne(
+    id: string, 
+    roles: string[] = ['default'], 
+    dbType: DatabaseType = 'mongodb'
+): Promise<any> {
     return await coreGlobal.findById(
-      collectionName,
+      'role',
       id,
       roles,
       dbType,
     )
   }
 
-  async create(collectionName: string, createDto: any, roles: string[] = ['default'], dbType: DatabaseType = 'mongodb'): Promise<any> {
+  async create(
+    createDto: any, 
+    roles: string[] = ['default'], 
+    dbType: DatabaseType = 'mongodb'
+): Promise<any> {
     return await coreGlobal.create(
-      collectionName,
+      'role',
       createDto,
       roles,
       dbType
     );
   }
 
-  async update(collectionName: string, id: string, body: any, roles: string[] = ['default'], dbType: DatabaseType = 'mongodb', _session?: any): Promise<any> {
+  async update(
+    id: string, 
+    body: any, 
+    roles: string[] = ['default'], 
+    dbType: DatabaseType = 'mongodb', 
+    _session?: any
+): Promise<any> {
     return await coreGlobal.update(
-      collectionName,
+      'role',
       id,
       body,
       roles,
@@ -67,9 +80,13 @@ class CommonService {
     );
   }
 
-  async hardDelete(collectionName: string, id: string, roles: string[] = ['default'], dbType: DatabaseType = 'mongodb'): Promise<any> {
+  async hardDelete(
+    id: string, 
+    roles: string[] = ['default'], 
+    dbType: DatabaseType = 'mongodb'
+): Promise<any> {
     return await coreGlobal.delete(
-      collectionName,
+      'role',
       id,
       roles,
       dbType
@@ -78,4 +95,4 @@ class CommonService {
 
 }
 
-export const commonService = new CommonService();
+export const roleService = new RoleService();

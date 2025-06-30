@@ -164,7 +164,6 @@ export class AdapterRegistry {
    */
   async initializeAll(configs: Record<string, any>): Promise<void> {
     const promises = Array.from(this.adapters.entries()).map(async ([key, adapter]) => {
-      console.log(configs)
       const config = configs[adapter.name] || configs[key];
       if (config) {
         await adapter.initialize(config);

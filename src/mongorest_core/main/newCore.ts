@@ -91,7 +91,6 @@ export class NewCore {
     // 6. Validate query against adapter capabilities
     const validation = adapter.validateQuery(intermediateQuery);
     if (!validation.valid) {
-      console.log("chay vao day")
       throw CoreErrors.queryValidationFailed(validation.errors);
     }
 
