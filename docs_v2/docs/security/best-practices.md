@@ -628,7 +628,6 @@ Bảo mật là một quá trình liên tục, không phải là một tính nă
 
 ### Next Steps
 
-- Review [Authentication](./authentication.md) configuration
 - Implement [RBAC Configuration](./rbac-configuration.md)
 - Setup [Field-level Security](./field-level-security.md)
 - Read the [API Reference](../api-reference/basic-queries.md) for secure query patterns

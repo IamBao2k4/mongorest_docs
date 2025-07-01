@@ -733,4 +733,4 @@ Field types trong MongoREST:
 4. **Transformable**: Built-in transformations
 5. **Extensible**: Custom validators support
 
-Next: [Validation Rules →](./validation)
+MongoREST field types provide a powerful foundation for building robust data schemas that work seamlessly with MongoDB.

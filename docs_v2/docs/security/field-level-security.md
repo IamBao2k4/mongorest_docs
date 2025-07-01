@@ -640,4 +640,3 @@ describe('Field Security', () => {
 
 - Review [RBAC Configuration](./rbac-configuration.md) for role setup
 - Read [Security Best Practices](./best-practices.md) for implementation guidelines
-- Check [Authentication](./authentication.md) for user context handling

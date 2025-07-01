@@ -406,4 +406,4 @@ module.exports = config;
 ## Bước tiếp theo
 
 - [API Reference](../references/api) - Chi tiết về API
-- [Performance](../explanations/performance) - Tối ưu hiệu năng
+- [Getting Started](../getting-started/quick-start) - Hướng dẫn bắt đầu nhanh

@@ -673,4 +673,3 @@ logger.info('RBAC Access', {
 
 - Tìm hiểu về [Field-level Security](./field-level-security.md)
 - Xem [Security Best Practices](./best-practices.md)
-- Đọc [Authentication](./authentication.md) để hiểu về JWT integration

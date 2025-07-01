@@ -860,5 +860,4 @@ Với proper planning và execution, MongoREST sẽ mang lại significant impro
 
 - [Schema Documentation](../schema/schema-structure.md)
 - [API Reference](../api-reference/basic-queries.md)
-- [Security Setup](../security/authentication.md)
 - [Example Projects](./e-commerce-example.md)
