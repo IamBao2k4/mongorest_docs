@@ -1,0 +1,8 @@
+{
+  "label": "Kiến Trúc",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Hiểu về kiến trúc và cách MongoREST hoạt động"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "label": "Guides",
+  "position": 7,
+  "link": {
+    "type": "generated-index",
+    "title": "Practical Guides",
+    "description": "Hướng dẫn thực hành với các use cases phổ biến",
+    "keywords": ["guides", "examples", "use cases", "migration"]
+  }
+}

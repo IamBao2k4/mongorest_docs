@@ -2,530 +2,438 @@
 sidebar_position: 2
 ---
 
-# Complex Queries
+# Complex Queries Guide
 
-Hướng dẫn sử dụng các queries phức tạp và tối ưu trong MongoREST.
+## Tổng Quan
 
-## Overview
+MongoREST hỗ trợ query syntax mạnh mẽ cho phép bạn thực hiện các truy vấn phức tạp với relationships, filtering, aggregations và nhiều tính năng khác.
 
-Document này bao gồm:
-- Function pipelines
-- Geospatial queries
-- Time-series queries
-- Bulk operations
-- Query optimization
+## Basic Query Parameters
 
-## Function Pipeline
+### Select Fields
 
-### Basic Function
+Chọn fields cụ thể để trả về:
 
-```bash
-POST /users/aggregate
-Content-Type: application/json
-
-[
-  { "$match": { "status": "active" } },
-  { "$group": {
-    "_id": "$department",
-    "count": { "$sum": 1 },
-    "avgAge": { "$avg": "$age" },
-    "minAge": { "$min": "$age" },
-    "maxAge": { "$max": "$age" }
-  }},
-  { "$sort": { "count": -1 } },
-  { "$limit": 10 }
-]
+```
+GET /products?select=name,price,stock
 ```
 
-### Complex Function Examples
+### Sorting
 
-#### Sales Analytics
+Sort theo một hoặc nhiều fields:
 
+```
+GET /products?sort=price&order=asc
+GET /products?sort=category,price&order=asc,desc
+```
+
+### Pagination
+
+```
+GET /products?limit=20&page=2
+// hoặc
+GET /products?limit=20&skip=20
+```
+
+## Filter Operators
+
+### Comparison Operators
+
+```
+// Equal
+GET /products?status=eq.active
+
+// Not equal
+GET /products?status=neq.deleted
+
+// Greater than
+GET /products?price=gt.100
+
+// Greater than or equal
+GET /products?price=gte.100
+
+// Less than
+GET /products?stock=lt.10
+
+// Less than or equal
+GET /products?price=lte.500
+```
+
+### Array Operators
+
+```
+// In array
+GET /products?status=in.(active,pending,draft)
+
+// Not in array
+GET /products?status=nin.(deleted,archived)
+```
+
+### String Operators
+
+```
+// Pattern matching (case-insensitive)
+GET /products?name=like.*phone*
+
+// Regular expression
+GET /products?email=regex.^admin@
+
+// Starts with
+GET /products?sku=like.PROD-*
+
+// Ends with
+GET /products?email=like.*@company.com
+```
+
+### Existence Operators
+
+```
+// Field exists
+GET /products?discount=exists.true
+
+// Field doesn't exist
+GET /products?deletedAt=exists.false
+
+// Field is null
+GET /products?parentId=null.true
+
+// Field is not null
+GET /products?parentId=null.false
+
+// Array is empty
+GET /products?tags=empty.true
+```
+
+## Complex Filter Combinations
+
+### AND Operator
+
+Kết hợp nhiều điều kiện với AND:
+
+```
+GET /products?and=(status=eq.active,price=gte.100,price=lte.500,stock=gt.0)
+```
+
+Tương đương với:
 ```javascript
-// Total sales by month with year-over-year comparison
-POST /orders/function
-[
-  // Match orders from last 2 years
-  { "$match": {
-    "createdAt": {
-      "$gte": { "$dateSubtract": { 
-        "startDate": "$$NOW", 
-        "unit": "year", 
-        "amount": 2 
-      }}
-    },
-    "status": "completed"
-  }},
-  
-  // Extract date parts
-  { "$addFields": {
-    "year": { "$year": "$createdAt" },
-    "month": { "$month": "$createdAt" },
-    "day": { "$dayOfMonth": "$createdAt" }
-  }},
-  
-  // Group by year and month
-  { "$group": {
-    "_id": {
-      "year": "$year",
-      "month": "$month"
-    },
-    "totalRevenue": { "$sum": "$total" },
-    "orderCount": { "$sum": 1 },
-    "avgOrderValue": { "$avg": "$total" },
-    "uniqueCustomers": { "$addToSet": "$customerId" }
-  }},
-  
-  // Calculate unique customer count
-  { "$addFields": {
-    "uniqueCustomerCount": { "$size": "$uniqueCustomers" }
-  }},
-  
-  // Remove customer array
-  { "$project": { "uniqueCustomers": 0 } },
-  
-  // Sort by year and month
-  { "$sort": { "_id.year": 1, "_id.month": 1 } },
-  
-  // Reshape for easier consumption
-  { "$project": {
-    "_id": 0,
-    "year": "$_id.year",
-    "month": "$_id.month",
-    "revenue": "$totalRevenue",
-    "orders": "$orderCount",
-    "avgOrder": { "$round": ["$avgOrderValue", 2] },
-    "customers": "$uniqueCustomerCount"
-  }}
-]
-```
-
-#### User Activity Analysis
-
-```javascript
-POST /activities/function
-[
-  // Match last 30 days
-  { "$match": {
-    "timestamp": { "$gte": { "$dateSubtract": {
-      "startDate": "$$NOW",
-      "unit": "day",
-      "amount": 30
-    }}}
-  }},
-  
-  // Lookup user details
-  { "$lookup": {
-    "from": "users",
-    "localField": "userId",
-    "foreignField": "_id",
-    "as": "user"
-  }},
-  { "$unwind": "$user" },
-  
-  // Group by user and action type
-  { "$group": {
-    "_id": {
-      "userId": "$userId",
-      "action": "$action"
-    },
-    "count": { "$sum": 1 },
-    "lastActivity": { "$max": "$timestamp" },
-    "userName": { "$first": "$user.name" },
-    "userEmail": { "$first": "$user.email" }
-  }},
-  
-  // Regroup by user
-  { "$group": {
-    "_id": "$_id.userId",
-    "name": { "$first": "$userName" },
-    "email": { "$first": "$userEmail" },
-    "totalActions": { "$sum": "$count" },
-    "lastSeen": { "$max": "$lastActivity" },
-    "actions": {
-      "$push": {
-        "type": "$_id.action",
-        "count": "$count"
-      }
-    }
-  }},
-  
-  // Calculate engagement score
-  { "$addFields": {
-    "engagementScore": {
-      "$multiply": [
-        "$totalActions",
-        { "$size": "$actions" }
-      ]
-    }
-  }},
-  
-  // Sort by engagement
-  { "$sort": { "engagementScore": -1 } },
-  { "$limit": 100 }
-]
-```
-
-### Faceted Search
-
-```javascript
-POST /products/function
-[
-  // Initial match
-  { "$match": { "status": "active" } },
-  
-  // Faceted aggregation
-  { "$facet": {
-    // Results
-    "results": [
-      { "$match": { /* search criteria */ } },
-      { "$sort": { "price": 1 } },
-      { "$skip": 0 },
-      { "$limit": 20 }
-    ],
-    
-    // Category counts
-    "categories": [
-      { "$group": {
-        "_id": "$category",
-        "count": { "$sum": 1 }
-      }},
-      { "$sort": { "count": -1 } }
-    ],
-    
-    // Price ranges
-    "priceRanges": [
-      { "$bucket": {
-        "groupBy": "$price",
-        "boundaries": [0, 50, 100, 200, 500, 1000],
-        "default": "1000+",
-        "output": { "count": { "$sum": 1 } }
-      }}
-    ],
-    
-    // Brand counts
-    "brands": [
-      { "$group": {
-        "_id": "$brand",
-        "count": { "$sum": 1 }
-      }},
-      { "$sort": { "count": -1 } },
-      { "$limit": 20 }
-    ],
-    
-    // Stats
-    "stats": [
-      { "$group": {
-        "_id": null,
-        "total": { "$sum": 1 },
-        "avgPrice": { "$avg": "$price" },
-        "minPrice": { "$min": "$price" },
-        "maxPrice": { "$max": "$price" }
-      }}
-    ]
-  }},
-  
-  // Flatten stats
-  { "$addFields": {
-    "stats": { "$arrayElemAt": ["$stats", 0] }
-  }}
-]
-```
-
-### GraphLookup for Hierarchical Data
-
-```javascript
-// Find all subordinates in org chart
-POST /employees/function
-[
-  { "$match": { "_id": "manager-id" } },
-  
-  { "$graphLookup": {
-    "from": "employees",
-    "startWith": "$_id",
-    "connectFromField": "_id",
-    "connectToField": "managerId",
-    "as": "subordinates",
-    "maxDepth": 10,
-    "depthField": "level"
-  }},
-  
-  // Count by level
-  { "$unwind": "$subordinates" },
-  { "$group": {
-    "_id": "$subordinates.level",
-    "count": { "$sum": 1 },
-    "employees": { "$push": {
-      "name": "$subordinates.name",
-      "title": "$subordinates.title"
-    }}
-  }},
-  { "$sort": { "_id": 1 } }
-]
-```
-
-## Full-Text Search
-
-
-### Basic Text Search
-
-```bash
-# Simple search
-GET /posts?field=eq.mongodb
-
-# Phrase search
-GET /posts?field=eq."mongodb atlas"
-
-# With text score
-GET /posts?field=eq.mongodb&select=title,content,score&order=-score
-```
-
-### Advanced Text Search
-
-```javascript
-// Search with aggregation
-POST /posts/function
-[
-  { "$match": {
-    "$text": { "$search": "mongodb nodejs" }
-  }},
-  
-  // Add text score
-  { "$addFields": {
-    "score": { "$meta": "textScore" }
-  }},
-  
-  // Filter by minimum score
-  { "$match": {
-    "score": { "$gte": 1.0 }
-  }},
-  
-  // Boost recent posts
-  { "$addFields": {
-    "adjustedScore": {
-      "$multiply": [
-        "$score",
-        { "$cond": [
-          { "$gte": ["$createdAt", { "$dateSubtract": {
-            "startDate": "$$NOW",
-            "unit": "day",
-            "amount": 7
-          }}]},
-          1.5,  // Boost factor for recent posts
-          1.0
-        ]}
-      ]
-    }
-  }},
-  
-  // Sort by adjusted score
-  { "$sort": { "adjustedScore": -1 } },
-  
-  // Limit results
-  { "$limit": 20 }
-]
-```
-
-### Autocomplete Search
-
-```javascript
-// Using like for autocomplete
-GET /users?name=like.john&limit=10
-```
-## Time-Series Queries
-
-### Date Range Queries
-
-```bash
-# Specific date range
-GET /events?date=gte.2023-01-01&date=lt.2023-02-01
-
-# Relative dates (requires server support)
-GET /events?date=gte.today-7d
-GET /events?date=gte.thisMonth
-GET /events?date=between.lastWeek
-```
-
-### Time-Series function
-
-```javascript
-// Hourly metrics
-POST /metrics/function
-[
-  { "$match": {
-    "timestamp": {
-      "$gte": { "$dateSubtract": {
-        "startDate": "$$NOW",
-        "unit": "day",
-        "amount": 1
-      }}
-    }
-  }},
-  
-  // Group by hour
-  { "$group": {
-    "_id": {
-      "$dateToString": {
-        "format": "%Y-%m-%d %H:00",
-        "date": "$timestamp"
-      }
-    },
-    "count": { "$sum": 1 },
-    "avgValue": { "$avg": "$value" },
-    "minValue": { "$min": "$value" },
-    "maxValue": { "$max": "$value" }
-  }},
-  
-  { "$sort": { "_id": 1 } }
-]
-```
-
-## Bulk Operations
-
-### Bulk Write
-
-```javascript
-POST /users/bulk
-Content-Type: application/json
-
 {
-  "operations": [
-    // Insert
-    {
-      "insertOne": {
-        "document": {
-          "name": "John Doe",
-          "email": "john@example.com"
-        }
-      }
-    },
-    
-    // Update one
-    {
-      "updateOne": {
-        "filter": { "_id": "user123" },
-        "update": { "$set": { "status": "active" } },
-        "upsert": false
-      }
-    },
-    
-    // Update many
-    {
-      "updateMany": {
-        "filter": { "status": "pending" },
-        "update": { "$set": { "status": "active" } }
-      }
-    },
-    
-    // Replace
-    {
-      "replaceOne": {
-        "filter": { "_id": "user456" },
-        "replacement": {
-          "name": "Jane Doe",
-          "email": "jane@example.com",
-          "status": "active"
-        }
-      }
-    },
-    
-    // Delete one
-    {
-      "deleteOne": {
-        "filter": { "_id": "user789" }
-      }
-    },
-    
-    // Delete many
-    {
-      "deleteMany": {
-        "filter": { "status": "deleted" }
-      }
-    }
-  ],
-  
-  "options": {
-    "ordered": true,  // Stop on first error
-    "writeConcern": { "w": "majority" }
+  status: "active",
+  price: { $gte: 100, $lte: 500 },
+  stock: { $gt: 0 }
+}
+```
+
+### OR Operator
+
+Kết hợp điều kiện với OR:
+
+```
+GET /products?or=(category=eq.electronics,category=eq.computers)
+```
+
+### Nested AND/OR
+
+Kết hợp phức tạp:
+
+```
+GET /users?or=(and=(role=eq.vip,lastPurchase=gte.Date.now()-30*24*60*60*1000),and=(role=eq.premium,totalPurchases=gte.5000))
+```
+
+Điều này tìm users là:
+- VIP và có mua hàng trong 30 ngày, HOẶC
+- Premium và có tổng mua hàng >= 5000
+
+## Relationship Queries
+
+### Basic Relationship Embedding
+
+```
+// Embed category info
+GET /products?select=name,price,category(name,slug)
+
+// Embed multiple relationships
+GET /orders?select=orderNumber,customer(name,email),items(productId,quantity)
+```
+
+### Nested Relationships
+
+```
+// 3 levels deep
+GET /orders?select=id,customer(name,company(name,address))
+
+// Multiple nested
+GET /posts?select=title,author(name,profile(avatar)),categories(name,parent(name))
+```
+
+### Relationship Filtering
+
+Filter dựa trên relationship fields:
+
+```
+// Orders của VIP customers
+GET /orders?customer.vipStatus=eq.true
+
+// Products trong featured categories
+GET /products?category.featured=eq.true&select=name,price,category(name)
+
+// Posts của active authors
+GET /posts?author.status=eq.active&author.role=in.(admin,editor)
+```
+
+### Aggregated Relationships
+
+```
+// Count relationships
+GET /users?select=name,orderCount:orders!count
+
+// Sum values
+GET /users?select=name,totalSpent:orders!sum(totalAmount)
+
+// Average values
+GET /products?select=name,avgRating:reviews!avg(rating)
+
+// Multiple aggregations
+GET /products?select=name,reviewCount:reviews!count,avgRating:reviews!avg(rating),totalSold:orders!sum(items.quantity)
+```
+
+## Dynamic Date Queries
+
+### Date Comparisons
+
+```
+// Documents created today
+GET /posts?createdAt=gte.Date.now()-24*60*60*1000
+
+// Expiring in next 7 days
+GET /products?expiredAt=lt.Date.now()+7*24*60*60*1000&expiredAt=gt.Date.now()
+
+// Last 30 days
+GET /orders?orderDate=gte.Date.now()-30*24*60*60*1000
+```
+
+### Date Expressions
+
+```
+// Start of today
+GET /events?date=gte.Date.today()
+
+// End of this month
+GET /subscriptions?expiresAt=lte.Date.endOfMonth()
+
+// Specific date
+GET /orders?orderDate=gte.2024-01-01&orderDate=lt.2024-02-01
+```
+
+## Advanced Query Features
+
+### Text Search
+
+Search across multiple fields:
+
+```
+GET /products?search=wireless&searchFields=name,description,tags
+```
+
+### Count Total
+
+Get total count với results:
+
+```
+GET /products?status=eq.active&count=true
+```
+
+Response includes:
+```json
+{
+  "data": [...],
+  "meta": {
+    "total": 150,
+    "count": 20
   }
 }
 ```
 
-## Query Optimization
+### Dry Run Mode
 
-### Performance Tips
+Test query without executing:
 
-```javascript
-// 1. Use projections to reduce data transfer
-GET /users?select=name,email&limit=100
-
-// 2. Use covered queries (index contains all fields)
-GET /users?email=john@example.com&select=email,status
-
-// 3. Avoid large skip values
-// Bad:
-GET /users?skip=10000&limit=20
-
-// Good: Use cursor-based pagination
-GET /users?cursor=lastId&limit=20
-
-// 4. Use aggregation for complex queries
-// Instead of filter after lookup
-GET /users?dryRun=false&dbType=mongodb&skip=0&limit=10&select=product_reviews()&and=(status=eq.active,product_reviews.status=eq.approved)
-
-// Filter when lookup
-GET /users?dryRun=false&dbType=mongodb&skip=0&limit=10&select=product_reviews(verified=neq.true)&and=(status=eq.active)
-
-
-// 5. Batch operations
-// Instead of:
-for (const update of updates) {
-  await fetch(`/users/${update.id}`, { method: 'PATCH', body: update });
-}
-
-// Use bulk:
-await fetch('/users/bulk', { 
-  method: 'POST', 
-  body: { operations: updates }
-});
 ```
-
-<!-- ### Query Monitoring
-
-```javascript
-// Enable query profiling
-db: {
-  profiling: {
-    enabled: true,
-    level: 1, // 0=off, 1=slow, 2=all
-    slowMs: 100 // Log queries slower than 100ms
-  }
-}
-
-// Query metrics endpoint
-GET /metrics/queries
+GET /products?dryRun=true&and=(price=gt.100)&debug=true
+```
 
 Response:
+```json
 {
-  "slowQueries": [
-    {
-      "collection": "orders",
-      "query": { "status": "pending" },
-      "executionTime": 245,
-      "docsExamined": 50000,
-      "indexesUsed": [],
-      "timestamp": "2023-01-15T10:30:00Z"
-    }
-  ],
-  "queryStats": {
-    "total": 10000,
-    "avgExecutionTime": 12,
-    "slowQueryCount": 45
+  "dryRun": true,
+  "debug": {
+    "parsedQuery": {...},
+    "aggregationPipeline": [...],
+    "estimatedDocuments": 150,
+    "indexesUsed": ["price_1"]
   }
 }
 ```
- -->
 
-## Next Steps
+### Field Aliases
 
-- [Performance](../explanations/performance) - Optimization guide
+Rename fields trong response:
+
+```
+GET /products?select=productName:name,cost:price,inStock:stock
+```
+
+## Real-World Examples
+
+### 1. E-commerce Product Search
+
+Tìm products trong category Electronics, giá từ $100-500, còn hàng, sort theo popularity:
+
+```
+GET /products?and=(category.slug=eq.electronics,price=gte.100,price=lte.500,stock=gt.0)&select=name,price,stock,category(name),reviewCount:reviews!count,avgRating:reviews!avg(rating)&sort=reviewCount,avgRating&order=desc,desc&limit=20
+```
+
+### 2. Order Management Dashboard
+
+Lấy orders đang xử lý của VIP customers với tổng > $1000:
+
+```
+GET /orders?and=(status=in.(processing,shipped),totalAmount=gte.1000)&customer.vipStatus=eq.true&select=orderNumber,totalAmount,status,customer(name,email,vipStatus),items(productId,quantity,price)&sort=orderDate&order=desc&limit=50
+```
+
+### 3. Content Management
+
+Tìm published posts của active authors trong 30 ngày qua:
+
+```
+GET /posts?and=(status=eq.published,publishedAt=gte.Date.now()-30*24*60*60*1000)&author.status=eq.active&select=title,slug,excerpt,publishedAt,author(name,avatar),categories(name),viewCount,commentCount:comments!count&sort=viewCount&order=desc
+```
+
+### 4. User Analytics
+
+Tìm high-value users (VIP hoặc Premium với high spending):
+
+```
+GET /users?or=(and=(role=eq.vip,lastPurchase=gte.Date.now()-30*24*60*60*1000),and=(role=eq.premium,totalPurchases=gte.5000))&select=name,email,role,profile(phone,country),orderCount:orders!count,totalSpent:orders!sum(totalAmount),lastOrder:orders(orderDate)!sort.orderDate.desc!limit.1
+```
+
+### 5. Inventory Alert
+
+Products sắp hết hàng hoặc hết hạn:
+
+```
+GET /products?or=(stock=lte.10,and=(expiredAt=lt.Date.now()+7*24*60*60*1000,expiredAt=gt.Date.now()))&select=name,sku,stock,expiredAt,supplier(name,contact)&sort=stock,expiredAt&order=asc,asc
+```
+
+## Query với RBAC
+
+Queries tự động được filter theo user permissions:
+
+### User Role: Guest
+```
+GET /products?select=name,price,description
+// Chỉ thấy public fields
+```
+
+### User Role: User
+```
+GET /products?select=name,price,stock,reviews(*)
+// Thấy thêm stock và reviews
+```
+
+### User Role: Admin
+```
+GET /products?select=*,supplier(*),cost,profit
+// Full access to all fields
+```
+
+## Performance Tips
+
+### 1. Use Indexes
+
+Ensure có indexes cho filtered fields:
+
+```javascript
+// Nếu thường query theo status và price
+{
+  "indexes": [
+    { "fields": { "status": 1, "price": 1 } }
+  ]
+}
+```
+
+### 2. Limit Nested Data
+
+Thay vì:
+```
+GET /users?select=*,orders(*)
+```
+
+Tốt hơn:
+```
+GET /users?select=name,email,recentOrders:orders(orderNumber,total)!limit.5
+```
+
+### 3. Use Projections
+
+Chỉ select fields cần thiết:
+```
+GET /products?select=name,price,stock
+```
+
+### 4. Paginate Large Results
+
+Always use pagination cho large datasets:
+```
+GET /orders?limit=50&page=1
+```
+
+## Troubleshooting
+
+### Query Not Working
+
+1. **Check operator syntax**: `=eq.` not `=`
+2. **Verify field names**: Case-sensitive
+3. **Check data types**: Numbers vs strings
+4. **Test incrementally**: Build complex queries step by step
+
+### Debug Mode
+
+```
+GET /products?debug=true&yourQuery
+```
+
+Shows:
+- Parsed query
+- MongoDB pipeline
+- Execution plan
+- Performance metrics
+
+### Common Errors
+
+```json
+// Invalid operator
+{
+  "error": "Invalid operator 'eqq' for field 'status'"
+}
+
+// Field not found
+{
+  "error": "Field 'invalidField' does not exist in schema"
+}
+
+// Permission denied
+{
+  "error": "You don't have permission to access field 'cost'"
+}
+```
+
+## Best Practices
+
+1. **Start Simple**: Test basic queries first
+2. **Use Aliases**: Make response cleaner with aliases
+3. **Optimize Relationships**: Only fetch needed relationship data
+4. **Cache Complex Queries**: Use caching for expensive queries
+5. **Monitor Performance**: Use debug mode to check execution
+6. **Document Queries**: Save important queries for reuse
+7. **Use Variables**: In code, build queries programmatically
+8. **Test with Data**: Ensure queries work with real data volumes

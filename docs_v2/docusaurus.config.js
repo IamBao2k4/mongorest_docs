@@ -1,26 +1,18 @@
 // @ts-check
-// `@type` JSDoc annotations allow editor autocompletion and type checking
-// (when paired with `@ts-check`).
-// There are various equivalent ways to declare your Docusaurus config.
-// See: https://docusaurus.io/docs/api/docusaurus-config
+// Note: type annotations allow type checking and IDEs autocompletion
 
-import {themes as prismThemes} from 'prism-react-renderer';
-
-// This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
+const { themes } = require('prism-react-renderer');
+const lightCodeTheme = themes.github;
+const darkCodeTheme = themes.dracula;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'MongoREST',
-  tagline: 'Automatic REST API for MongoDB',
+  tagline: 'The Missing API Layer for MongoDB',
   favicon: 'img/favicon.ico',
 
-  // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
-  future: {
-    v4: true, // Improve compatibility with the upcoming Docusaurus v4
-  },
-
   // Set the production url of your site here
-  url: 'https://mongorest.dev',
+  url: 'https://mongorest.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
@@ -33,9 +25,9 @@ const config = {
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
 
-  // Even if you don't use internationalization, you can use this field to set
-  // useful metadata like html lang. For example, if your site is Chinese, you
-  // may want to replace "en" with "zh-Hans".
+  // Even if you don't use internalization, you can use this field to set useful
+  // metadata like html lang. For example, if your site is Chinese, you may want
+  // to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
@@ -47,15 +39,13 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          sidebarPath: './sidebars.js',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
+          sidebarPath: require.resolve('./sidebars.js'),
           editUrl:
             'https://github.com/mongorest/mongorest/tree/main/docs/',
         },
         blog: false, // Disable blog
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: require.resolve('./src/css/custom.css'),
         },
       }),
     ],
@@ -75,10 +65,11 @@ const config = {
         items: [
           {
             type: 'docSidebar',
-            sidebarId: 'docs',
+            sidebarId: 'tutorialSidebar',
             position: 'left',
             label: 'Documentation',
           },
+          // Remove this line: {to: '/blog', label: 'Blog', position: 'left'},
           {
             href: 'https://github.com/mongorest/mongorest',
             label: 'GitHub',
@@ -90,19 +81,19 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Documentation',
+            title: 'Docs',
             items: [
               {
                 label: 'Getting Started',
-                to: '/docs/tutorials/getting-started',
+                to: '/docs/intro',
               },
               {
                 label: 'API Reference',
-                to: '/docs/references/api',
+                to: '/docs/api-reference/basic-queries',
               },
               {
-                label: 'Configuration',
-                to: '/docs/references/configuration',
+                label: 'Guides',
+                to: '/docs/guides/e-commerce-example',
               },
             ],
           },
@@ -118,8 +109,8 @@ const config = {
                 href: 'https://discord.gg/mongorest',
               },
               {
-                label: 'GitHub Discussions',
-                href: 'https://github.com/mongorest/mongorest/discussions',
+                label: 'Twitter',
+                href: 'https://twitter.com/mongorest',
               },
             ],
           },
@@ -127,24 +118,28 @@ const config = {
             title: 'More',
             items: [
               {
+                label: 'Blog',
+                to: '/blog',
+              },
+              {
                 label: 'GitHub',
                 href: 'https://github.com/mongorest/mongorest',
               },
               {
-                label: 'npm',
-                href: 'https://www.npmjs.com/package/mongorest',
+                label: 'NPM',
+                href: 'https://www.npmjs.com/package/@mongorest/core',
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} MongoREST. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} MongoREST Project. Built with Docusaurus.`,
       },
       prism: {
-        theme: prismThemes.github,
-        darkTheme: prismThemes.dracula,
-        additionalLanguages: ['bash', 'json'],
+        theme: lightCodeTheme,
+        darkTheme: darkCodeTheme,
+        additionalLanguages: ['bash', 'json', 'javascript', 'typescript'],
       },
     }),
 };
 
-export default config;
+module.exports = config;

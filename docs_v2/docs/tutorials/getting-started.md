@@ -4,358 +4,516 @@ sidebar_position: 1
 
 # Getting Started
 
-Hướng dẫn cài đặt và sử dụng MongoREST.
+## Giới Thiệu
 
-## Giới thiệu
+Hướng dẫn này sẽ giúp bạn bắt đầu với MongoREST trong 15 phút. Chúng ta sẽ:
+1. Cài đặt và cấu hình MongoREST
+2. Tạo schema đầu tiên
+3. Thực hiện các CRUD operations
+4. Sử dụng relationships và queries nâng cao
 
-MongoREST là một REST API server tự động cho MongoDB, giúp bạn:
-- Tạo REST endpoints cho MongoDB collections một cách tự động
-- Không cần viết code backend phức tạp
-- Hỗ trợ đầy đủ CRUD operations
-- Authentication và authorization tích hợp sẵn
-- Query phức tạp với aggregation pipeline
+## Prerequisites
 
-## Yêu cầu hệ thống
+- Node.js 16+ installed
+- MongoDB 4.4+ running
+- Basic knowledge của REST APIs và MongoDB
 
-### Phần mềm
-- Node.js >= 14.0.0
-- MongoDB >= 4.0
-- npm hoặc yarn
+## Installation
 
-## Cài đặt
-
-### Cài đặt global (khuyến nghị cho development)
+### 1. Clone Repository
 
 ```bash
-npm install -g mongorest
-```
-
-Hoặc với yarn:
-
-```bash
-yarn global add mongorest
-```
-
-### Cài đặt trong project
-
-```bash
-npm install mongorest
-```
-
-Hoặc thêm vào package.json:
-
-```json
-{
-  "dependencies": {
-    "mongorest": "^1.0.0"
-  }
-}
-```
-
-### Cài đặt từ source
-
-```bash
-git clone https://github.com/mongorest/mongorest.git
+git clone https://github.com/your-org/mongorest.git
 cd mongorest
+```
+
+### 2. Install Dependencies
+
+```bash
 npm install
-npm run build
-npm link
 ```
 
-## Khởi động nhanh
+### 3. Environment Setup
 
-### 1. Sử dụng programmatic
-
-Tạo file `server.js`:
-
-```javascript
-const MongoRest = require('mongorest');
-
-// Khởi tạo server
-const server = new MongoRest({
-  db: 'mongodb://localhost:27017/mydb',
-  port: 3000,
-  host: '0.0.0.0'
-});
-
-// Start server
-server.start()
-  .then(() => {
-    console.log('MongoREST server started on port 3000');
-  })
-  .catch(err => {
-    console.error('Failed to start server:', err);
-    process.exit(1);
-  });
-```
-
-Chạy server:
+Copy file `.env.example` thành `.env`:
 
 ```bash
-node server.js
+cp .env.example .env
 ```
 
-## Cấu hình cơ bản
+Edit `.env` với MongoDB connection của bạn:
 
-### File cấu hình
+```env
+# MongoDB Configuration
+MONGODB_URI=mongodb://localhost:27017/mongorest
+MONGODB_DATABASE=mongorest
 
-Tạo file `mongorest.config.js`:
-
-```javascript
-module.exports = {
-  // Database connection
-  db: process.env.MONGODB_URI || 'mongodb://localhost:27017/mydb',
-  
-  // Server settings
-  port: process.env.PORT || 3000,
-  host: '0.0.0.0',
-  basePath: '/api/v1',
-  
-  // CORS
-  cors: {
-    origin: '*',
-    credentials: true
-  },
-  
-  // Logging
-  logging: {
-    level: 'info',
-    format: 'json'
-  },
-  
-  // Rate limiting
-  rateLimit: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100 // limit each IP to 100 requests per windowMs
-  }
-};
-```
-
-### Environment variables
-
-Tạo file `.env`:
-
-```bash
-# Database
-MONGODB_URI=mongodb://localhost:27017/mydb
-MONGODB_OPTIONS={"useNewUrlParser":true,"useUnifiedTopology":true}
-
-# Server
+# Server Configuration
 PORT=3000
-HOST=0.0.0.0
-BASE_PATH=/api/v1
+NODE_ENV=development
 
-# Security
+# JWT Configuration
 JWT_SECRET=your-super-secret-key-change-this
-JWT_EXPIRES_IN=7d
+JWT_EXPIRES_IN=24h
 
-# Features
-ENABLE_AUTH=true
-ENABLE_WEBSOCKET=true
-ENABLE_FILE_UPLOAD=true
-
-# Logging
-LOG_LEVEL=info
-LOG_FORMAT=json
+# API Configuration
+API_PREFIX=/api
+RATE_LIMIT_WINDOW=15
+RATE_LIMIT_MAX=100
 ```
 
-## Test API
+## Tạo Schema Đầu Tiên
 
-### 1. Kiểm tra server status
+### 1. Product Schema
 
-```bash
-curl http://localhost:3000/health
-```
-
-Response:
-```json
-{
-  "status": "ok",
-  "version": "1.0.0",
-  "uptime": 120,
-  "database": "connected"
-}
-```
-
-### 2. CRUD operations cơ bản
-
-#### Create (POST)
-```bash
-curl -X POST http://localhost:3000/users \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "John Doe",
-    "email": "john@example.com",
-    "age": 30
-  }'
-```
-
-#### Read (GET)
-```bash
-# Get all users
-curl http://localhost:3000/users
-
-# Get specific user
-curl http://localhost:3000/users/507f1f77bcf86cd799439011
-
-# With query parameters
-curl http://localhost:3000/users?age=gte.18&status=active
-```
-
-#### Update (PUT/PATCH)
-```bash
-# Full update
-curl -X PUT http://localhost:3000/users/507f1f77bcf86cd799439011 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "John Updated",
-    "email": "john.new@example.com",
-    "age": 31
-  }'
-
-# Partial update
-curl -X PATCH http://localhost:3000/users/507f1f77bcf86cd799439011 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "age": 32
-  }'
-```
-
-#### Delete (DELETE)
-```bash
-curl -X DELETE http://localhost:3000/users/507f1f77bcf86cd799439011
-```
-
-## Project structure
-
-Khi sử dụng MongoREST trong project:
-
-```
-my-project/
-├── server.js              # Entry point
-├── mongorest.config.js    # Configuration
-├── .env                   # Environment variables
-├── schemas/              # Schema definitions
-│   ├── users.json
-│   ├── posts.json
-│   ├── rbac.json
-│   └── comments.json
-├── hooks/                # Custom hooks
-│   ├── auth.js
-│   └── validation.js
-├── middleware/           # Custom middleware
-│   └── logging.js
-└── package.json
-```
-
-### Ví dụ schema file
-
-`schemas/users.js`:
+Tạo file `schemas/collections/products.json`:
 
 ```json
 {
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Products",
+  "collection": "products",
+  "type": "object",
   "properties": {
-    "_id": {
-      "type": "string",
-      "pattern": "^[0-9a-fA-F]{24}$",
-      "description": "MongoDB ObjectId",
-      "disabled": true
-    },
-    "email": {
-      "type": "string",
-      "format": "email",
-      "required": true,
-      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-      "title": "Email Address",
-      "description": "User email address"
-    },
     "name": {
       "type": "string",
-      "required": true,
-      "minLength": 2,
-      "maxLength": 100,
-      "pattern": "^.{2,100}$",
-      "title": "Full Name",
-      "description": "Full name"
+      "maxLength": 200,
+      "description": "Product name"
     },
-    "profile": {
-      "type": "object",
-      "required": true,
-      "title": "User Profile",
-      "properties": {
-        "age": {
-          "type": "integer",
-          "minimum": 13,
-          "maximum": 120,
-          "title": "Age"
-        },
-        "country": {
-          "type": "string",
-          "enum": ["Vietnam", "Thailand", "Malaysia", "Singapore", "Indonesia", "Philippines"],
-          "title": "Country"
-        },
-        "interests": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "maxLength": 50
-          },
-          "maxItems": 10,
-          "title": "Interests"
-        },
-        "avatar": {
-          "type": "string",
-          "format": "uri",
-          "pattern": "^(https?://|/).*\\.(jpg|jpeg|png|gif|webp|svg)$",
-          "title": "Avatar"
-        }
-      }
+    "price": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Product price"
+    },
+    "stock": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
     },
     "status": {
       "type": "string",
-      "enum": ["active", "inactive", "suspended"],
-      "default": "active",
-      "title": "Account Status"
-    },
-    "lastLogin": {
-      "type": "string",
-      "format": "date-time",
-      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
-      "title": "Last Login"
-    },
-    "createdAt": {
-      "type": "string",
-      "format": "date-time",
-      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
-      "title": "Created At"
-    },
-    "updatedAt": {
-      "type": "string",
-      "format": "date-time",
-      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
-      "title": "Updated At"
+      "enum": ["active", "inactive"],
+      "default": "active"
+    }
+  },
+  "required": ["name", "price"],
+  "indexes": [
+    { "fields": { "name": 1 } },
+    { "fields": { "status": 1, "price": -1 } }
+  ],
+  "mongorest": {
+    "permissions": {
+      "read": ["guest", "user", "admin"],
+      "create": ["user", "admin"],
+      "update": ["admin"],
+      "delete": ["admin"]
     }
   }
 }
 ```
 
-Schema file này có thể được tạo một cách đơn giản trên trang dashboard [Admin dashboard](https://admin-reactjs.mangoads.com.vn)
+### 2. Category Schema
 
-## Troubleshooting
+Tạo file `schemas/collections/categories.json`:
 
-### Lỗi kết nối MongoDB
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Categories",
+  "collection": "categories",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "unique": true
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 500
+    }
+  },
+  "required": ["name", "slug"]
+}
+```
+
+### 3. Update Product Schema với Relationship
+
+Update `products.json` để add relationship:
+
+```json
+{
+  // ... existing properties ...
+  "properties": {
+    // ... existing fields ...
+    "categoryId": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{24}$",
+      "description": "Category reference"
+    }
+  },
+  "relationships": {
+    "category": {
+      "type": "belongsTo",
+      "collection": "categories",
+      "localField": "categoryId",
+      "foreignField": "_id"
+    }
+  }
+}
+```
+
+## Start Server
+
+```bash
+npm run dev
+```
+
+Server sẽ start tại `http://localhost:3000`
+
+## First API Calls
+
+### 1. Get API Info
+
+```bash
+curl http://localhost:3000/api
+```
+
+Response:
+```json
+{
+  "name": "MongoREST API",
+  "version": "1.0.0",
+  "collections": ["products", "categories"]
+}
+```
+
+### 2. Create a Category
+
+```bash
+curl -X POST http://localhost:3000/api/crud/categories \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Electronics",
+    "slug": "electronics",
+    "description": "Electronic products"
+  }'
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "Electronics",
+    "slug": "electronics",
+    "description": "Electronic products"
+  }
+}
+```
+
+### 3. Create a Product
+
+```bash
+curl -X POST http://localhost:3000/api/crud/products \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "iPhone 15",
+    "price": 999,
+    "stock": 50,
+    "categoryId": "507f1f77bcf86cd799439011"
+  }'
+```
+
+### 4. List Products với Category
+
+```bash
+curl "http://localhost:3000/api/crud/products?select=name,price,category(name,slug)"
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "name": "iPhone 15",
+      "price": 999,
+      "category": {
+        "name": "Electronics",
+        "slug": "electronics"
+      }
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "limit": 20
+  }
+}
+```
+
+## Authentication Setup
+
+### 1. Create User Schema
+
+`schemas/collections/users.json`:
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Users",
+  "collection": "users",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string",
+      "format": "email",
+      "unique": true
+    },
+    "password": {
+      "type": "string",
+      "minLength": 8
+    },
+    "name": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "enum": ["user", "admin"],
+      "default": "user"
+    }
+  },
+  "required": ["email", "password", "name"],
+  "mongorest": {
+    "permissions": {
+      "read": ["admin"],
+      "create": ["guest"],
+      "update": ["admin"],
+      "delete": ["admin"]
+    }
+  }
+}
+```
+
+### 2. Register User
+
+```bash
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "securepassword",
+    "name": "John Doe"
+  }'
+```
+
+### 3. Login
+
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "securepassword"
+  }'
+```
+
+Response:
+```json
+{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "user": {
+    "id": "507f1f77bcf86cd799439012",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "role": "user"
+  }
+}
+```
+
+### 4. Use Token
+
+```bash
+curl http://localhost:3000/api/crud/products \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+## Advanced Queries
+
+### 1. Filtering
+
+```bash
+# Products với price >= 500
+curl "http://localhost:3000/api/crud/products?price=gte.500"
+
+# Active products trong category
+curl "http://localhost:3000/api/crud/products?status=eq.active&category.slug=eq.electronics"
+```
+
+### 2. Complex Queries
+
+```bash
+# Products với multiple conditions
+curl "http://localhost:3000/api/crud/products?and=(price=gte.100,price=lte.1000,stock=gt.0)"
+```
+
+### 3. Sorting và Pagination
+
+```bash
+# Sort by price descending, limit 10
+curl "http://localhost:3000/api/crud/products?sort=price&order=desc&limit=10"
+```
+
+## Using Plugins
+
+### Auto Timestamps
+
+```bash
+curl -X POST http://localhost:3000/api/crud/products \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "name": "New Product",
+    "price": 299,
+    "created_at": {
+      "isTurnOn": true,
+      "value": "Date.now()"
+    },
+    "created_by": {
+      "isTurnOn": true,
+      "value": ""
+    }
+  }'
+```
+
+## Configure RBAC
+
+### 1. RBAC Config File
+
+Tạo `schemas/rbac/products.json`:
+
+```json
+{
+  "collection_name": "products",
+  "rbac_config": {
+    "GET": [
+      {
+        "user_role": "guest",
+        "patterns": [
+          {"name": {"type": "string"}},
+          {"price": {"type": "number"}}
+        ]
+      },
+      {
+        "user_role": "user",
+        "patterns": [
+          {"name": {"type": "string"}},
+          {"price": {"type": "number"}},
+          {"stock": {"type": "integer"}},
+          {"category": {"type": "relation"}}
+        ]
+      }
+    ]
+  }
+}
+```
+
+### 2. Test RBAC
+
+```bash
+# As guest (no token) - only sees name and price
+curl "http://localhost:3000/api/crud/products"
+
+# As user (with token) - sees more fields
+curl "http://localhost:3000/api/crud/products" \
+  -H "Authorization: Bearer USER_TOKEN"
+```
+
+## Project Structure
+
+Sau khi setup, project structure sẽ như sau:
 
 ```
-Error: MongoNetworkError: failed to connect to server
+mongorest/
+├── schemas/
+│   ├── collections/
+│   │   ├── products.json
+│   │   ├── categories.json
+│   │   └── users.json
+│   ├── functions/
+│   └── rbac/
+│       └── products.json
+├── src/
+│   ├── core/
+│   ├── middleware/
+│   ├── routes/
+│   └── utils/
+├── .env
+├── .env.example
+├── package.json
+└── server.js
 ```
 
-Giải pháp:
-1. Kiểm tra MongoDB đã chạy chưa: `sudo systemctl status mongod`
-2. Kiểm tra connection string
-3. Kiểm tra firewall/network settings
+## Next Steps
 
-## Bước tiếp theo
+1. **Explore Documentation**:
+   - [API Reference](/docs/references/api) - Chi tiết về endpoints
+   - [Schema Reference](/docs/references/schema) - Schema configuration
+   - [Complex Queries](/docs/how-to-guides/complex-queries) - Advanced querying
 
-- [Basic Queries](./basic-queries) - Học cách query dữ liệu
-- [Authentication](./authentication) - Bảo mật API với JWT
-- [Configuration](./configuration) - Cấu hình nâng cao
+2. **Add More Features**:
+   - Configure more plugins
+   - Add custom functions
+   - Set up webhooks
+   - Implement caching
+
+3. **Production Setup**:
+   - Configure production MongoDB
+   - Set up monitoring
+   - Enable rate limiting
+   - Configure backup
+
+## Common Issues
+
+### MongoDB Connection Error
+```
+Error: MongoServerError: Authentication failed
+```
+Solution: Check MongoDB URI trong `.env`
+
+### Schema Not Loading
+```
+Error: Schema file not found
+```
+Solution: Ensure schema files trong `schemas/collections/`
+
+### Permission Denied
+```
+Error: You don't have permission to perform this action
+```
+Solution: Check user role và RBAC configuration
+
+## Getting Help
+
+- **Documentation**: [https://mongorest.dev/docs](https://mongorest.dev/docs)
+- **GitHub Issues**: [https://github.com/your-org/mongorest/issues](https://github.com/your-org/mongorest/issues)
+- **Community Forum**: [https://forum.mongorest.dev](https://forum.mongorest.dev)
+
+## Summary
+
+Congratulations! Bạn đã:
+- ✅ Cài đặt MongoREST
+- ✅ Tạo schemas với relationships
+- ✅ Thực hiện CRUD operations
+- ✅ Sử dụng authentication
+- ✅ Configure RBAC
+- ✅ Thực hiện complex queries
+
+MongoREST giúp bạn tạo APIs nhanh chóng và an toàn. Explore thêm features và build amazing applications!

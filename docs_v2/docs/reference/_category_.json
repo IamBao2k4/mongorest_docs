@@ -1,0 +1,10 @@
+{
+  "label": "Reference",
+  "position": 8,
+  "link": {
+    "type": "generated-index",
+    "title": "Technical Reference",
+    "description": "Chi tiết kỹ thuật về operators, error codes, và configuration",
+    "keywords": ["reference", "operators", "errors", "configuration"]
+  }
+}
