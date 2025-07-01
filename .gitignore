@@ -8,3 +8,4 @@ generator/
 **/.next/
 .note_docs
 *.txt
+example.ts
