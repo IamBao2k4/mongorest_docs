@@ -92,8 +92,8 @@ const config = {
                 to: '/docs/api-reference/basic-queries',
               },
               {
-                label: 'Guides',
-                to: '/docs/guides/e-commerce-example',
+                label: 'Schema',
+                to: '/docs/schema/schema-structure',
               },
             ],
           },

@@ -607,4 +607,4 @@ Relationship queries trong MongoREST:
 4. **Intuitive**: Natural query syntax
 5. **Feature-rich**: Aggregations, sorting, pagination
 
-Next: [Statistics API →](./statistics-api)
+Relationship queries trong MongoREST cung cấp một cách mạnh mẽ để truy vấn và hiển thị dữ liệu quan hệ phức tạp một cách dễ dàng và hiệu quả.

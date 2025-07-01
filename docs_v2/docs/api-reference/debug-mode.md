@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 4
 ---
 
 # Debug Mode & Dry Run

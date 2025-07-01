@@ -52,8 +52,6 @@ const sidebars = {
         'api-reference/basic-queries',
         'api-reference/advanced-queries',
         'api-reference/relationship-queries',
-        'api-reference/statistics-api',
-        'api-reference/batch-operations',
         'api-reference/debug-mode',
       ],
     },
@@ -70,18 +68,6 @@ const sidebars = {
       label: 'Security',
       items: [
         'security/rbac-configuration',
-        'security/field-level-security',
-        'security/best-practices',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Guides',
-      items: [
-        'guides/e-commerce-example',
-        'guides/cms-example',
-        'guides/analytics-example',
-        'guides/migration-guide',
       ],
     },
     {
@@ -89,8 +75,6 @@ const sidebars = {
       label: 'Reference',
       items: [
         'reference/operators',
-        'reference/error-codes',
-        'reference/configuration',
       ],
     },
   ],

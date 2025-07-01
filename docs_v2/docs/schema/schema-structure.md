@@ -63,12 +63,6 @@ Schema trong MongoREST:
   "additionalProperties": false,
   "relationships": {
     // Relationship definitions
-  },
-  "indexes": [
-    // Index definitions
-  ],
-  "mongorest": {
-    // MongoREST specific configurations
   }
 }
 ```
@@ -130,56 +124,6 @@ Array of required field names.
 }
 ```
 Whether to allow fields not defined in properties.
-
-### MongoREST Specific Properties
-
-#### collection (required)
-```json
-{
-  "collection": "products"
-}
-```
-MongoDB collection name.
-
-#### relationships
-```json
-{
-  "relationships": {
-    "category": {
-      "type": "belongsTo",
-      "collection": "categories",
-      "localField": "categoryId",
-      "foreignField": "_id"
-    }
-  }
-}
-```
-Defines relationships to other collections.
-
-#### indexes
-```json
-{
-  "indexes": [
-    {
-      "fields": { "name": 1 },
-      "options": { "unique": true }
-    }
-  ]
-}
-```
-MongoDB index definitions.
-
-#### mongorest
-```json
-{
-  "mongorest": {
-    "permissions": {...},
-    "plugins": {...},
-    "hooks": {...}
-  }
-}
-```
-MongoREST-specific configurations.
 
 ## Data Type Definitions
 
@@ -432,128 +376,6 @@ MongoREST-specific configurations.
 }
 ```
 
-## Index Definitions
-
-### Single Field Index
-
-```json
-{
-  "indexes": [
-    {
-      "fields": { "email": 1 },
-      "options": { "unique": true }
-    }
-  ]
-}
-```
-
-### Compound Index
-
-```json
-{
-  "indexes": [
-    {
-      "fields": { "status": 1, "createdAt": -1 },
-      "options": { "name": "status_date_idx" }
-    }
-  ]
-}
-```
-
-### Text Index
-
-```json
-{
-  "indexes": [
-    {
-      "fields": { "title": "text", "description": "text" },
-      "options": { 
-        "weights": { "title": 10, "description": 5 },
-        "default_language": "english"
-      }
-    }
-  ]
-}
-```
-
-### Geospatial Index
-
-```json
-{
-  "indexes": [
-    {
-      "fields": { "location": "2dsphere" },
-      "options": { "sparse": true }
-    }
-  ]
-}
-```
-
-## MongoREST Configuration
-
-### Permissions
-
-```json
-{
-  "mongorest": {
-    "permissions": {
-      "read": ["guest", "user", "admin"],
-      "create": ["user", "admin"],
-      "update": ["admin"],
-      "delete": ["admin"]
-    }
-  }
-}
-```
-
-### Plugins
-
-```json
-{
-  "mongorest": {
-    "plugins": {
-      "timestamps": true,
-      "softDelete": true,
-      "audit": {
-        "enabled": true,
-        "fields": ["createdBy", "updatedBy"]
-      }
-    }
-  }
-}
-```
-
-### Hooks
-
-```json
-{
-  "mongorest": {
-    "hooks": {
-      "beforeCreate": ["validateUniqueSku", "generateSlug"],
-      "afterCreate": ["updateSearchIndex", "sendNotification"],
-      "beforeUpdate": ["trackChanges"],
-      "afterDelete": ["cleanupRelatedData"]
-    }
-  }
-}
-```
-
-### Query Options
-
-```json
-{
-  "mongorest": {
-    "queryOptions": {
-      "defaultLimit": 50,
-      "maxLimit": 1000,
-      "defaultSort": { "createdAt": -1 },
-      "searchableFields": ["name", "description"],
-      "allowedOperators": ["eq", "neq", "gt", "gte", "lt", "lte", "in", "regex"]
-    }
-  }
-}
-```
-
 ## Complete Example: E-commerce Product Schema
 
 ```json
@@ -648,39 +470,6 @@ MongoREST-specific configurations.
       "throughForeignField": "relatedId",
       "foreignField": "_id"
     }
-  },
-  "indexes": [
-    { "fields": { "sku": 1 }, "options": { "unique": true } },
-    { "fields": { "status": 1, "price": 1 } },
-    { "fields": { "name": "text", "description": "text" } },
-    { "fields": { "categoryId": 1 } }
-  ],
-  "mongorest": {
-    "permissions": {
-      "read": ["guest", "user", "admin"],
-      "create": ["admin"],
-      "update": ["admin"],
-      "delete": ["admin"]
-    },
-    "plugins": {
-      "timestamps": true,
-      "softDelete": true,
-      "slugify": {
-        "enabled": true,
-        "sourceField": "name",
-        "targetField": "slug"
-      }
-    },
-    "hooks": {
-      "beforeCreate": ["validateUniqueSku"],
-      "afterUpdate": ["updateSearchIndex"],
-      "beforeDelete": ["checkOrderReferences"]
-    },
-    "queryOptions": {
-      "defaultLimit": 20,
-      "maxLimit": 100,
-      "searchableFields": ["name", "description", "sku"]
-    }
   }
 }
 ```
@@ -723,19 +512,7 @@ MongoREST-specific configurations.
   }
 }
 ```
-
-### 4. Define Indexes Early
-
-```json
-{
-  "indexes": [
-    { "fields": { "email": 1 }, "options": { "unique": true } },
-    { "fields": { "status": 1, "createdAt": -1 } }
-  ]
-}
-```
-
-### 5. Use Enums for Fixed Values
+### 4. Use Enums for Fixed Values
 
 ```json
 {
