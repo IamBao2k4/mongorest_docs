@@ -4,9 +4,15 @@ import { registerGlobalErrorHandler } from './common/exceptions/global.exception
 import { responseInterceptor } from './common/interceptors/response.interceptor';
 import * as fs from 'fs';
 import * as path from 'path';
-import { coreGlobal, InitialCore } from './configs/core-global';
+import { InitialCore, filterPassword } from './configs/core-global';
 
 import cors from '@fastify/cors';
+
+declare global {
+    var filterPassword: any;
+}
+
+global.filterPassword = filterPassword;
 
 function writeFatalLog(type: string, error: any) {
     const logsDir = path.join(process.cwd(), 'logs');

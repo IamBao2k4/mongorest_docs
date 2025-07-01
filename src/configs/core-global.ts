@@ -8,3 +8,14 @@ export const InitialCore = async () => {
 };
 
 
+export const filterPassword = (obj: any) => {
+  if (obj && typeof obj === 'object') {
+    for (const key in obj) {
+      if (key.toLowerCase().includes('password')) {
+        console.log(key)
+        obj[key] = undefined;
+      }
+    }
+  }
+  return obj;
+}
