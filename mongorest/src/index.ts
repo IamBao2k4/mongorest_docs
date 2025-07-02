@@ -1,7 +1,5 @@
 import Fastify from 'fastify';
 import { IndexRoute } from './routes/_index';
-import { registerGlobalErrorHandler } from './common/exceptions/global.exception';
-import { responseInterceptor } from './common/interceptors/response.interceptor';
 import * as fs from 'fs';
 import * as path from 'path';
 import { InitialCore, filterPassword } from './configs/core-global';
@@ -49,13 +47,10 @@ app.register(cors, {
     credentials: true
 });
 
-app.addHook('onSend', responseInterceptor);
-
 app.get('/', async (request, reply) => {
     return { message: 'Hello, Mongorest lib!' };
 });
 
-registerGlobalErrorHandler(app); 
 IndexRoute(app);
 
 const loadSchemasFromSubfolders = async (schemasPath: string) => {
