@@ -42,7 +42,6 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.16.0",
     "mongodb-memory-server": "^10.1.4",
-    "mongoose": "^8.15.0",
     "mysql2": "^3.6.0",
     "pg": "^8.11.0",
     "redis": "^5.5.6"
