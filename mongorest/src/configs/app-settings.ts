@@ -18,7 +18,7 @@ export const appSettings = {
   prefixApi: process.env.PREFIX_API,
   corsOrigin: ["*"],
   mongo: {
-    url: "mongodb://localhost:27017/mongorest",
+    url: process.env.MONGODB_URL || "mongodb://localhost:27017/prototype_3",
     dbName: "test",
     options: "?tls=true&authSource=admin&replicaSet=mangoads-mongodb-2025",
     isReplicaSet: process.env.IS_REPLICA_SET === "true" ? true : false,

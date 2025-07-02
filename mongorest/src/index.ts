@@ -1,8 +1,10 @@
+import 'dotenv/config';
 import Fastify from 'fastify';
 import { IndexRoute } from './routes/_index';
 import * as fs from 'fs';
 import * as path from 'path';
 import { InitialCore, filterPassword } from './configs/core-global';
+import { appSettings } from './configs/app-settings';
 
 import cors from '@fastify/cors';
 
@@ -51,7 +53,16 @@ app.get('/', async (request, reply) => {
     return { message: 'Hello, Mongorest lib!' };
 });
 
-IndexRoute(app);
+const setupRoutes = async () => {
+    // Register routes with prefix if configured
+    if (appSettings.prefixApi) {
+        await app.register(async function (fastify) {
+            IndexRoute(fastify);
+        }, { prefix: appSettings.prefixApi });
+    } else {
+        IndexRoute(app);
+    }
+};
 
 const loadSchemasFromSubfolders = async (schemasPath: string) => {
     const allSchemas = new Map();
@@ -106,25 +117,33 @@ const start = async () => {
     try {
         // Load all schemas from schemas folder and subfolders
         await InitialCore();
-        const schemasPath = path.join(__dirname, 'schemas');
         
-        if (!fs.existsSync(schemasPath)) {
-            console.log(`Schemas directory not found: ${schemasPath}`);
-            console.log('Creating schemas directory structure...');
+        // Setup routes with prefix
+        await setupRoutes();
+        
+        // const schemasPath = path.join(__dirname, 'schemas');
+        
+        // if (!fs.existsSync(schemasPath)) {
+        //     console.log(`Schemas directory not found: ${schemasPath}`);
+        //     console.log('Creating schemas directory structure...');
             
-            // Create folder structure
-            fs.mkdirSync(path.join(schemasPath, 'collections'), { recursive: true });
-            fs.mkdirSync(path.join(schemasPath, 'functions'), { recursive: true });
-            fs.mkdirSync(path.join(schemasPath, 'rbac'), { recursive: true });
+        //     // Create folder structure
+        //     fs.mkdirSync(path.join(schemasPath, 'collections'), { recursive: true });
+        //     fs.mkdirSync(path.join(schemasPath, 'functions'), { recursive: true });
+        //     fs.mkdirSync(path.join(schemasPath, 'rbac'), { recursive: true });
             
-            console.log('Schemas directory structure created');
+        //     console.log('Schemas directory structure created');
+        // }
+        
+        // const schemas = await loadSchemasFromSubfolders(schemasPath);
+        // console.log(`Total loaded ${schemas.size} schemas:`, Array.from(schemas.keys()));
+        
+        const port = parseInt(appSettings.port || '3000');
+        await app.listen({ port });
+        console.log(`Server is running on http://localhost:${port}`);
+        if (appSettings.prefixApi) {
+            console.log(`API endpoints available at: http://localhost:${port}${appSettings.prefixApi}`);
         }
-        
-        const schemas = await loadSchemasFromSubfolders(schemasPath);
-        console.log(`Total loaded ${schemas.size} schemas:`, Array.from(schemas.keys()));
-        
-        await app.listen({ port: 3000 });
-        console.log('Server is running on http://localhost:3000');
     } catch (err) {
         app.log.error(err);
         process.exit(1);

@@ -33,9 +33,6 @@ export class NewCore {
     this.queryConverter = new QueryConverter(this.relationshipRegistry);
     this.rbacValidator = new RbacValidator();
     this.adapterRegistry = customAdapterRegistry || adapterRegistry;
-
-    // Load RBAC configuration
-    this.rbacValidator.loadConfig();
   }
 
   async findAll<T = any>(

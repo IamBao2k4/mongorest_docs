@@ -3,7 +3,7 @@ import { commonService } from "./common.service";
 
 export async function CommonRoutes(app: FastifyInstance) {
   // Get entity list
-  app.get("/api/v1/:entityName", async (request, reply) => {
+  app.get("/:entityName", async (request, reply) => {
     const { entityName } = request.params as { entityName: string };
     const queryData = request.query as any;
     const roles = ["user"];
@@ -18,7 +18,7 @@ export async function CommonRoutes(app: FastifyInstance) {
   });
 
   // Get entity details by id
-  app.get("/api/v1/:entityName/:id", async (request, reply) => {
+  app.get("/:entityName/:id", async (request, reply) => {
     const { entityName, id } = request.params as {
       entityName: string;
       id: string;
@@ -27,14 +27,14 @@ export async function CommonRoutes(app: FastifyInstance) {
   });
 
   // Create new entity
-  app.post("/api/v1/:entityName", async (request, reply) => {
+  app.post("/:entityName", async (request, reply) => {
     const { entityName } = request.params as { entityName: string };
     const body = request.body;
     return await commonService.create(entityName, body);
   });
 
   // Update entity
-  app.put("/api/v1/:entityName/:id", async (request, reply) => {
+  app.put("/:entityName/:id", async (request, reply) => {
     const { entityName, id } = request.params as {
       entityName: string;
       id: string;
@@ -44,12 +44,11 @@ export async function CommonRoutes(app: FastifyInstance) {
   });
 
   // Delete entity
-  app.delete("/api/v1/:entityName/:id", async (request, reply) => {
+  app.delete("/:entityName/:id", async (request, reply) => {
     const { entityName, id } = request.params as {
       entityName: string;
       id: string;
     };
-    // TODO: Delete entity from DB
     return await commonService.hardDelete(entityName, id, ["user"], "mongodb");
   });
 
