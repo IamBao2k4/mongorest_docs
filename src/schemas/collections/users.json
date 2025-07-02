@@ -108,6 +108,20 @@
       },
       "required": ["country"]
     },
+    "role": {
+      "type": "string",
+      "widget": "select",
+      "title": "Role",
+      "enum": ["user", "admin", "moderator"],
+      "default": "user",
+      "choices": [
+        { "key": "user", "value": "User" },
+        { "key": "admin", "value": "Admin" },
+        { "key": "moderator", "value": "Moderator" }
+      ],
+      "allowNull": false,
+      "description": "User role for access control"
+    },
     "status": {
       "type": "string",
       "widget": "select",
@@ -158,6 +172,6 @@
       "mode": "dateTime"
     }
   },
-  "required": ["email", "name", "profile"],
+  "required": ["email", "name", "profile", "role"],
   "additionalProperties": false
 }

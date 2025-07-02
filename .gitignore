@@ -6,3 +6,6 @@ generator/
 **/dist/
 **/logs/
 **/.next/
+.note_docs
+*.txt
+example.ts

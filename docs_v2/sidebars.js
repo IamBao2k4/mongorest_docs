@@ -14,56 +14,67 @@
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   // By default, Docusaurus generates a sidebar from the docs folder structure
-  docs: [
+  tutorialSidebar: [
     'intro',
     {
       type: 'category',
-      label: 'Tutorials',
+      label: 'Getting Started',
       items: [
-        'tutorials/getting-started',
-        'tutorials/basic-queries',
-        'tutorials/authentication',
-        'tutorials/configuration',
+        'getting-started/installation',
+        'getting-started/quick-start',
+        'getting-started/philosophy',
       ],
     },
     {
       type: 'category',
-      label: 'How-to Guides',
+      label: 'Architecture',
       items: [
-        'how-to-guides/authentication',
-        'how-to-guides/complex-queries',
-        'how-to-guides/file-uploads',
-        'how-to-guides/websocket',
+        'architecture/overview',
+        'architecture/core-components',
+        'architecture/data-flow',
       ],
     },
     {
       type: 'category',
-      label: 'References',
+      label: 'Features',
       items: [
-        'references/api',
-        'references/configuration',
-        'references/schema',
-        'references/hooks',
+        'features/plugin-system',
+        'features/query-api',
+        'features/rbac',
+        'features/relationships',
+        'features/form-schema',
       ],
     },
     {
       type: 'category',
-      label: 'Explanations',
+      label: 'API Reference',
       items: [
-        'explanations/architecture',
-        'explanations/query-translation',
-        'explanations/security',
-        'explanations/performance',
+        'api-reference/basic-queries',
+        'api-reference/advanced-queries',
+        'api-reference/relationship-queries',
+        'api-reference/debug-mode',
       ],
     },
     {
       type: 'category',
-      label: 'Integrations',
+      label: 'Schema',
       items: [
-        'integrations/express',
-        'integrations/react',
-        'integrations/vue',
-        'integrations/nextjs',
+        'schema/schema-structure',
+        'schema/field-types',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Security',
+      items: [
+        'security/rbac-configuration',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Reference',
+      items: [
+        'reference/operators',
       ],
     },
   ],

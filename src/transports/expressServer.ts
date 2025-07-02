@@ -119,7 +119,11 @@ async function initializeCore() {
         adapters: {
           mongodb: {
             connection: {
+<<<<<<< HEAD
               connectionString: process.env.MONGODB_URL || 'mongodb://thaily:Th%40i2004@localhost:27017/mongorest?authSource=admin'
+=======
+              connectionString: process.env.MONGODB_URL || 'mongodb://localhost:27017/mongorest?authSource=admin'
+>>>>>>> 3a6b59a48a9e800cf4f5e95d6b53f20e83a375c0
             }
           },
           postgresql: {
@@ -295,7 +299,7 @@ app.get('/api/:collection', async (req, res) => {
   try {
     const { collection } = req.params;
     const dbType = (req.query.dbType as DatabaseType) || 'mongodb';
-    const roles = req.headers['x-user-roles']?.toString().split(',') || ['nice'];
+    const roles = req.headers['x-user-roles']?.toString().split(',') || ['default'];
     const dryRun = req.query.dryRun === 'true';
     
     // Remove internal params
