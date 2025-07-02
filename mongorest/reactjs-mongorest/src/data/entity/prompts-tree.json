@@ -1,0 +1,19 @@
+{
+  "json": {
+    "type": "object",
+    "description": "Chỉnh sửa thông tin",
+    "properties": {
+      "title": {
+        "title": "Title",
+        "description": "Nhập thông tin",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": true
+      }
+    },
+    "dependencies": {}
+  },
+  "ui": {
+    "ui:order": ["title"]
+  }
+}

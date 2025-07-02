@@ -1,0 +1,25 @@
+{
+  "json": {
+    "type": "object",
+    "dependencies": {},
+    "properties": {
+      "title": {
+        "title": "Title",
+        "description": "Nhập thông tin tiêu đề",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": true
+      },
+      "position": {
+        "title": "Position",
+        "description": "Nhập thông tin tiêu đề",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": true
+      }
+    }
+  },
+  "ui": {
+    "ui:order": ["title", "position"]
+  }
+}

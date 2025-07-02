@@ -1,0 +1,88 @@
+{
+  "json": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "title": "Title",
+        "description": "Nhập thông tin tiêu đề",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": true
+      },
+      "endpoint": {
+        "title": "Slug",
+        "description": "Nhập slug cho posttype",
+        "type": "string",
+        "depend_field": "root_title",
+        "filter": true,
+        "widget": "autoGenKeyFromAnotherField"
+      },
+      "long_description": {
+        "title": "Description",
+        "type": "string",
+        "widget": "longAnswer",
+        "customRole": "texteditor",
+        "objectKey": "long_description",
+        "description": "Nhập mô tả"
+      },
+      "method": {
+        "widget": "select",
+        "returnValue": 2,
+        "choices": [
+          {
+            "key": "Get List",
+            "value": "get-list"
+          },
+          {
+            "key": "Get Detail",
+            "value": "get-detail"
+          },
+          {
+            "key": "Post",
+            "value": "post"
+          },
+          {
+            "key": "Put",
+            "value": "put"
+          },
+          {
+            "key": "Patch",
+            "value": "patch"
+          },
+          {
+            "key": "Delete",
+            "value": "delete"
+          }
+        ],
+        "default": [],
+        "allowNull": false,
+        "isMultiple": true,
+        "title": "Method",
+        "description": "Chọn method dùng trong api",
+        "type": "string",
+        "filter": true
+      },
+      "settings": {
+        "title": "Title",
+        "description": "Nhập thông tin tiêu đề",
+        "type": "string",
+        "widget": "shortAnswer",
+        "hidden": true
+      }
+    },
+    "dependencies": {},
+    "required": ["title"]
+  },
+  "ui": {
+    "method": {
+      "ui:widget": "select"
+    },
+    "endpoint": {
+      "ui:widget": "UriKeyGen"
+    },
+    "long_description": {
+      "ui:widget": "textarea"
+    },
+    "ui:order": ["title", "endpoint", "long_description", "method", "settings"]
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "json": {
+    "type": "object",
+    "description": "Chỉnh sửa thông tin file",
+    "properties": {
+      "path": {
+        "title": "File Path",
+        "type": "string",
+        "widget": "file",
+        "library_setting": "all",
+        "objectKey": "featured_image",
+        "description": "Chọn hình ảnh đại diện",
+        "hidden": true,
+        "filter": true
+      },
+      "title": {
+        "title": "Title",
+        "type": "string",
+        "widget": "shortAnswer",
+        "objectKey": "title",
+        "description": "Nhập tiêu đề cho hình ảnh (Tối đa 125 kí tự)",
+        "maxLength": 125,
+        "filter": true
+      },
+      "alt": {
+        "title": "Alt",
+        "type": "string",
+        "widget": "shortAnswer",
+        "objectKey": "alt",
+        "description": "Nhập thông tin thay thế khi ảnh lỗi  (Tối đa 125 kí tự)",
+        "maxLength": 125
+      },
+      "filename": {
+        "title": "File Name",
+        "type": "string",
+        "widget": "shortAnswer",
+        "objectKey": "filename",
+        "description": "Nhập file name"
+      },
+      "file_path": {
+        "title": "File Path",
+        "type": "string",
+        "widget": "shortAnswer",
+        "objectKey": "file_path",
+        "description": "Nhập file path"
+      },
+      "folder": {
+        "type": "string",
+        "typeSelect": "multiple",
+        "typeRelation": {
+          "title": "categories-media",
+          "_id": "categories-media",
+          "type": "n-1"
+        },
+        "navigateTo": "detail",
+        "widget": "relation",
+        "title": "Folder",
+        "filter": true,
+        "objectKey": "folder",
+        "description": "Chọn folder"
+      }
+    },
+    "dependencies": {},
+    "required": ["title", "alt", "filename"]
+  },
+  "ui": {
+    "featured_image": {
+      "ui:widget": "file"
+    },
+    "folder": {
+      "ui:widget": "relation"
+    },
+    "ui:order": ["title", "path", "alt", "filename", "file_path", "folder"]
+  }
+}

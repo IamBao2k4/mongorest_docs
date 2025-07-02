@@ -1,0 +1,128 @@
+{
+  "json": {
+    "type": "object",
+    "description": "Chỉnh sửa thông tin file",
+    "properties": {
+      "username": {
+        "title": "Username",
+        "description": "Nhập thông tin",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": true
+      },
+      "password": {
+        "title": "Password",
+        "widget": "password",
+        "type": "string"
+      },
+      "email": {
+        "title": "Email",
+        "description": "Nhập thông tin",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": true
+      },
+      "first_name": {
+        "title": "First name",
+        "description": "Nhập thông tin first name",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": true
+      },
+      "last_name": {
+        "title": "Last name",
+        "description": "Nhập thông tin last name",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": true
+      },
+      "birthday": {
+        "title": "Birthday",
+        "description": "Nhập thông tin ngày sinh",
+        "type": "string",
+        "widget": "date",
+        "displayFormat": "DD/MM/YYYY",
+        "formatDate": "date",
+        "filter": true
+      },
+      "nickname": {
+        "title": "Nickname",
+        "description": "Nhập thông tin nickname",
+        "type": "string",
+        "widget": "shortAnswer",
+        "filter": true
+      },
+      "featured_image": {
+        "title": "Featured image",
+        "type": "string",
+        "widget": "file",
+        "library_setting": "all",
+        "description": "Chọn hình ảnh đại diện",
+        "filter": true
+      },
+      "cover": {
+        "title": "Cover",
+        "type": "string",
+        "widget": "file",
+        "library_setting": "all",
+        "description": "Chọn hình ảnh cover",
+        "filter": true
+      },
+      "role": {
+        "type": "string",
+        "description": "Chọn roles",
+        "typeSelect": "once",
+        "widget": "relation",
+        "title": "Role",
+        "expanded": true,
+        "filter": true,
+        "typeRelation": {
+          "title": "role",
+          "entity": "role"
+        }
+      },
+      "is_active": {
+        "title": "Active",
+        "description": "Active user hay không?",
+        "type": "string",
+        "widget": "boolean",
+        "filter": true
+      }
+    },
+    "dependencies": {},
+    "required": ["username", "email", "password", "role"]
+  },
+  "ui": {
+    "password": {
+      "ui:widget": "password"
+    },
+    "role": {
+      "ui:widget": "relation"
+    },
+    "birthday": {
+      "ui:widget": "date"
+    },
+    "featured_image": {
+      "ui:widget": "file"
+    },
+    "cover": {
+      "ui:widget": "file"
+    },
+    "is_active": {
+      "ui:widget": "boolean"
+    },
+    "ui:order": [
+      "username",
+      "password",
+      "email",
+      "first_name",
+      "last_name",
+      "birthday",
+      "nickname",
+      "featured_image",
+      "cover",
+      "role",
+      "is_active"
+    ]
+  }
+}
