@@ -34,6 +34,7 @@ const sidebars = {
         'architecture/data-flow',
       ],
     },
+    'rbac-function/rbac-function',
     {
       type: 'category',
       label: 'Features',
