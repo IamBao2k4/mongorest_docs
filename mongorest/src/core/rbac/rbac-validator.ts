@@ -6,7 +6,7 @@ import {
 } from './rbac-interface'
 import * as fs from 'fs';
 import * as path from 'path';
-import { RbacErrors } from '../errors/errorFactories';
+import { RbacErrors } from '../errors/errorFactories'; 
 
 
 export class RbacValidator {
@@ -17,7 +17,8 @@ export class RbacValidator {
     }
 
     public loadConfig(): RbacJson {
-        const filePath = path.join(__dirname, '../../schemas/rbac/mongorestrbacjson.json');
+        // kiểm tra xem tệp có tồn tại không
+        const filePath = path.join(__dirname, '../../../json/rbac/mongorestrbacjson.json');
         const raw = fs.readFileSync(filePath, 'utf-8');
         return JSON.parse(raw);
     }
@@ -189,8 +190,8 @@ export class RbacValidator {
         return result;
     }
 
-    private RBACStrictData(data: any, projection: any ): any {
-        
+    private RBACStrictData(data: any, projection: any): any {
+
     }
 
     public filterBodyData(collection: string, action: string, roles: string[], data: any): any {

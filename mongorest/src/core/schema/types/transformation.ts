@@ -1,7 +1,3 @@
-/**
- * Types for Schema Transformation System
- */
-
 export interface TransformationRule {
   field: string;
   transformer: (value: any, data?: any) => any;
