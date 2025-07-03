@@ -1,17 +1,12 @@
-import { isISOString, isSafeDateExpression, evaluateSafeDateExpression } from "./dateFormatValidate";
+import { DateValidate } from "./dateFormatValidate/dateValidate";
 
 export function deletedAt(data: any, date: string = new Date(Date.now()).toISOString()): any {
-    if(!isISOString(date) && !isSafeDateExpression(date)) {
-        throw new Error('Invalid date format. Use ISO string or safe date expression.');
+    const dateValidator = new DateValidate(date);
+    if(dateValidator.isValidDateFormat()) {
+        throw new Error('Invalid date format.');
     }
     
-    let dateValue: Date;
-    if (isSafeDateExpression(date)) {
-        const timestamp = evaluateSafeDateExpression(date);
-        dateValue = new Date(timestamp);
-    } else {
-        dateValue = new Date(date);
-    }
+    const dateValue = new Date(eval(date));
     
     date = dateValue.toISOString();
 
@@ -21,7 +16,7 @@ export function deletedAt(data: any, date: string = new Date(Date.now()).toISOSt
         } else {
             return {
                 ...data,
-                deletedAt: date,
+                createdAt: date,
             };
         }
     }

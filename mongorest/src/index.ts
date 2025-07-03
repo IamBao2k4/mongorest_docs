@@ -64,55 +64,6 @@ const setupRoutes = async () => {
     }
 };
 
-const loadSchemasFromSubfolders = async (schemasPath: string) => {
-    const allSchemas = new Map();
-    
-    // Load from collections folder
-    const collectionsPath = path.join(schemasPath, 'collections');
-    if (fs.existsSync(collectionsPath)) {
-        console.log(`Loading collections from: ${collectionsPath}`);
-        // TODO: Restore schema loading when SchemaLoader is reimplemented
-        // const collectionSchemas = await SchemaLoader.loadAllSchemas(collectionsPath, "collections");
-        // console.log(`Found ${collectionSchemas.size} collection schemas:`, Array.from(collectionSchemas.keys()));
-        // 
-        // // Merge into allSchemas
-        // for (const [key, value] of collectionSchemas) {
-        //     allSchemas.set(key, value);
-        // }
-    }
-    
-    // Load from functions folder  
-    const functionsPath = path.join(schemasPath, 'functions');
-    if (fs.existsSync(functionsPath)) {
-        console.log(`Loading functions from: ${functionsPath}`);
-        // TODO: Restore schema loading when SchemaLoader is reimplemented
-        // const functionSchemas = await SchemaLoader.loadAllSchemas(functionsPath, "functions");
-        // console.log(`Found ${functionSchemas.size} function schemas:`, Array.from(functionSchemas.keys()));
-        // 
-        // // Merge into allSchemas
-        // for (const [key, value] of functionSchemas) {
-        //     allSchemas.set(key, value);
-        // }
-    }
-
-    const rbacPath = path.join(schemasPath, 'rbac');
-    if (fs.existsSync(rbacPath)) {
-        console.log(`Loading RBAC schemas from: ${rbacPath}`);
-        // TODO: Restore schema loading when SchemaLoader is reimplemented
-        // const rbacSchemas = await SchemaLoader.loadAllSchemas(rbacPath, "rbac");
-        // console.log(`Found ${rbacSchemas.size} RBAC schemas:`, Array.from(rbacSchemas.keys()));
-        // 
-        // // Merge into allSchemas
-        // for (const [key, value] of rbacSchemas) {
-        //     allSchemas.set(key, value);
-        // }
-    }
-    
-    return allSchemas;
-};
-
-
-
 const start = async () => {
     try {
         // Load all schemas from schemas folder and subfolders
@@ -120,23 +71,6 @@ const start = async () => {
         
         // Setup routes with prefix
         await setupRoutes();
-        
-        // const schemasPath = path.join(__dirname, 'schemas');
-        
-        // if (!fs.existsSync(schemasPath)) {
-        //     console.log(`Schemas directory not found: ${schemasPath}`);
-        //     console.log('Creating schemas directory structure...');
-            
-        //     // Create folder structure
-        //     fs.mkdirSync(path.join(schemasPath, 'collections'), { recursive: true });
-        //     fs.mkdirSync(path.join(schemasPath, 'functions'), { recursive: true });
-        //     fs.mkdirSync(path.join(schemasPath, 'rbac'), { recursive: true });
-            
-        //     console.log('Schemas directory structure created');
-        // }
-        
-        // const schemas = await loadSchemasFromSubfolders(schemasPath);
-        // console.log(`Total loaded ${schemas.size} schemas:`, Array.from(schemas.keys()));
         
         const port = parseInt(appSettings.port || '3000');
         await app.listen({ port });
