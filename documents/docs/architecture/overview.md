@@ -155,5 +155,3 @@ Hiểu kiến trúc tổng thể giúp bạn:
 - 🔍 Debug issues hiệu quả
 - ⚡ Optimize performance
 - 🔒 Implement security best practices
-
-Tiếp theo: [Core Components →](./core-components)

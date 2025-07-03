@@ -494,5 +494,3 @@ Relationship system trong MongoREST:
 3. **Performant**: Optimized aggregation pipelines
 4. **Intuitive**: Natural query syntax
 5. **Extensible**: Custom modifiers và aggregations
-
-Next: [Form Schema Configuration →](./form-schema)
