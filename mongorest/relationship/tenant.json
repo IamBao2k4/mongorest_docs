@@ -1,0 +1,51 @@
+[
+  {
+    "name": "settings.entities",
+    "targetTable": "entity",
+    "localField": "settings.entities",
+    "foreignField": "_id",
+    "type": "one-to-many"
+  },
+  {
+    "name": "mge_setting.setting_permissions.setting_group_create",
+    "targetTable": "user-tenant-level",
+    "localField": "mge_setting.setting_permissions.setting_group_create",
+    "foreignField": "_id",
+    "type": "one-to-many"
+  },
+  {
+    "name": "course_setting.full_permission",
+    "targetTable": "user-tenant-level",
+    "localField": "course_setting.full_permission",
+    "foreignField": "_id",
+    "type": "many-to-one"
+  },
+  {
+    "name": "course_setting.create_course",
+    "targetTable": "user-tenant-level",
+    "localField": "course_setting.create_course",
+    "foreignField": "_id",
+    "type": "many-to-one"
+  },
+  {
+    "name": "course_setting.create_question",
+    "targetTable": "user-tenant-level",
+    "localField": "course_setting.create_question",
+    "foreignField": "_id",
+    "type": "many-to-one"
+  },
+  {
+    "name": "course_setting.create_learning_path",
+    "targetTable": "user-tenant-level",
+    "localField": "course_setting.create_learning_path",
+    "foreignField": "_id",
+    "type": "many-to-one"
+  },
+  {
+    "name": "domain",
+    "targetTable": "domain",
+    "localField": "domain",
+    "foreignField": "_id",
+    "type": "many-to-one"
+  }
+]

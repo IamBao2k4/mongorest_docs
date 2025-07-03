@@ -1,0 +1,8 @@
+{
+  "label": "RBAC",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "Filter data in MongoREST using RBAC (Role-Based Access Control)"
+  }
+}

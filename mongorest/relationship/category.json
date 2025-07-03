@@ -1,0 +1,9 @@
+[
+  {
+    "name": "parent_id",
+    "targetTable": "category",
+    "localField": "parent_id",
+    "foreignField": "_id",
+    "type": "one-to-many"
+  }
+]

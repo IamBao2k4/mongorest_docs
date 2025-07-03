@@ -1,0 +1,12 @@
+{
+    "MONGODB": {
+        "ADMIN": {
+            "USERNAME": "tiendo1242dev",
+            "PASSWORD": "FGIQd9sMEIau1stY"
+        },
+        "READ_ONLY":{
+            "USERNAME": "readoly",
+            "PASSWORD": "WgkFd396JjoJPFXe"
+        }
+    }
+}

@@ -1,0 +1,8 @@
+{
+  "label": "Schema System",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Hướng dẫn định nghĩa và sử dụng schemas trong MongoREST"
+  }
+}
