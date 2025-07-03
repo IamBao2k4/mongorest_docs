@@ -80,8 +80,6 @@ export class NewCore {
     // // 4. Apply RBAC field restrictions
     // this.applyRbacRestrictions(intermediateQuery, collection, roles);
 
-    // console.log(intermediateQuery);
-
     // 5. Get appropriate database adapter
     const adapter = this.getAdapter(databaseType, adapterName);
 
@@ -263,32 +261,6 @@ export class NewCore {
   }
 
   /**
-   * Convert query to intermediate format (for debugging/inspection)
-   */
-  convertToIntermediate(
-    params: QueryParams,
-    collection: string,
-    roles: string[] = []
-  ): IntermediateQuery {
-    const query = this.queryConverter.convert(params, collection, roles);
-    this.enhanceQueryWithRelationships(query);
-    // this.applyRbacRestrictions(query, collection, roles);
-    return query;
-  }
-
-  /**
-   * Convert intermediate query to native format (for debugging/inspection)
-   */
-  convertToNative(
-    intermediateQuery: IntermediateQuery,
-    databaseType: DatabaseType,
-    adapterName?: string
-  ): any {
-    const adapter = this.getAdapter(databaseType, adapterName);
-    return adapter.convertQuery(intermediateQuery);
-  }
-
-  /**
    * Create a new resource
    */
   async create<T = any>(
@@ -302,9 +274,6 @@ export class NewCore {
     // if (!this.rbacValidator.hasAccess(collection, "create", roles)) {
     //   throw CoreErrors.accessDeniedCreate(collection, roles);
     // }
-
-    console.log(collection);
-
     // Get appropriate database adapter
     const adapter = this.getAdapter(databaseType, adapterName);
 
@@ -601,5 +570,17 @@ export class NewCore {
     );
 
     return result.data && result.data.length > 0 ? result.data[0] : null;
+  }
+
+  async findOne<T = any>(
+    collection: string,
+    query: any,
+    roles: string[],
+    databaseType: DatabaseType = "mongodb",
+    adapterName?: string
+  ): Promise<T | null> {
+    const adapter = this.getAdapter(databaseType, adapterName);
+    console.log(adapter)
+    return null
   }
 }
