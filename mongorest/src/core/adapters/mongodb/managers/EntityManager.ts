@@ -27,7 +27,6 @@ export class EntityManager implements IEntityManager {
    */
   async initialize(client: MongoClient, dbName: string): Promise<void> {
     this.db = client.db(dbName);
-    console.log(`[EntityManager] MongoDB connection initialized for database: ${dbName}`);
   }
 
   private initializeEntityCache(): void {
@@ -39,11 +38,9 @@ export class EntityManager implements IEntityManager {
     if (fs.existsSync(this.entitiesFilePath)) {
       this.fileWatcher = fs.watch(this.entitiesFilePath, (eventType) => {
         if (eventType === 'change') {
-          console.log('[EntityManager] Entities file changed, reloading cache...');
           this.loadEntitiesFromFile();
         }
       });
-      console.log(`[EntityManager] File watcher initialized for: ${this.entitiesFilePath}`);
     } else {
       console.warn(`[EntityManager] Entities file not found: ${this.entitiesFilePath}`);
     }
@@ -98,7 +95,6 @@ export class EntityManager implements IEntityManager {
       }
 
       this.entitiesCache = entities;
-      console.log('[EntityManager] Entities loaded and cached successfully');
       
       // Parse and register relationships
       this.parseAndRegisterRelationships(entities);
@@ -220,7 +216,6 @@ export class EntityManager implements IEntityManager {
         validationAction: "error",
       });
 
-      console.log(`[EntityManager] Collection ${collectionName} created with schema validation`);
     } catch (error) {
       console.error(`[EntityManager] Error creating collection:`, error);
       throw error;
@@ -314,7 +309,6 @@ export class EntityManager implements IEntityManager {
         
         const data = await collection.findOne({ _id: change.documentKey._id });
         if (data) {
-          console.log(`[EntityManager] 🔄 ${change.operationType} ${collectionName}: ${data._id} to ${targetCollectionName} with type ${type}`);
           await targetCollection.updateOne(
             { _id: data._id },
             { $set: { ...data, type } },
@@ -326,7 +320,6 @@ export class EntityManager implements IEntityManager {
       }
     });
 
-    console.log(`[EntityManager] 🔄 Watching ${collectionName}`);
   }
 
   /**
@@ -354,7 +347,6 @@ export class EntityManager implements IEntityManager {
       try {
         await fs.promises.mkdir(path.dirname(relationshipsFilePath), { recursive: true });
         await fs.promises.writeFile(relationshipsFilePath, jsonData, { encoding: 'utf8' });
-        console.log(`[EntityManager] Registered ${relationships.length} relationships for collection: ${collectionName}`);
       } catch (err) {
         console.error(`Lỗi khi ghi relationships cho ${collectionName}:`, err);
       }
@@ -485,7 +477,6 @@ export class EntityManager implements IEntityManager {
     if (this.fileWatcher) {
       this.fileWatcher.close();
       this.fileWatcher = null;
-      console.log('[EntityManager] File watcher disposed');
     }
 
     // Clear cache
