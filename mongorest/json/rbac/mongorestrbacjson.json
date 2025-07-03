@@ -435,7 +435,7 @@
       }
     },
     {
-      "collection_name": "users",
+      "collection_name": "user",
       "rbac_config": {
         "read": [
           {

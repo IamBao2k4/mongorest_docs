@@ -1,6 +1,6 @@
 import { HttpError } from '../../utils/http-error';
 import { coreGlobal } from '../../configs/core-global';
-import { DatabaseType } from '../../mongorest/adapters/base/databaseAdapter';
+import { DatabaseType } from '../../core/adapters/base/types';
 
 export interface PaginatedResult<T> {
     limit: number;

@@ -6,7 +6,7 @@ export async function CommonRoutes(app: FastifyInstance) {
   app.get("/:entityName", async (request, reply) => {
     const { entityName } = request.params as { entityName: string };
     const queryData = request.query as any;
-    const roles = ["user"];
+    const roles = request.headers["x-roles"] as string[] || ["default"];
     const result = await commonService.findAllQuery(
       entityName,
       queryData,
@@ -23,7 +23,8 @@ export async function CommonRoutes(app: FastifyInstance) {
       entityName: string;
       id: string;
     };
-    return await commonService.findOne(entityName, id, ["user"], "mongodb");
+    const roles = request.headers["x-roles"] as string[] || ["default"];
+    return await commonService.findOne(entityName, id, roles, "mongodb");
   });
 
   // Create new entity
@@ -40,7 +41,8 @@ export async function CommonRoutes(app: FastifyInstance) {
       id: string;
     };
     const body = request.body;
-    return await commonService.update(entityName, id, body, ["user"], "mongodb");
+    const roles = request.headers["x-roles"] as string[] || ["default"];
+    return await commonService.update(entityName, id, body, roles, "mongodb");
   });
 
   // Delete entity
@@ -49,7 +51,8 @@ export async function CommonRoutes(app: FastifyInstance) {
       entityName: string;
       id: string;
     };
-    return await commonService.hardDelete(entityName, id, ["user"], "mongodb");
+    const roles = request.headers["x-roles"] as string[] || ["default"];
+    return await commonService.hardDelete(entityName, id, roles, "mongodb");
   });
 
 }
