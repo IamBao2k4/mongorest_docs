@@ -1,0 +1,16 @@
+[
+  {
+    "name": "header",
+    "targetTable": "menu",
+    "localField": "header",
+    "foreignField": "_id",
+    "type": "many-to-one"
+  },
+  {
+    "name": "Footer",
+    "targetTable": "menu",
+    "localField": "Footer",
+    "foreignField": "_id",
+    "type": "many-to-one"
+  }
+]

@@ -1,0 +1,9 @@
+[
+  {
+    "name": "to",
+    "targetTable": "user",
+    "localField": "to",
+    "foreignField": "_id",
+    "type": "many-to-one"
+  }
+]
