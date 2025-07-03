@@ -14,56 +14,68 @@
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   // By default, Docusaurus generates a sidebar from the docs folder structure
-  docs: [
+  tutorialSidebar: [
     'intro',
     {
       type: 'category',
-      label: 'Tutorials',
+      label: 'Getting Started',
       items: [
-        'tutorials/getting-started',
-        'tutorials/basic-queries',
-        'tutorials/authentication',
-        'tutorials/configuration',
+        'getting-started/installation',
+        'getting-started/quick-start',
+        'getting-started/philosophy',
       ],
     },
     {
       type: 'category',
-      label: 'How-to Guides',
+      label: 'Architecture',
       items: [
-        'how-to-guides/authentication',
-        'how-to-guides/complex-queries',
-        'how-to-guides/file-uploads',
-        'how-to-guides/websocket',
+        'architecture/overview',
+        'architecture/core-components',
+        'architecture/data-flow',
+      ],
+    },
+    'rbac-function/rbac-function',
+    {
+      type: 'category',
+      label: 'Features',
+      items: [
+        'features/plugin-system',
+        'features/query-api',
+        'features/rbac',
+        'features/relationships',
+        'features/form-schema',
       ],
     },
     {
       type: 'category',
-      label: 'References',
+      label: 'API Reference',
       items: [
-        'references/api',
-        'references/configuration',
-        'references/schema',
-        'references/hooks',
+        'api-reference/basic-queries',
+        'api-reference/advanced-queries',
+        'api-reference/relationship-queries',
+        'api-reference/debug-mode',
       ],
     },
     {
       type: 'category',
-      label: 'Explanations',
+      label: 'Schema',
       items: [
-        'explanations/architecture',
-        'explanations/query-translation',
-        'explanations/security',
-        'explanations/performance',
+        'schema/schema-structure',
+        'schema/field-types',
       ],
     },
     {
       type: 'category',
-      label: 'Integrations',
+      label: 'Security',
       items: [
-        'integrations/express',
-        'integrations/react',
-        'integrations/vue',
-        'integrations/nextjs',
+        'security/rbac-configuration',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Reference',
+      items: [
+        'reference/operators',
       ],
     },
   ],

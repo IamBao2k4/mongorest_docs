@@ -28,3 +28,83 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+/* Custom styles for MongoREST docs */
+.hero {
+  background: linear-gradient(135deg, var(--ifm-color-primary) 0%, var(--ifm-color-primary-darker) 100%);
+  color: white;
+  padding: 4rem 0;
+}
+
+.hero__title {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.hero__subtitle {
+  font-size: 1.5rem;
+  opacity: 0.9;
+}
+
+/* Code blocks */
+.theme-code-block {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/* Tables */
+table {
+  display: table;
+  width: 100%;
+  margin: 2rem 0;
+}
+
+th {
+  background: var(--ifm-color-primary-lighter);
+  color: white;
+  font-weight: 600;
+}
+
+[data-theme='dark'] th {
+  background: var(--ifm-color-primary-darker);
+}
+
+/* Admonitions */
+.admonition {
+  border-radius: 8px;
+  margin: 1.5rem 0;
+}
+
+/* Feature cards */
+.feature-card {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* API endpoint styling */
+.api-endpoint {
+  font-family: var(--ifm-font-family-monospace);
+  background: var(--ifm-color-emphasis-100);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.http-method {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.http-method.get { color: #61affe; }
+.http-method.post { color: #49cc90; }
+.http-method.put { color: #fca130; }
+.http-method.patch { color: #50e3c2; }
+.http-method.delete { color: #f93e3e; }

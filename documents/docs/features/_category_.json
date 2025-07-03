@@ -1,0 +1,8 @@
+{
+  "label": "Tính Năng",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Khám phá các tính năng chính của MongoREST"
+  }
+}
