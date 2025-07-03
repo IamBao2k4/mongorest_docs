@@ -62,18 +62,14 @@ app.delete('/crud/:collection/:id', handlers.delete)
 
 ### 2. Security Layer
 
-**Responsibility**: Authentication và Authorization
+**Responsibility**: Authorization
 
 ```javascript
-// JWT verification
-const payload = jwt.verify(token, SECRET)
-
 // RBAC check
-const allowed = checkPermission(user.role, collection, operation)
+const allowed = hasAccess(collection, operation, user.role)
 ```
 
 **Components**:
-- **JWT Authenticator**: Token verification
 - **RBAC Engine**: Role-based permissions
 - **Field Filter**: Hide fields based on role
 
@@ -112,7 +108,7 @@ const result = await db.collection(name).aggregate(pipeline)
 
 ### Request Flow Example
 
-Ví dụ với request: `GET /products?select=name,category(name)&price=gte.100`
+Ví dụ với request: `GET /products?select=name,category()&price=gte.100`
 
 ```mermaid
 sequenceDiagram

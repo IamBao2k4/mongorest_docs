@@ -30,11 +30,25 @@ const sidebars = {
       label: 'Architecture',
       items: [
         'architecture/overview',
-        'architecture/core-components',
         'architecture/data-flow',
       ],
     },
-    'rbac-function/rbac-function',
+        {
+      type: 'category',
+      label: 'Schema',
+      items: [
+        'schema/schema-structure',
+        'schema/field-types',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'RBAC (Role-Based Access Control)',
+      items: [
+        'rbac/rbac-configuration',
+        'rbac/rbac-function'
+      ],
+    },
     {
       type: 'category',
       label: 'Features',
@@ -43,7 +57,7 @@ const sidebars = {
         'features/query-api',
         'features/rbac',
         'features/relationships',
-        'features/form-schema',
+        'features/schema-field',
       ],
     },
     {
@@ -54,21 +68,6 @@ const sidebars = {
         'api-reference/advanced-queries',
         'api-reference/relationship-queries',
         'api-reference/debug-mode',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Schema',
-      items: [
-        'schema/schema-structure',
-        'schema/field-types',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Security',
-      items: [
-        'security/rbac-configuration',
       ],
     },
     {

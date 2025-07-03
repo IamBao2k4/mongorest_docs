@@ -47,24 +47,12 @@ Chỉnh sửa các giá trị trong `.env`:
 ```env
 # Database
 MONGODB_URI=mongodb://localhost:27017/your-database
-MONGODB_MAX_POOL_SIZE=50
 
 # Authentication
 JWT_SECRET=your-super-secret-key-change-this
-JWT_EXPIRES_IN=24h
 
 # Server
 PORT=3000
-NODE_ENV=development
-
-# Redis (optional)
-REDIS_URL=redis://localhost:6379
-
-# Features
-ENABLE_CACHING=true
-ENABLE_QUERY_LOGGING=true
-MAX_QUERY_SIZE=1000000
-QUERY_TIMEOUT=30000
 ```
 
 ### 4. Tạo schemas
@@ -85,17 +73,25 @@ Ví dụ schema cho products:
   "type": "object",
   "properties": {
     "name": {
+      "title": "Name",
       "type": "string",
-      "maxLength": 200
+      "widget": "shortAnswer",
+      "filter": true,
+      "description": "Product name"
+    },
+    "slug": {
+      "title": "Slug",
+      "type": "string",
+      "widget": "UriKeyGen",
+      "depend_field": "root_title",
+      "filter": true,
+      "description": "Nhập slug cho title"
     },
     "price": {
-      "type": "number",
-      "minimum": 0
+      "widget": "numberInput",
+      "title": "Price",
+      "type": "string"
     },
-    "status": {
-      "type": "string",
-      "enum": ["active", "inactive"]
-    }
   },
   "required": ["name", "price"],
 }
