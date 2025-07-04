@@ -34,6 +34,8 @@ const sidebars = {
         'api-reference/advanced-queries',
         'api-reference/relationship-queries',
         'api-reference/debug-mode',
+        'api-reference/IntermediateQuery',
+        'api-reference/relationship-registration',
       ],
     },
     {
