@@ -27,6 +27,17 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'API Reference',
+      items: [
+        'api-reference/query-api',
+        'api-reference/basic-queries',
+        'api-reference/advanced-queries',
+        'api-reference/relationship-queries',
+        'api-reference/debug-mode',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Architecture',
       items: [
         'architecture/overview',
@@ -54,7 +65,7 @@ const sidebars = {
       label: 'Work with data',
       items: [
         'features/plugin-system',
-        'features/query-api',
+        
         // 'features/rbac',
         'features/relationships',
         'features/schema-field',
@@ -71,16 +82,7 @@ const sidebars = {
         'plugin/custom-plugin',
       ],
     },
-    {
-      type: 'category',
-      label: 'API Reference',
-      items: [
-        'api-reference/basic-queries',
-        'api-reference/advanced-queries',
-        'api-reference/relationship-queries',
-        'api-reference/debug-mode',
-      ],
-    },
+    
     // {
     //   type: 'category',
     //   label: 'Reference',

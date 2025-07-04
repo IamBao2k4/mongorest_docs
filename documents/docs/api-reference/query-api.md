@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Advanced Query & Statistics API
+# Basic Query & Statistics API
 
 MongoREST cung cấp Query API mạnh mẽ cho phép thực hiện các truy vấn phức tạp và thống kê dữ liệu một cách linh hoạt.
 
