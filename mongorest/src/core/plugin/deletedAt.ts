@@ -16,7 +16,7 @@ export function deletedAt(data: any, date: string = new Date(Date.now()).toISOSt
         } else {
             return {
                 ...data,
-                createdAt: date,
+                deletedAt: date,
             };
         }
     }
