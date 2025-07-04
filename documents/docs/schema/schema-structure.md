@@ -25,7 +25,8 @@ Schema trong MongoREST:
   "type": "object",
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "widget": "shortAnswer"
     }
   }
 }
@@ -45,18 +46,21 @@ Schema trong MongoREST:
       "type": "string",
       "minLength": 1,
       "maxLength": 200,
-      "description": "Product name"
+      "description": "Product name",
+      "widget": "shortAnswer"
     },
     "price": {
       "type": "number",
       "minimum": 0,
       "exclusiveMinimum": true,
-      "description": "Product price in USD"
+      "description": "Product price in USD",
+      "widget": "numberInput"
     },
     "status": {
       "type": "string",
       "enum": ["active", "inactive", "discontinued"],
-      "default": "active"
+      "default": "active",
+      "widget": "select"
     }
   },
   "required": ["name", "price"],
@@ -102,7 +106,8 @@ Root type should always be "object" for MongoDB documents.
   "properties": {
     "fieldName": {
       "type": "string",
-      "description": "Field description"
+      "description": "Field description",
+      "widget": "shortAnswer"
     }
   }
 }
@@ -136,7 +141,8 @@ Whether to allow fields not defined in properties.
     "minLength": 1,
     "maxLength": 100,
     "pattern": "^[a-zA-Z0-9 ]+$",
-    "format": "email"
+    "format": "email",
+    "widget": "shortAnswer"
   }
 }
 ```
@@ -157,7 +163,8 @@ Whether to allow fields not defined in properties.
     "maximum": 99999,
     "exclusiveMinimum": false,
     "exclusiveMaximum": false,
-    "multipleOf": 0.01
+    "multipleOf": 0.01,
+    "widget": "numberInput"
   }
 }
 ```
@@ -174,7 +181,8 @@ Whether to allow fields not defined in properties.
   "quantity": {
     "type": "integer",
     "minimum": 0,
-    "maximum": 9999
+    "maximum": 9999,
+    "widget": "numberInput"
   }
 }
 ```
@@ -185,7 +193,8 @@ Whether to allow fields not defined in properties.
 {
   "isActive": {
     "type": "boolean",
-    "default": true
+    "default": true,
+    "widget": "boolean"
   }
 }
 ```
@@ -198,11 +207,13 @@ Whether to allow fields not defined in properties.
     "type": "array",
     "items": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "widget": "shortAnswer"
     },
     "minItems": 0,
     "maxItems": 10,
-    "uniqueItems": true
+    "uniqueItems": true,
+    "widget": "checkbox"
   }
 }
 ```
@@ -219,9 +230,9 @@ Whether to allow fields not defined in properties.
   "address": {
     "type": "object",
     "properties": {
-      "street": { "type": "string" },
-      "city": { "type": "string" },
-      "zipCode": { "type": "string", "pattern": "^\\d{5}$" }
+      "street": { "type": "string", "widget": "shortAnswer" },
+      "city": { "type": "string", "widget": "shortAnswer" },
+      "zipCode": { "type": "string", "pattern": "^\\d{5}$", "widget": "shortAnswer" }
     },
     "required": ["street", "city"],
     "additionalProperties": false
@@ -235,7 +246,8 @@ Whether to allow fields not defined in properties.
 {
   "deletedAt": {
     "type": ["string", "null"],
-    "format": "date-time"
+    "format": "date-time",
+    "widget": "dateTime"
   }
 }
 ```
@@ -249,7 +261,8 @@ Whether to allow fields not defined in properties.
   "properties": {
     "type": {
       "type": "string",
-      "enum": ["individual", "company"]
+      "enum": ["individual", "company"],
+      "widget": "select"
     }
   },
   "if": {
@@ -257,15 +270,15 @@ Whether to allow fields not defined in properties.
   },
   "then": {
     "properties": {
-      "companyName": { "type": "string" },
-      "taxId": { "type": "string" }
+      "companyName": { "type": "string", "widget": "shortAnswer" },
+      "taxId": { "type": "string", "widget": "shortAnswer" }
     },
     "required": ["companyName", "taxId"]
   },
   "else": {
     "properties": {
-      "firstName": { "type": "string" },
-      "lastName": { "type": "string" }
+      "firstName": { "type": "string", "widget": "shortAnswer" },
+      "lastName": { "type": "string", "widget": "shortAnswer" }
     },
     "required": ["firstName", "lastName"]
   }
@@ -280,16 +293,16 @@ Whether to allow fields not defined in properties.
     "oneOf": [
       {
         "properties": {
-          "type": { "const": "credit_card" },
-          "cardNumber": { "type": "string" },
-          "cvv": { "type": "string" }
+          "type": { "const": "credit_card", "widget": "select" },
+          "cardNumber": { "type": "string", "widget": "shortAnswer" },
+          "cvv": { "type": "string", "widget": "password" }
         },
         "required": ["cardNumber", "cvv"]
       },
       {
         "properties": {
-          "type": { "const": "paypal" },
-          "email": { "type": "string", "format": "email" }
+          "type": { "const": "paypal", "widget": "select" },
+          "email": { "type": "string", "format": "email", "widget": "shortAnswer" }
         },
         "required": ["email"]
       }
@@ -306,8 +319,8 @@ Whether to allow fields not defined in properties.
     "address": {
       "type": "object",
       "properties": {
-        "street": { "type": "string" },
-        "city": { "type": "string" }
+        "street": { "type": "string", "widget": "shortAnswer" },
+        "city": { "type": "string", "widget": "shortAnswer" }
       }
     }
   },
@@ -388,62 +401,73 @@ Whether to allow fields not defined in properties.
     "name": {
       "type": "string",
       "minLength": 1,
-      "maxLength": 200
+      "maxLength": 200,
+      "widget": "shortAnswer"
     },
     "slug": {
       "type": "string",
-      "pattern": "^[a-z0-9-]+$"
+      "pattern": "^[a-z0-9-]+$",
+      "widget": "UriKeyGen"
     },
     "description": {
       "type": "string",
-      "maxLength": 2000
+      "maxLength": 2000,
+      "widget": "textarea"
     },
     "price": {
       "type": "number",
       "minimum": 0,
-      "multipleOf": 0.01
+      "multipleOf": 0.01,
+      "widget": "numberInput"
     },
     "comparePrice": {
       "type": ["number", "null"],
-      "minimum": 0
+      "minimum": 0,
+      "widget": "numberInput"
     },
     "sku": {
       "type": "string",
-      "pattern": "^[A-Z0-9-]+$"
+      "pattern": "^[A-Z0-9-]+$",
+      "widget": "shortAnswer"
     },
     "stock": {
       "type": "integer",
       "minimum": 0,
-      "default": 0
+      "default": 0,
+      "widget": "numberInput"
     },
     "status": {
       "type": "string",
       "enum": ["active", "inactive", "discontinued"],
-      "default": "active"
+      "default": "active",
+      "widget": "select"
     },
     "categoryId": {
       "type": "string",
-      "pattern": "^[0-9a-fA-F]{24}$"
+      "pattern": "^[0-9a-fA-F]{24}$",
+      "widget": "relation"
     },
     "tags": {
       "type": "array",
       "items": { "type": "string" },
-      "uniqueItems": true
+      "uniqueItems": true,
+      "widget": "checkbox"
     },
     "images": {
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
-          "url": { "type": "string", "format": "uri" },
-          "alt": { "type": "string" }
+          "url": { "type": "string", "format": "uri", "widget": "file" },
+          "alt": { "type": "string", "widget": "shortAnswer" }
         },
         "required": ["url"]
-      }
+      },
+      "widget": "multipleFiles"
     },
     "specifications": {
       "type": "object",
-      "additionalProperties": { "type": "string" }
+      "additionalProperties": { "type": "string", "widget": "shortAnswer" }
     }
   },
   "required": ["name", "price", "sku"],
@@ -481,12 +505,12 @@ Whether to allow fields not defined in properties.
 ```json
 // ✅ Good
 {
-  "customerEmail": { "type": "string", "format": "email" }
+  "customerEmail": { "type": "string", "format": "email", "widget": "shortAnswer" }
 }
 
 // ❌ Bad
 {
-  "email": { "type": "string" }
+  "email": { "type": "string", "widget": "shortAnswer" }
 }
 ```
 
@@ -496,7 +520,8 @@ Whether to allow fields not defined in properties.
 {
   "price": {
     "type": "number",
-    "description": "Product price in USD, excluding tax"
+    "description": "Product price in USD, excluding tax",
+    "widget": "numberInput"
   }
 }
 ```
@@ -508,7 +533,8 @@ Whether to allow fields not defined in properties.
   "age": {
     "type": "integer",
     "minimum": 0,
-    "maximum": 150
+    "maximum": 150,
+    "widget": "numberInput"
   }
 }
 ```
@@ -519,7 +545,8 @@ Whether to allow fields not defined in properties.
   "status": {
     "type": "string",
     "enum": ["pending", "approved", "rejected"],
-    "default": "pending"
+    "default": "pending",
+    "widget": "select"
   }
 }
 ```

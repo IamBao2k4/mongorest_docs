@@ -16,32 +16,7 @@ Schema trong MongoREST là JSON Schema mở rộng để:
 
 ## 1. Schema Cơ Bản - User Entity
 
-### 1.1 User Schema Tối Giản
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "User",
-  "collection": "user",
-  "type": "object",
-  "properties": {
-    "name": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 100,
-      "widget": "text"
-    },
-    "email": {
-      "type": "string",
-      "format": "email",
-      "widget": "email"
-    }
-  },
-  "required": ["name", "email"]
-}
-```
-
-### 1.2 User Schema Đầy Đủ với UI Schema
+### 1.1 User Schema với UI Schema
 
 ```json
 {
@@ -55,57 +30,69 @@ Schema trong MongoREST là JSON Schema mở rộng để:
       "type": "string",
       "minLength": 2,
       "maxLength": 100,
-      "description": "Full name of user"
+      "description": "Full name of user",
+      "widget": "shortAnswer"
     },
     "email": {
       "type": "string",
       "format": "email",
-      "description": "User email address"
+      "description": "User email address",
+      "widget": "shortAnswer"
     },
     "username": {
       "type": "string",
       "minLength": 3,
       "maxLength": 30,
-      "pattern": "^[a-zA-Z0-9_]+$"
+      "pattern": "^[a-zA-Z0-9_]+$",
+      "widget": "shortAnswer"
     },
     "password": {
       "type": "string",
       "minLength": 8,
-      "description": "Encrypted password"
+      "description": "Encrypted password",
+      "widget": "password"
     },
     "phone": {
       "type": ["string", "null"],
-      "pattern": "^\\+?[1-9]\\d{1,14}$"
+      "pattern": "^\\+?[1-9]\\d{1,14}$",
+      "widget": "shortAnswer"
     },
     "avatar": {
       "type": ["string", "null"],
-      "format": "uri"
+      "format": "uri",
+      "widget": "file"
     },
     "birthDate": {
       "type": ["string", "null"],
-      "format": "date"
+      "format": "date",
+      "widget": "date"
     },
     "gender": {
       "type": "string",
       "enum": ["male", "female", "other"],
-      "default": "other"
+      "default": "other",
+      "widget": "radio"
     },
     "status": {
       "type": "string",
       "enum": ["active", "inactive", "banned", "pending"],
-      "default": "pending"
+      "default": "pending",
+      "widget": "select"
     },
     "emailVerified": {
       "type": "boolean",
-      "default": false
+      "default": false,
+      "widget": "boolean"
     },
     "lastLogin": {
       "type": ["string", "null"],
-      "format": "date-time"
+      "format": "date-time",
+      "widget": "dateTime"
     },
     "bio": {
       "type": ["string", "null"],
-      "maxLength": 1000
+      "maxLength": 1000,
+      "widget": "textarea"
     },
     "preferences": {
       "type": "object",
@@ -113,14 +100,15 @@ Schema trong MongoREST là JSON Schema mở rộng để:
         "language": {
           "type": "string",
           "enum": ["en", "vi", "ja"],
-          "default": "en"
+          "default": "en",
+          "widget": "select"
         },
         "notifications": {
           "type": "object",
           "properties": {
-            "email": { "type": "boolean", "default": true },
-            "push": { "type": "boolean", "default": true },
-            "sms": { "type": "boolean", "default": false }
+            "email": { "type": "boolean", "default": true, "widget": "boolean" },
+            "push": { "type": "boolean", "default": true, "widget": "boolean" },
+            "sms": { "type": "boolean", "default": false, "widget": "boolean" }
           }
         }
       }
@@ -128,11 +116,11 @@ Schema trong MongoREST là JSON Schema mở rộng để:
     "address": {
       "type": "object",
       "properties": {
-        "street": { "type": "string" },
-        "city": { "type": "string" },
-        "state": { "type": "string" },
-        "zipCode": { "type": "string", "pattern": "^\\d{5}(-\\d{4})?$" },
-        "country": { "type": "string", "default": "VN" }
+        "street": { "type": "string", "widget": "shortAnswer" },
+        "city": { "type": "string", "widget": "shortAnswer" },
+        "state": { "type": "string", "widget": "shortAnswer" },
+        "zipCode": { "type": "string", "pattern": "^\\d{5}(-\\d{4})?$", "widget": "shortAnswer" },
+        "country": { "type": "string", "default": "VN", "widget": "select" }
       }
     },
     "socialLinks": {
@@ -142,9 +130,10 @@ Schema trong MongoREST là JSON Schema mở rộng để:
         "properties": {
           "platform": {
             "type": "string",
-            "enum": ["facebook", "twitter", "linkedin", "instagram"]
+            "enum": ["facebook", "twitter", "linkedin", "instagram"],
+            "widget": "select"
           },
-          "url": { "type": "string", "format": "uri" }
+          "url": { "type": "string", "format": "uri", "widget": "href" }
         },
         "required": ["platform", "url"]
       }
@@ -290,43 +279,7 @@ Schema trong MongoREST là JSON Schema mở rộng để:
 
 ## 2. Schema Trung Bình - Product Entity
 
-### 2.1 Product Schema Cơ Bản
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Product",
-  "collection": "product",
-  "type": "object",
-  "properties": {
-    "name": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 200
-    },
-    "price": {
-      "type": "number",
-      "minimum": 0,
-      "multipleOf": 0.01
-    },
-    "categoryId": {
-      "type": "string",
-      "pattern": "^[0-9a-fA-F]{24}$"
-    }
-  },
-  "required": ["name", "price"],
-  "relationships": {
-    "category": {
-      "type": "belongsTo",
-      "collection": "category",
-      "localField": "categoryId",
-      "foreignField": "_id"
-    }
-  }
-}
-```
-
-### 2.2 Product Schema Nâng Cao với UI Schema
+### 2.1 Product Schema với UI Schema
 
 ```json
 {
@@ -340,60 +293,70 @@ Schema trong MongoREST là JSON Schema mở rộng để:
       "type": "string",
       "minLength": 1,
       "maxLength": 200,
-      "description": "Product name"
+      "description": "Product name",
+      "widget": "shortAnswer"
     },
     "slug": {
       "type": "string",
       "pattern": "^[a-z0-9-]+$",
-      "description": "URL-friendly product identifier"
+      "description": "URL-friendly product identifier",
+      "widget": "UriKeyGen"
     },
     "description": {
       "type": "string",
       "maxLength": 5000,
-      "description": "Detailed product description"
+      "description": "Detailed product description",
+      "widget": "textarea"
     },
     "shortDescription": {
       "type": "string",
       "maxLength": 500,
-      "description": "Brief product summary"
+      "description": "Brief product summary",
+      "widget": "textarea"
     },
     "price": {
       "type": "number",
       "minimum": 0,
       "multipleOf": 0.01,
-      "description": "Current selling price"
+      "description": "Current selling price",
+      "widget": "numberInput"
     },
     "comparePrice": {
       "type": ["number", "null"],
       "minimum": 0,
-      "description": "Original price for comparison"
+      "description": "Original price for comparison",
+      "widget": "numberInput"
     },
     "costPrice": {
       "type": ["number", "null"],
       "minimum": 0,
-      "description": "Cost price for internal use"
+      "description": "Cost price for internal use",
+      "widget": "numberInput"
     },
     "sku": {
       "type": "string",
       "pattern": "^[A-Z0-9-]+$",
-      "description": "Stock Keeping Unit"
+      "description": "Stock Keeping Unit",
+      "widget": "shortAnswer"
     },
     "barcode": {
       "type": ["string", "null"],
-      "description": "Product barcode"
+      "description": "Product barcode",
+      "widget": "shortAnswer"
     },
     "weight": {
       "type": ["number", "null"],
       "minimum": 0,
-      "description": "Product weight in grams"
+      "description": "Product weight in grams",
+      "widget": "numberInput"
     },
     "dimensions": {
       "type": "object",
       "properties": {
-        "length": { "type": "number", "minimum": 0 },
-        "width": { "type": "number", "minimum": 0 },
-        "height": { "type": "number", "minimum": 0 },
-        "unit": { "type": "string", "enum": ["cm", "in"], "default": "cm" }
+        "length": { "type": "number", "minimum": 0, "widget": "numberInput" },
+        "width": { "type": "number", "minimum": 0, "widget": "numberInput" },
+        "height": { "type": "number", "minimum": 0, "widget": "numberInput" },
+        "unit": { "type": "string", "enum": ["cm", "in"], "default": "cm", "widget": "radio" }
       }
     },
     "inventory": {
@@ -402,75 +365,85 @@ Schema trong MongoREST là JSON Schema mở rộng để:
         "quantity": {
           "type": "integer",
           "minimum": 0,
-          "default": 0
+          "default": 0,
+          "widget": "numberInput"
         },
         "lowStockThreshold": {
           "type": "integer",
           "minimum": 0,
-          "default": 10
+          "default": 10,
+          "widget": "numberInput"
         },
         "trackQuantity": {
           "type": "boolean",
-          "default": true
+          "default": true,
+          "widget": "boolean"
         },
         "allowBackorders": {
           "type": "boolean",
-          "default": false
+          "default": false,
+          "widget": "boolean"
         }
       }
     },
     "status": {
       "type": "string",
       "enum": ["draft", "active", "inactive", "discontinued"],
-      "default": "draft"
+      "default": "draft",
+      "widget": "select"
     },
     "featured": {
       "type": "boolean",
-      "default": false
+      "default": false,
+      "widget": "boolean"
     },
     "categoryId": {
       "type": "string",
-      "pattern": "^[0-9a-fA-F]{24}$"
+      "pattern": "^[0-9a-fA-F]{24}$",
+      "widget": "relation"
     },
     "brandId": {
       "type": ["string", "null"],
-      "pattern": "^[0-9a-fA-F]{24}$"
+      "pattern": "^[0-9a-fA-F]{24}$",
+      "widget": "relation"
     },
     "tags": {
       "type": "array",
       "items": { "type": "string" },
       "uniqueItems": true,
-      "maxItems": 20
+      "maxItems": 20,
+      "widget": "checkbox"
     },
     "images": {
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
-          "url": { "type": "string", "format": "uri" },
-          "alt": { "type": "string" },
-          "position": { "type": "integer", "minimum": 0 },
-          "isPrimary": { "type": "boolean", "default": false }
+          "url": { "type": "string", "format": "uri", "widget": "file" },
+          "alt": { "type": "string", "widget": "shortAnswer" },
+          "position": { "type": "integer", "minimum": 0, "widget": "numberInput" },
+          "isPrimary": { "type": "boolean", "default": false, "widget": "boolean" }
         },
         "required": ["url"]
       },
-      "maxItems": 10
+      "maxItems": 10,
+      "widget": "multipleFiles"
     },
     "variants": {
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
-          "name": { "type": "string" },
-          "sku": { "type": "string" },
-          "price": { "type": "number", "minimum": 0 },
-          "quantity": { "type": "integer", "minimum": 0 },
+          "name": { "type": "string", "widget": "shortAnswer" },
+          "sku": { "type": "string", "widget": "shortAnswer" },
+          "price": { "type": "number", "minimum": 0, "widget": "numberInput" },
+          "quantity": { "type": "integer", "minimum": 0, "widget": "numberInput" },
           "options": {
             "type": "object",
             "properties": {
-              "size": { "type": "string" },
-              "color": { "type": "string" },
-              "material": { "type": "string" }
+              "size": { "type": "string", "widget": "select" },
+              "color": { "type": "string", "widget": "shortAnswer" },
+              "material": { "type": "string", "widget": "shortAnswer" }
             }
           }
         },
@@ -480,11 +453,12 @@ Schema trong MongoREST là JSON Schema mở rộng để:
     "seo": {
       "type": "object",
       "properties": {
-        "title": { "type": "string", "maxLength": 60 },
-        "description": { "type": "string", "maxLength": 160 },
+        "title": { "type": "string", "maxLength": 60, "widget": "shortAnswer" },
+        "description": { "type": "string", "maxLength": 160, "widget": "textarea" },
         "keywords": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": { "type": "string" },
+          "widget": "checkbox"
         }
       }
     },
@@ -792,50 +766,61 @@ Schema trong MongoREST là JSON Schema mở rộng để:
     "name": {
       "type": "string",
       "minLength": 1,
-      "maxLength": 100
+      "maxLength": 100,
+      "widget": "shortAnswer"
     },
     "slug": {
       "type": "string",
-      "pattern": "^[a-z0-9-]+$"
+      "pattern": "^[a-z0-9-]+$",
+      "widget": "UriKeyGen"
     },
     "description": {
       "type": ["string", "null"],
-      "maxLength": 1000
+      "maxLength": 1000,
+      "widget": "textarea"
     },
     "parentId": {
       "type": ["string", "null"],
-      "pattern": "^[0-9a-fA-F]{24}$"
+      "pattern": "^[0-9a-fA-F]{24}$",
+      "widget": "relation"
     },
     "level": {
       "type": "integer",
       "minimum": 0,
       "maximum": 5,
-      "default": 0
+      "default": 0,
+      "widget": "numberInput"
     },
     "path": {
       "type": "string",
-      "description": "Hierarchical path like '/electronics/computers/laptops'"
+      "description": "Hierarchical path like '/electronics/computers/laptops'",
+      "widget": "shortAnswer"
     },
     "position": {
       "type": "integer",
       "minimum": 0,
-      "default": 0
+      "default": 0,
+      "widget": "numberInput"
     },
     "icon": {
       "type": ["string", "null"],
-      "format": "uri"
+      "format": "uri",
+      "widget": "icon"
     },
     "image": {
       "type": ["string", "null"],
-      "format": "uri"
+      "format": "uri",
+      "widget": "file"
     },
     "isActive": {
       "type": "boolean",
-      "default": true
+      "default": true,
+      "widget": "boolean"
     },
     "isVisible": {
       "type": "boolean",
-      "default": true
+      "default": true,
+      "widget": "boolean"
     },
     "metadata": {
       "type": "object",
@@ -843,21 +828,23 @@ Schema trong MongoREST là JSON Schema mở rộng để:
         "productCount": {
           "type": "integer",
           "minimum": 0,
-          "default": 0
+          "default": 0,
+          "widget": "numberInput"
         },
         "childrenCount": {
           "type": "integer",
           "minimum": 0,
-          "default": 0
+          "default": 0,
+          "widget": "numberInput"
         }
       }
     },
     "seo": {
       "type": "object",
       "properties": {
-        "title": { "type": "string" },
-        "description": { "type": "string" },
-        "keywords": { "type": "array", "items": { "type": "string" } }
+        "title": { "type": "string", "widget": "shortAnswer" },
+        "description": { "type": "string", "widget": "textarea" },
+        "keywords": { "type": "array", "items": { "type": "string" }, "widget": "checkbox" }
       }
     }
   },
@@ -898,23 +885,28 @@ Schema trong MongoREST là JSON Schema mở rộng để:
   "properties": {
     "orderNumber": {
       "type": "string",
-      "pattern": "^ORD-\\d{8}-\\d{4}$"
+      "pattern": "^ORD-\\d{8}-\\d{4}$",
+      "widget": "shortAnswer"
     },
     "customerId": {
       "type": "string",
-      "pattern": "^[0-9a-fA-F]{24}$"
+      "pattern": "^[0-9a-fA-F]{24}$",
+      "widget": "relation"
     },
     "status": {
       "type": "string",
-      "enum": ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled", "refunded"]
+      "enum": ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled", "refunded"],
+      "widget": "select"
     },
     "paymentMethod": {
       "type": "string",
-      "enum": ["credit_card", "paypal", "bank_transfer", "cash_on_delivery"]
+      "enum": ["credit_card", "paypal", "bank_transfer", "cash_on_delivery"],
+      "widget": "select"
     },
     "shippingMethod": {
       "type": "string",
-      "enum": ["standard", "express", "overnight", "pickup"]
+      "enum": ["standard", "express", "overnight", "pickup"],
+      "widget": "select"
     }
   },
   "allOf": [
@@ -982,23 +974,28 @@ Schema trong MongoREST là JSON Schema mở rộng để:
     "title": {
       "type": "string",
       "minLength": 1,
-      "maxLength": 200
+      "maxLength": 200,
+      "widget": "shortAnswer"
     },
     "slug": {
       "type": "string",
-      "pattern": "^[a-z0-9-]+$"
+      "pattern": "^[a-z0-9-]+$",
+      "widget": "UriKeyGen"
     },
     "content": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "widget": "textarea"
     },
     "excerpt": {
       "type": ["string", "null"],
-      "maxLength": 300
+      "maxLength": 300,
+      "widget": "textarea"
     },
     "authorId": {
       "type": "string",
-      "pattern": "^[0-9a-fA-F]{24}$"
+      "pattern": "^[0-9a-fA-F]{24}$",
+      "widget": "relation"
     },
     "categoryIds": {
       "type": "array",
@@ -1007,34 +1004,41 @@ Schema trong MongoREST là JSON Schema mở rộng để:
         "pattern": "^[0-9a-fA-F]{24}$"
       },
       "minItems": 1,
-      "maxItems": 5
+      "maxItems": 5,
+      "widget": "checkbox"
     },
     "tags": {
       "type": "array",
       "items": { "type": "string" },
-      "uniqueItems": true
+      "uniqueItems": true,
+      "widget": "checkbox"
     },
     "status": {
       "type": "string",
       "enum": ["draft", "published", "scheduled", "archived"],
-      "default": "draft"
+      "default": "draft",
+      "widget": "select"
     },
     "publishedAt": {
       "type": ["string", "null"],
-      "format": "date-time"
+      "format": "date-time",
+      "widget": "dateTime"
     },
     "featuredImage": {
       "type": ["string", "null"],
-      "format": "uri"
+      "format": "uri",
+      "widget": "file"
     },
     "viewCount": {
       "type": "integer",
       "minimum": 0,
-      "default": 0
+      "default": 0,
+      "widget": "numberInput"
     },
     "allowComments": {
       "type": "boolean",
-      "default": true
+      "default": true,
+      "widget": "boolean"
     }
   },
   "required": ["title", "content", "authorId"],
@@ -1072,628 +1076,6 @@ Schema trong MongoREST là JSON Schema mở rộng để:
 }
 ```
 
-## 6. Widget Types & UI Schema Reference
-
-### 6.1 Basic Input Widgets
-```json
-{
-  "ui_schema": {
-    "textField": {
-      "ui:widget": "text",
-      "ui:placeholder": "Enter text",
-      "ui:help": "Helper text"
-    },
-    "emailField": {
-      "ui:widget": "email",
-      "ui:placeholder": "user@example.com"
-    },
-    "passwordField": {
-      "ui:widget": "password",
-      "ui:placeholder": "Enter password"
-    },
-    "numberField": {
-      "ui:widget": "number",
-      "ui:placeholder": "0"
-    },
-    "textareaField": {
-      "ui:widget": "textarea",
-      "ui:options": {
-        "rows": 4
-      }
-    }
-  }
-}
-```
-
-### 6.2 Selection Widgets
-```json
-{
-  "ui_schema": {
-    "selectField": {
-      "ui:widget": "select",
-      "ui:options": {
-        "enumOptions": [
-          { "value": "option1", "label": "Option 1" },
-          { "value": "option2", "label": "Option 2" }
-        ]
-      }
-    },
-    "radioField": {
-      "ui:widget": "radio",
-      "ui:options": {
-        "inline": true
-      }
-    },
-    "checkboxField": {
-      "ui:widget": "checkbox",
-      "ui:title": "Check this option"
-    },
-    "multiSelectField": {
-      "ui:widget": "checkboxes",
-      "ui:options": {
-        "inline": false
-      }
-    }
-  }
-}
-```
-
-### 6.3 Advanced Widgets
-```json
-{
-  "ui_schema": {
-    "dateField": {
-      "ui:widget": "date",
-      "ui:options": {
-        "format": "YYYY-MM-DD"
-      }
-    },
-    "dateTimeField": {
-      "ui:widget": "datetime",
-      "ui:options": {
-        "format": "YYYY-MM-DD HH:mm:ss"
-      }
-    },
-    "colorField": {
-      "ui:widget": "color",
-      "ui:options": {
-        "format": "hex"
-      }
-    },
-    "fileField": {
-      "ui:widget": "file",
-      "ui:options": {
-        "accept": "image/*",
-        "filePreview": true
-      }
-    },
-    "richTextField": {
-      "ui:widget": "richtext",
-      "ui:options": {
-        "toolbar": ["bold", "italic", "link", "image"],
-        "height": 300
-      }
-    }
-  }
-}
-```
-
-### 6.4 Specialized E-commerce Widgets
-```json
-{
-  "ui_schema": {
-    "priceField": {
-      "ui:widget": "money",
-      "ui:options": {
-        "currency": "USD",
-        "currencyDisplay": "symbol"
-      }
-    },
-    "tagsField": {
-      "ui:widget": "tags",
-      "ui:options": {
-        "suggestions": true,
-        "endpoint": "/api/tags/suggestions"
-      }
-    },
-    "imageGallery": {
-      "ui:widget": "image-gallery",
-      "ui:options": {
-        "accept": "image/*",
-        "multiple": true,
-        "maxFiles": 10,
-        "dragDrop": true
-      }
-    },
-    "variantBuilder": {
-      "ui:widget": "variant-builder",
-      "ui:options": {
-        "optionTypes": ["size", "color", "material"]
-      }
-    }
-  }
-}
-```
-
-### 6.5 Layout & Organization Widgets
-```json
-{
-  "ui_schema": {
-    "fieldsetGroup": {
-      "ui:widget": "fieldset",
-      "ui:title": "Group Title",
-      "ui:options": {
-        "collapsible": true,
-        "collapsed": false
-      }
-    },
-    "tabsLayout": {
-      "ui:widget": "tabs",
-      "ui:options": {
-        "tabs": [
-          { "title": "Basic Info", "fields": ["name", "description"] },
-          { "title": "Pricing", "fields": ["price", "comparePrice"] }
-        ]
-      }
-    },
-    "gridLayout": {
-      "ui:widget": "grid",
-      "ui:options": {
-        "columns": 2,
-        "gap": "16px"
-      }
-    }
-  }
-}
-```
-
-### 6.6 Relationship Widgets
-```json
-{
-  "ui_schema": {
-    "asyncSelect": {
-      "ui:widget": "select",
-      "ui:options": {
-        "async": true,
-        "endpoint": "/api/categories",
-        "valueField": "_id",
-        "labelField": "name",
-        "searchable": true
-      }
-    },
-    "multiRelation": {
-      "ui:widget": "multi-select",
-      "ui:options": {
-        "async": true,
-        "endpoint": "/api/tags",
-        "valueField": "_id",
-        "labelField": "name"
-      }
-    }
-  }
-}
-```
-
-## 6.7 Naming Conventions
-```json
-{
-  "properties": {
-    "firstName": { "type": "string" },
-    "lastName": { "type": "string" },
-    "emailAddress": { "type": "string", "format": "email" },
-    "phoneNumber": { "type": "string" },
-    "dateOfBirth": { "type": "string", "format": "date" },
-    "isActive": { "type": "boolean" },
-    "hasPermission": { "type": "boolean" },
-    "canEdit": { "type": "boolean" }
-  }
-}
-```
-
-### 6.8 Validation Patterns
-```json
-{
-  "properties": {
-    "email": {
-      "type": "string",
-      "format": "email",
-      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-    },
-    "phone": {
-      "type": "string",
-      "pattern": "^\\+?[1-9]\\d{1,14}$"
-    },
-    "slug": {
-      "type": "string",
-      "pattern": "^[a-z0-9-]+$"
-    },
-    "objectId": {
-      "type": "string",
-      "pattern": "^[0-9a-fA-F]{24}$"
-    }
-  }
-}
-```
-
-### 6.3 Default Values và Enums
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "role": {
-      "type": "string",
-      "enum": ["user", "admin", "moderator"],
-      "default": "user"
-    },
-    "language": {
-      "type": "string",
-      "enum": ["en", "vi", "ja", "ko"],
-      "default": "en"
-    },
-    "createdAt": {
-      "type": "string",
-      "format": "date-time",
-      "default": "Date.now()"
-    },
-    "status": {
-      "type": "string",
-      "enum": ["draft", "published", "archived"],
-      "default": "draft"
-    }
-  }
-}
-```
-
-### 6.4 Advanced Validation Patterns
-
-#### Complex Conditional Validation
-```json
-{
-  "type": "object",
-  "properties": {
-    "userType": {
-      "type": "string",
-      "enum": ["individual", "business"]
-    },
-    "businessInfo": {
-      "type": "object",
-      "properties": {
-        "companyName": { "type": "string" },
-        "taxId": { "type": "string" },
-        "businessLicense": { "type": "string" }
-      }
-    },
-    "personalInfo": {
-      "type": "object", 
-      "properties": {
-        "firstName": { "type": "string" },
-        "lastName": { "type": "string" },
-        "idNumber": { "type": "string" }
-      }
-    }
-  },
-  "if": { "properties": { "userType": { "const": "business" } } },
-  "then": {
-    "required": ["businessInfo"],
-    "properties": {
-      "businessInfo": { "required": ["companyName", "taxId"] }
-    }
-  },
-  "else": {
-    "required": ["personalInfo"],
-    "properties": {
-      "personalInfo": { "required": ["firstName", "lastName"] }
-    }
-  }
-}
-```
-
-#### Real-world E-commerce Validation
-```json
-{
-  "type": "object",
-  "properties": {
-    "productType": {
-      "type": "string",
-      "enum": ["physical", "digital", "service"]
-    },
-    "weight": { "type": "number", "minimum": 0 },
-    "dimensions": {
-      "type": "object",
-      "properties": {
-        "length": { "type": "number", "minimum": 0 },
-        "width": { "type": "number", "minimum": 0 },
-        "height": { "type": "number", "minimum": 0 }
-      }
-    },
-    "downloadUrl": { "type": "string", "format": "uri" },
-    "serviceArea": {
-      "type": "array",
-      "items": { "type": "string" }
-    }
-  },
-  "allOf": [
-    {
-      "if": { "properties": { "productType": { "const": "physical" } } },
-      "then": { "required": ["weight", "dimensions"] }
-    },
-    {
-      "if": { "properties": { "productType": { "const": "digital" } } },
-      "then": { "required": ["downloadUrl"] }
-    },
-    {
-      "if": { "properties": { "productType": { "const": "service" } } },
-      "then": { "required": ["serviceArea"] }
-    }
-  ]
-}
-```
-
-### 6.5 Performance & Indexing Hints
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "email": {
-      "type": "string",
-      "format": "email",
-      "_index": { "unique": true, "sparse": true }
-    },
-    "username": {
-      "type": "string",
-      "_index": { "unique": true }
-    },
-    "status": {
-      "type": "string",
-      "enum": ["active", "inactive"],
-      "_index": true
-    },
-    "createdAt": {
-      "type": "string",
-      "format": "date-time",
-      "_index": { "order": -1 }
-    },
-    "tags": {
-      "type": "array",
-      "items": { "type": "string" },
-      "_index": "text"
-    },
-    "location": {
-      "type": "object",
-      "properties": {
-        "coordinates": {
-          "type": "array",
-          "items": { "type": "number" }
-        }
-      },
-      "_index": "2dsphere"
-    }
-  }
-}
-```
-
-### 6.6 Naming Conventions
-```json
-{
-  "properties": {
-    "status": {
-      "type": "string",
-      "enum": ["active", "inactive", "pending", "banned"],
-      "default": "pending"
-    },
-    "role": {
-      "type": "string",
-      "enum": ["user", "admin", "moderator"],
-      "default": "user"
-    },
-    "language": {
-      "type": "string",
-      "enum": ["en", "vi", "ja", "ko"],
-      "default": "en"
-    }
-  }
-}
-```
-
-### 6.9 UI Schema Best Practices
-
-#### Widget Selection Guidelines
-```json
-{
-  "ui_schema": {
-    // Use appropriate input types
-    "email": { "ui:widget": "email" },        // Better than "text"
-    "password": { "ui:widget": "password" },  // Security
-    "url": { "ui:widget": "url" },           // Validation
-    "phone": { "ui:widget": "tel" },         // Mobile-friendly
-    
-    // Large text content
-    "description": {
-      "ui:widget": "textarea",
-      "ui:options": { "rows": 4 }
-    },
-    "content": {
-      "ui:widget": "richtext",               // HTML editor
-      "ui:options": { "toolbar": "full" }
-    },
-    
-    // Enums based on count
-    "status": {
-      "ui:widget": "radio",                  // <= 5 options
-      "ui:options": { "inline": true }
-    },
-    "country": {
-      "ui:widget": "select",                 // > 5 options
-      "ui:options": { "searchable": true }
-    },
-    
-    // Arrays based on type
-    "tags": {
-      "ui:widget": "tags",                   // Simple string array
-      "ui:options": { "allowNew": true }
-    },
-    "attachments": {
-      "ui:widget": "array",                  // Complex object array
-      "ui:options": { "orderable": true }
-    }
-  }
-}
-```
-
-#### User Experience Considerations
-```json
-{
-  "ui_schema": {
-    "price": {
-      "ui:widget": "number",
-      "ui:placeholder": "0.00",
-      "ui:help": "Enter price in USD",
-      "ui:options": {
-        "step": 0.01,
-        "min": 0,
-        "inputType": "number"
-      }
-    },
-    "category": {
-      "ui:widget": "select",
-      "ui:placeholder": "Choose category...",
-      "ui:help": "Select the most relevant category",
-      "ui:options": {
-        "searchable": true,
-        "clearable": true
-      }
-    },
-    "featured": {
-      "ui:widget": "checkbox",
-      "ui:title": "Feature this product",
-      "ui:help": "Featured products appear on homepage"
-    }
-  }
-}
-```
-
-## 8. API Query Parameters & Usage
-
-### 8.1 Filtering & Query Operators
-
-MongoREST hỗ trợ rich query parameters để filter, sort, và paginate data:
-
-#### Basic Filtering
-```bash
-# Exact match
-GET /api/user?name=eq.John
-GET /api/product?status=eq.active
-
-# Comparison operators
-GET /api/user?age=gte.18          # greater than or equal
-GET /api/user?age=lt.65           # less than
-GET /api/product?price=gte.100    # price >= 100
-GET /api/product?price=lt.500     # price < 500
-
-# Text operators
-GET /api/user?name=like.*john*    # contains 'john'
-GET /api/user?email=ilike.*@gmail.com*  # case-insensitive
-GET /api/product?name=starts.iPhone     # starts with 'iPhone'
-```
-
-#### Array & Object Filtering
-```bash
-# Array contains
-GET /api/user?tags=cs.{tech,programming}  # contains 'tech' or 'programming'
-GET /api/product?categories=cs.{electronics}
-
-# JSON/Object field filtering
-GET /api/user?preferences->>language=eq.en
-GET /api/user?address->>city=eq.Hanoi
-```
-
-#### Null/Not Null
-```bash
-GET /api/user?avatar=is.null      # avatar is null
-GET /api/user?avatar=not.is.null  # avatar is not null
-```
-
-### 8.2 Relationships & Embedding
-
-```bash
-# Include related data
-GET /api/user?select=*,orders(*)        # user with all orders
-GET /api/order?select=*,user(name,email) # order with user name & email
-GET /api/product?select=*,category(name),reviews(rating,comment)
-
-# Filter by relationship
-GET /api/order?user.status=eq.active    # orders from active users
-GET /api/product?category.name=eq.Electronics
-```
-
-### 8.3 Sorting & Pagination
-
-```bash
-# Sorting
-GET /api/user?order=name.asc        # sort by name ascending
-GET /api/user?order=createdAt.desc  # sort by creation date descending
-GET /api/product?order=price.asc,name.desc  # multiple sort fields
-
-# Pagination
-GET /api/user?limit=10&offset=20    # page 3 (20 records skip, 10 per page)
-GET /api/user?page=3&per_page=10    # alternative pagination syntax
-```
-
-### 8.4 Advanced Queries
-
-```bash
-# Complex conditions with AND/OR
-GET /api/user?and=(status.eq.active,age.gte.18)
-GET /api/product?or=(category.eq.electronics,price.lt.100)
-
-# Range queries
-GET /api/order?createdAt=gte.2024-01-01&createdAt=lt.2024-02-01
-GET /api/product?price=gte.100&price=lte.500
-
-# Full-text search (if enabled)
-GET /api/product?search=fts.smartphone&search_lang=english
-```
-
-### 8.5 Select & Projection
-
-```bash
-# Select specific fields
-GET /api/user?select=name,email,createdAt
-GET /api/product?select=name,price,category(name)
-
-# Exclude fields
-GET /api/user?select=*&exclude=password,internalNotes
-
-# Count only
-GET /api/user?select=count()
-GET /api/order?select=count()&status=eq.completed
-```
-
-### 8.6 Schema-Based Query Examples
-
-Based on our User and Product schemas:
-
-```bash
-# User queries
-GET /api/user?status=eq.active&emailVerified=eq.true
-GET /api/user?preferences->>language=eq.vi
-GET /api/user?address->>country=eq.VN
-GET /api/user?socialLinks=cs.{facebook}
-
-# Product queries  
-GET /api/product?category.name=eq.Electronics
-GET /api/product?price=gte.100&price=lte.500
-GET /api/product?tags=cs.{smartphone,android}
-GET /api/product?inStock=eq.true&status=eq.active
-
-# Order queries
-GET /api/order?user.status=eq.active
-GET /api/order?items.product.category.name=eq.Electronics
-GET /api/order?createdAt=gte.2024-01-01&status=eq.completed
-```
-
 ## Tổng kết
 
 Schema trong MongoREST cung cấp:
@@ -1705,210 +1087,3 @@ Schema trong MongoREST cung cấp:
 5. **Performance**: Built-in indexing và query optimization
 
 Next: [Detailed Schema Structure →](./schema-structure)
-
-## 6.10 Practical Widget Examples
-
-#### Complete Form Example - User Registration
-```json
-{
-  "type": "object",
-  "properties": {
-    "personalInfo": {
-      "type": "object",
-      "properties": {
-        "firstName": { "type": "string", "minLength": 1 },
-        "lastName": { "type": "string", "minLength": 1 },
-        "email": { "type": "string", "format": "email" },
-        "phone": { "type": "string", "pattern": "^\\+?[1-9]\\d{1,14}$" }
-      }
-    },
-    "preferences": {
-      "type": "object",
-      "properties": {
-        "newsletter": { "type": "boolean", "default": true },
-        "notifications": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": ["email", "sms", "push"]
-          }
-        },
-        "language": {
-          "type": "string",
-          "enum": ["en", "vi", "ja"],
-          "default": "en"
-        }
-      }
-    }
-  },
-  "ui_schema": {
-    "ui:order": ["personalInfo", "preferences"],
-    "personalInfo": {
-      "ui:widget": "fieldset",
-      "ui:title": "Personal Information",
-      "ui:description": "Please provide your basic information",
-      "firstName": {
-        "ui:widget": "text",
-        "ui:placeholder": "Enter first name",
-        "ui:autofocus": true
-      },
-      "lastName": {
-        "ui:widget": "text",
-        "ui:placeholder": "Enter last name"
-      },
-      "email": {
-        "ui:widget": "email",
-        "ui:placeholder": "your@email.com",
-        "ui:help": "We'll send verification to this email"
-      },
-      "phone": {
-        "ui:widget": "tel",
-        "ui:placeholder": "+1 (555) 123-4567",
-        "ui:options": {
-          "inputType": "tel"
-        }
-      }
-    },
-    "preferences": {
-      "ui:widget": "fieldset",
-      "ui:title": "Preferences",
-      "newsletter": {
-        "ui:widget": "checkbox",
-        "ui:title": "Subscribe to newsletter",
-        "ui:help": "Get updates about new features"
-      },
-      "notifications": {
-        "ui:widget": "checkboxes",
-        "ui:title": "Notification methods",
-        "ui:options": {
-          "inline": true,
-          "enumNames": ["Email", "SMS", "Push notifications"]
-        }
-      },
-      "language": {
-        "ui:widget": "select",
-        "ui:title": "Preferred language",
-        "ui:options": {
-          "enumNames": ["English", "Tiếng Việt", "日本語"]
-        }
-      }
-    }
-  }
-}
-```
-
-#### E-commerce Product Form
-```json
-{
-  "type": "object",
-  "properties": {
-    "basic": {
-      "type": "object",
-      "properties": {
-        "name": { "type": "string", "maxLength": 200 },
-        "description": { "type": "string", "maxLength": 5000 },
-        "category": { "type": "string" },
-        "tags": {
-          "type": "array",
-          "items": { "type": "string" }
-        }
-      }
-    },
-    "pricing": {
-      "type": "object", 
-      "properties": {
-        "price": { "type": "number", "minimum": 0 },
-        "comparePrice": { "type": "number", "minimum": 0 },
-        "currency": { "type": "string", "enum": ["USD", "EUR", "VND"] }
-      }
-    },
-    "inventory": {
-      "type": "object",
-      "properties": {
-        "sku": { "type": "string" },
-        "quantity": { "type": "integer", "minimum": 0 },
-        "trackInventory": { "type": "boolean", "default": true }
-      }
-    }
-  },
-  "ui_schema": {
-    "ui:layout": "tabs",
-    "basic": {
-      "ui:title": "Basic Information",
-      "ui:icon": "info",
-      "name": {
-        "ui:widget": "text",
-        "ui:placeholder": "Product name",
-        "ui:autofocus": true
-      },
-      "description": {
-        "ui:widget": "richtext",
-        "ui:options": {
-          "toolbar": ["bold", "italic", "link", "bulletList"],
-          "placeholder": "Describe your product..."
-        }
-      },
-      "category": {
-        "ui:widget": "autocomplete",
-        "ui:options": {
-          "dataSource": "/api/categories",
-          "valueField": "_id",
-          "labelField": "name",
-          "searchable": true
-        }
-      },
-      "tags": {
-        "ui:widget": "tags",
-        "ui:options": {
-          "allowNew": true,
-          "suggestions": ["featured", "new", "sale", "popular"]
-        }
-      }
-    },
-    "pricing": {
-      "ui:title": "Pricing",
-      "ui:icon": "dollar",
-      "price": {
-        "ui:widget": "currency",
-        "ui:placeholder": "0.00",
-        "ui:options": {
-          "currency": "USD",
-          "precision": 2
-        }
-      },
-      "comparePrice": {
-        "ui:widget": "currency",
-        "ui:placeholder": "0.00",
-        "ui:help": "Original price for discount display"
-      },
-      "currency": {
-        "ui:widget": "select",
-        "ui:options": {
-          "enumNames": ["US Dollar", "Euro", "Vietnamese Dong"]
-        }
-      }
-    },
-    "inventory": {
-      "ui:title": "Inventory",
-      "ui:icon": "package",
-      "sku": {
-        "ui:widget": "text",
-        "ui:placeholder": "SKU-001",
-        "ui:help": "Stock Keeping Unit"
-      },
-      "quantity": {
-        "ui:widget": "number",
-        "ui:placeholder": "0",
-        "ui:options": {
-          "step": 1,
-          "min": 0
-        }
-      },
-      "trackInventory": {
-        "ui:widget": "switch",
-        "ui:title": "Track inventory quantities"
-      }
-    }
-  }
-}
-```

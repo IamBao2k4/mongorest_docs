@@ -51,13 +51,24 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Features',
+      label: 'Work with data',
       items: [
         'features/plugin-system',
         'features/query-api',
-        'features/rbac',
+        // 'features/rbac',
         'features/relationships',
         'features/schema-field',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Plugin',
+      items: [
+        'plugin/index',
+        'plugin/support-plugin',
+        'plugin/validate-syntax',
+        'plugin/custom-validate-syntax',
+        'plugin/custom-plugin',
       ],
     },
     {
@@ -70,13 +81,13 @@ const sidebars = {
         'api-reference/debug-mode',
       ],
     },
-    {
-      type: 'category',
-      label: 'Reference',
-      items: [
-        'reference/operators',
-      ],
-    },
+    // {
+    //   type: 'category',
+    //   label: 'Reference',
+    //   items: [
+    //     'reference/operators',
+    //   ],
+    // },
   ],
 };
 

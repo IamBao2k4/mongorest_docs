@@ -17,7 +17,8 @@ Hướng dẫn chi tiết về các loại field types được hỗ trợ trong
     "minLength": 3,
     "maxLength": 20,
     "pattern": "^[a-zA-Z0-9_]+$",
-    "description": "Username for login"
+    "description": "Username for login",
+    "widget": "shortAnswer"
   }
 }
 ```
@@ -28,6 +29,12 @@ Hướng dẫn chi tiết về các loại field types được hỗ trợ trong
 - `pattern`: Regular expression pattern
 - `enum`: List of allowed values
 - `format`: Predefined formats
+
+**Widget options:**
+- `shortAnswer`: Single line text input
+- `password`: Password input with masked text
+- `textarea`: Multi-line text input
+- `UriKeyGen`: Auto-generate URL slug
 
 **Supported formats:**
 - `email`: Email address
@@ -49,7 +56,8 @@ Hướng dẫn chi tiết về các loại field types được hỗ trợ trong
     "minimum": 0,
     "maximum": 999999.99,
     "multipleOf": 0.01,
-    "exclusiveMinimum": true
+    "exclusiveMinimum": true,
+    "widget": "numberInput"
   }
 }
 ```
@@ -61,6 +69,10 @@ Hướng dẫn chi tiết về các loại field types được hỗ trợ trong
 - `exclusiveMaximum`: Make maximum exclusive
 - `multipleOf`: Value must be multiple of this
 
+**Widget options:**
+- `numberInput`: Number input field
+- `range`: Slider input
+
 ### Integer
 
 ```json
@@ -69,7 +81,8 @@ Hướng dẫn chi tiết về các loại field types được hỗ trợ trong
     "type": "integer",
     "minimum": 0,
     "maximum": 9999,
-    "default": 1
+    "default": 1,
+    "widget": "numberInput"
   }
 }
 ```
@@ -83,10 +96,16 @@ Same validation options as number, but only accepts whole numbers.
   "isActive": {
     "type": "boolean",
     "default": true,
-    "description": "Whether the item is active"
+    "description": "Whether the item is active",
+    "widget": "boolean",
+    "appearance": "checkbox"
   }
 }
 ```
+
+**Widget options:**
+- `boolean`: Checkbox or toggle switch
+- `appearance`: Visual style (`checkbox`, `switch`)
 
 ### Null
 
@@ -111,16 +130,19 @@ Same validation options as number, but only accepts whole numbers.
     "properties": {
       "firstName": {
         "type": "string",
-        "minLength": 1
+        "minLength": 1,
+        "widget": "shortAnswer"
       },
       "lastName": {
         "type": "string",
-        "minLength": 1
+        "minLength": 1,
+        "widget": "shortAnswer"
       },
       "age": {
         "type": "integer",
         "minimum": 0,
-        "maximum": 150
+        "maximum": 150,
+        "widget": "numberInput"
       }
     },
     "required": ["firstName", "lastName"],
@@ -171,9 +193,9 @@ Same validation options as number, but only accepts whole numbers.
     "items": {
       "type": "object",
       "properties": {
-        "street": { "type": "string" },
-        "city": { "type": "string" },
-        "zipCode": { "type": "string" }
+        "street": { "type": "string", "widget": "shortAnswer" },
+        "city": { "type": "string", "widget": "shortAnswer" },
+        "zipCode": { "type": "string", "widget": "shortAnswer" }
       },
       "required": ["street", "city"]
     }
@@ -190,7 +212,12 @@ Same validation options as number, but only accepts whole numbers.
   "userId": {
     "type": "string",
     "pattern": "^[0-9a-fA-F]{24}$",
-    "description": "MongoDB ObjectId"
+    "description": "MongoDB ObjectId",
+    "widget": "relation",
+    "typeRelation": {
+      "entity": "users",
+      "type": "n-1"
+    }
   }
 }
 ```
@@ -202,10 +229,18 @@ Same validation options as number, but only accepts whole numbers.
   "createdAt": {
     "type": "string",
     "format": "date-time",
-    "description": "ISO 8601 date-time string"
+    "description": "ISO 8601 date-time string",
+    "widget": "dateTime",
+    "displayFormat": "yyyy/MM/dd HH:mm:ss",
+    "mode": "dateTime"
   }
 }
 ```
+
+**Widget options for dates:**
+- `date`: Date only picker
+- `time`: Time only picker
+- `dateTime`: Combined date and time picker
 
 ### GeoJSON
 
@@ -236,7 +271,8 @@ Same validation options as number, but only accepts whole numbers.
 {
   "metadata": {
     "type": ["object", "array", "string", "number", "boolean", "null"],
-    "description": "Flexible metadata field"
+    "description": "Flexible metadata field",
+    "widget": "dataWidget"
   }
 }
 ```
@@ -250,7 +286,8 @@ Same validation options as number, but only accepts whole numbers.
   "price": {
     "type": ["number", "null"],
     "minimum": 0,
-    "description": "Price or null if not set"
+    "description": "Price or null if not set",
+    "widget": "numberInput"
   }
 }
 ```
@@ -262,7 +299,8 @@ Same validation options as number, but only accepts whole numbers.
   "properties": {
     "accountType": {
       "type": "string",
-      "enum": ["personal", "business"]
+      "enum": ["personal", "business"],
+      "widget": "radio"
     }
   },
   "if": {
@@ -274,11 +312,13 @@ Same validation options as number, but only accepts whole numbers.
     "properties": {
       "companyName": {
         "type": "string",
-        "minLength": 1
+        "minLength": 1,
+        "widget": "shortAnswer"
       },
       "taxId": {
         "type": "string",
-        "pattern": "^\\d{2}-\\d{7}$"
+        "pattern": "^\\d{2}-\\d{7}$",
+        "widget": "shortAnswer"
       }
     },
     "required": ["companyName", "taxId"]
@@ -298,7 +338,13 @@ Same validation options as number, but only accepts whole numbers.
       "approved": "Approved and active",
       "rejected": "Rejected by admin"
     },
-    "default": "pending"
+    "default": "pending",
+    "widget": "select",
+    "choices": [
+      { "key": "pending", "value": "Awaiting review" },
+      { "key": "approved", "value": "Approved and active" },
+      { "key": "rejected", "value": "Rejected by admin" }
+    ]
   }
 }
 ```
@@ -326,7 +372,8 @@ Same validation options as number, but only accepts whole numbers.
     "format": "email",
     "maxLength": 255,
     "transform": ["lowercase", "trim"],
-    "uniqueInDb": true
+    "uniqueInDb": true,
+    "widget": "shortAnswer"
   }
 }
 ```
@@ -338,7 +385,8 @@ Same validation options as number, but only accepts whole numbers.
   "phone": {
     "type": "string",
     "pattern": "^\\+?[1-9]\\d{1,14}$",
-    "description": "E.164 format phone number"
+    "description": "E.164 format phone number",
+    "widget": "shortAnswer"
   }
 }
 ```
@@ -351,7 +399,8 @@ Same validation options as number, but only accepts whole numbers.
     "type": "string",
     "format": "uri",
     "pattern": "^https?://",
-    "maxLength": 2048
+    "maxLength": 2048,
+    "widget": "href"
   }
 }
 ```
@@ -366,7 +415,8 @@ Same validation options as number, but only accepts whole numbers.
     "maxLength": 128,
     "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]",
     "description": "Must contain uppercase, lowercase, number and special character",
-    "writeOnly": true
+    "writeOnly": true,
+    "widget": "password"
   }
 }
 ```
@@ -380,12 +430,14 @@ Same validation options as number, but only accepts whole numbers.
     "minimum": 0,
     "maximum": 999999.99,
     "multipleOf": 0.01,
-    "description": "Amount in USD"
+    "description": "Amount in USD",
+    "widget": "numberInput"
   },
   "currency": {
     "type": "string",
     "enum": ["USD", "EUR", "GBP", "JPY"],
-    "default": "USD"
+    "default": "USD",
+    "widget": "select"
   }
 }
 ```
@@ -398,12 +450,14 @@ Same validation options as number, but only accepts whole numbers.
 {
   "startDate": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "widget": "date"
   },
   "endDate": {
     "type": "string",
     "format": "date",
-    "minimumDate": { "$data": "1/startDate" }
+    "minimumDate": { "$data": "1/startDate" },
+    "widget": "date"
   }
 }
 ```
@@ -421,7 +475,8 @@ Same validation options as number, but only accepts whole numbers.
       "collection": "users",
       "field": "username",
       "caseSensitive": false
-    }
+    },
+    "widget": "shortAnswer"
   }
 }
 ```
@@ -441,7 +496,8 @@ Same validation options as number, but only accepts whole numbers.
         "name": "validSkuFormat",
         "params": { "prefix": "PROD" }
       }
-    ]
+    ],
+    "widget": "UriKeyGen"
   }
 }
 ```
@@ -455,11 +511,13 @@ Same validation options as number, but only accepts whole numbers.
   "email": {
     "type": "string",
     "format": "email",
-    "transform": ["lowercase", "trim"]
+    "transform": ["lowercase", "trim"],
+    "widget": "shortAnswer"
   },
   "name": {
     "type": "string",
-    "transform": ["trim", "titlecase"]
+    "transform": ["trim", "titlecase"],
+    "widget": "shortAnswer"
   }
 }
 ```
@@ -478,7 +536,8 @@ Same validation options as number, but only accepts whole numbers.
   "price": {
     "type": "number",
     "transform": ["round:2"],
-    "minimum": 0
+    "minimum": 0,
+    "widget": "numberInput"
   }
 }
 ```
@@ -496,13 +555,15 @@ Same validation options as number, but only accepts whole numbers.
       "maxLength": 20,
       "pattern": "^[a-zA-Z0-9_]+$",
       "uniqueInDb": true,
-      "transform": ["lowercase", "trim"]
+      "transform": ["lowercase", "trim"],
+      "widget": "shortAnswer"
     },
     "email": {
       "type": "string",
       "format": "email",
       "uniqueInDb": true,
-      "transform": ["lowercase", "trim"]
+      "transform": ["lowercase", "trim"],
+      "widget": "shortAnswer"
     },
     "profile": {
       "type": "object",
@@ -511,31 +572,38 @@ Same validation options as number, but only accepts whole numbers.
           "type": "string",
           "minLength": 1,
           "maxLength": 50,
-          "transform": ["trim", "titlecase"]
+          "transform": ["trim", "titlecase"],
+          "widget": "shortAnswer"
         },
         "lastName": {
           "type": "string",
           "minLength": 1,
           "maxLength": 50,
-          "transform": ["trim", "titlecase"]
+          "transform": ["trim", "titlecase"],
+          "widget": "shortAnswer"
         },
         "bio": {
           "type": "string",
-          "maxLength": 500
+          "maxLength": 500,
+          "widget": "textarea"
         },
         "avatar": {
           "type": "string",
-          "format": "uri"
+          "format": "uri",
+          "widget": "file",
+          "meta": "Upload avatar image"
         },
         "birthDate": {
           "type": "string",
-          "format": "date"
+          "format": "date",
+          "widget": "date",
+          "displayFormat": "yyyy/MM/dd"
         },
         "preferences": {
           "type": "object",
           "properties": {
-            "newsletter": { "type": "boolean", "default": true },
-            "notifications": { "type": "boolean", "default": true }
+            "newsletter": { "type": "boolean", "default": true, "widget": "boolean" },
+            "notifications": { "type": "boolean", "default": true, "widget": "boolean" }
           }
         }
       }
@@ -547,7 +615,13 @@ Same validation options as number, but only accepts whole numbers.
         "enum": ["user", "moderator", "admin"]
       },
       "default": ["user"],
-      "minItems": 1
+      "minItems": 1,
+      "widget": "checkbox",
+      "choices": [
+        { "key": "user", "value": "User" },
+        { "key": "moderator", "value": "Moderator" },
+        { "key": "admin", "value": "Admin" }
+      ]
     }
   },
   "required": ["username", "email"]
@@ -562,21 +636,25 @@ Same validation options as number, but only accepts whole numbers.
     "sku": {
       "type": "string",
       "pattern": "^[A-Z]{3}-[0-9]{4}$",
-      "uniqueInDb": true
+      "uniqueInDb": true,
+      "widget": "UriKeyGen"
     },
     "name": {
       "type": "string",
       "minLength": 1,
-      "maxLength": 200
+      "maxLength": 200,
+      "widget": "shortAnswer"
     },
     "description": {
       "type": "string",
-      "maxLength": 2000
+      "maxLength": 2000,
+      "widget": "textarea"
     },
     "price": {
       "type": "number",
       "minimum": 0,
-      "multipleOf": 0.01
+      "multipleOf": 0.01,
+      "widget": "numberInput"
     },
     "inventory": {
       "type": "object",
@@ -584,17 +662,20 @@ Same validation options as number, but only accepts whole numbers.
         "quantity": {
           "type": "integer",
           "minimum": 0,
-          "default": 0
+          "default": 0,
+          "widget": "numberInput"
         },
         "reserved": {
           "type": "integer",
           "minimum": 0,
-          "default": 0
+          "default": 0,
+          "widget": "numberInput"
         },
         "available": {
           "type": "integer",
           "minimum": 0,
-          "readOnly": true
+          "readOnly": true,
+          "widget": "numberInput"
         }
       }
     },
@@ -603,14 +684,17 @@ Same validation options as number, but only accepts whole numbers.
       "properties": {
         "color": {
           "type": "string",
-          "enum": ["red", "blue", "green", "black", "white"]
+          "enum": ["red", "blue", "green", "black", "white"],
+          "widget": "select"
         },
         "size": {
           "type": "string",
-          "enum": ["XS", "S", "M", "L", "XL", "XXL"]
+          "enum": ["XS", "S", "M", "L", "XL", "XXL"],
+          "widget": "radio"
         },
         "material": {
-          "type": "string"
+          "type": "string",
+          "widget": "shortAnswer"
         }
       },
       "additionalProperties": {
@@ -624,40 +708,63 @@ Same validation options as number, but only accepts whole numbers.
         "properties": {
           "url": {
             "type": "string",
-            "format": "uri"
+            "format": "uri",
+            "widget": "file"
           },
           "alt": {
-            "type": "string"
+            "type": "string",
+            "widget": "shortAnswer"
           },
           "isPrimary": {
             "type": "boolean",
-            "default": false
+            "default": false,
+            "widget": "boolean"
           }
         },
         "required": ["url"]
       },
       "minItems": 1,
-      "maxItems": 10
+      "maxItems": 10,
+      "widget": "multipleFiles"
     }
   }
 }
 ```
 
+## Widget Types Reference
+
+### Available Widgets by Type
+
+| Data Type | Available Widgets | Common Use Case |
+|-----------|------------------|-----------------|
+| **string** | `shortAnswer`, `password`, `textarea`, `UriKeyGen` | Text inputs |
+| **string (date)** | `date`, `time`, `dateTime` | Date/time pickers |
+| **string (enum)** | `select`, `radio`, `checkbox` | Choice selections |
+| **string (file)** | `file`, `multipleFiles`, `multiImage` | File uploads |
+| **string (special)** | `href`, `icon`, `function`, `condition` | Special inputs |
+| **number/integer** | `numberInput`, `range` | Numeric inputs |
+| **boolean** | `boolean` | True/false toggles |
+| **object** | `dataWidget` | Complex data |
+| **array** | Array editor built-in | Lists |
+| **relation** | `relation` | Foreign key selection |
+
 ## Best Practices
 
-### 1. Use Appropriate Types
+### 1. Use Appropriate Types and Widgets
 
 ```json
-// ✅ Good: Specific types
+// ✅ Good: Specific types with appropriate widgets
 {
-  "age": { "type": "integer", "minimum": 0 },
-  "price": { "type": "number", "multipleOf": 0.01 }
+  "age": { "type": "integer", "minimum": 0, "widget": "numberInput" },
+  "email": { "type": "string", "format": "email", "widget": "shortAnswer" },
+  "bio": { "type": "string", "maxLength": 500, "widget": "textarea" }
 }
 
-// ❌ Bad: Everything as string
+// ❌ Bad: Everything as string with default widget
 {
   "age": { "type": "string" },
-  "price": { "type": "string" }
+  "email": { "type": "string" },
+  "bio": { "type": "string" }
 }
 ```
 
@@ -669,7 +776,8 @@ Same validation options as number, but only accepts whole numbers.
   "email": {
     "type": "string",
     "format": "email",
-    "maxLength": 255
+    "maxLength": 255,
+    "widget": "shortAnswer"
   }
 }
 
@@ -682,11 +790,17 @@ Same validation options as number, but only accepts whole numbers.
 ### 3. Use Enums for Fixed Values
 
 ```json
-// ✅ Good: Enum for known values
+// ✅ Good: Enum with select widget
 {
   "status": {
     "type": "string",
-    "enum": ["active", "inactive", "pending"]
+    "enum": ["active", "inactive", "pending"],
+    "widget": "select",
+    "choices": [
+      { "key": "active", "value": "Active" },
+      { "key": "inactive", "value": "Inactive" },
+      { "key": "pending", "value": "Pending" }
+    ]
   }
 }
 
@@ -705,7 +819,8 @@ Same validation options as number, but only accepts whole numbers.
     "type": "number",
     "minimum": 0,
     "maximum": 1,
-    "description": "Tax rate as decimal (0.1 = 10%)"
+    "description": "Tax rate as decimal (0.1 = 10%)",
+    "widget": "numberInput"
   }
 }
 ```
@@ -713,12 +828,13 @@ Same validation options as number, but only accepts whole numbers.
 ### 5. Set Sensible Defaults
 
 ```json
-// ✅ Good: Helpful defaults
+// ✅ Good: Helpful defaults with proper widget
 {
   "status": {
     "type": "string",
     "enum": ["draft", "published"],
-    "default": "draft"
+    "default": "draft",
+    "widget": "radio"
   }
 }
 ```
@@ -732,5 +848,6 @@ Field types trong MongoREST:
 3. **Validation-rich**: Extensive validation options
 4. **Transformable**: Built-in transformations
 5. **Extensible**: Custom validators support
+6. **Widget-enabled**: Rich UI widget types for enhanced user experience
 
-MongoREST field types provide a powerful foundation for building robust data schemas that work seamlessly with MongoDB.
+MongoREST field types provide a powerful foundation for building robust data schemas that work seamlessly with MongoDB while offering flexible UI presentation options through various widget types.
